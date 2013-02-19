@@ -164,6 +164,14 @@ data/rc_models/et4x00/Makefile
 data/rc_models/et6x00/Makefile
 data/rc_models/et9500/Makefile
 data/rc_models/et9x00/Makefile
+data/rc_models/tm/Makefile
+data/rc_models/tm/tmtwinoe/Makefile
+data/rc_models/tm/tm2toe/Makefile
+data/rc_models/tm/tmsingleoe/Makefile
+data/rc_models/tm/ios100/Makefile
+data/rc_models/tm/ios200/Makefile
+data/rc_models/tm/ios300/Makefile
+data/rc_models/tm/tmnanooe/Makefile
 data/rc_models/vu/Makefile
 data/rc_models/xp1000/Makefile
 data/skin_default/Makefile

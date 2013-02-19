@@ -1,4 +1,4 @@
-installdir = $(pkgdatadir)/rc_models/et4x00
+installdir = $(pkgdatadir)/rc_models/tm/tmtwinoe
 
 dist_install_DATA = \
 	rc.png \
