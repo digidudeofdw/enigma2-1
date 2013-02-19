@@ -8,6 +8,7 @@ class RcModel:
 	RCTYPE_VU = 4
 	RCTYPE_ET4X00 = 5
 	RCTYPE_XP1000 = 6
+	RCTYPE_TMTWIN = 7
 
 	def __init__(self):
 		self.currentRcType = self.RCTYPE_DMM
@@ -25,7 +26,11 @@ class RcModel:
 		return out.split()[0]
 
 	def readRcTypeFromProc(self):
-		if os.path.exists('/proc/stb/info/boxtype'):
+		if os.path.exists('/proc/stb/info/hwmodel'):
+			model = self.readFile('/proc/stb/info/hwmodel')
+			if model == "tmtwinoe":
+				self.currentRcType = self.RCTYPE_TMTWIN
+		elif os.path.exists('/proc/stb/info/boxtype'):
 			model = self.readFile('/proc/stb/info/boxtype')
 			if model.startswith('et') or model.startswith('xp'):
 				rc = self.readFile('/proc/stb/ir/rc/type')
@@ -45,7 +50,6 @@ class RcModel:
 					self.currentRcType = self.RCTYPE_ET4X00
 				elif rc == '14':
 					self.currentRcType = self.RCTYPE_XP1000
-
 		elif os.path.exists('/proc/stb/info/vumodel'):
 			self.currentRcType = self.RCTYPE_VU
 
@@ -60,6 +64,8 @@ class RcModel:
 			return '/usr/share/enigma2/rc_models/et4x00/'
 		elif self.currentRcType == self.RCTYPE_XP1000:
 			return '/usr/share/enigma2/rc_models/xp1000/'
+		elif self.currentRcType == self.RCTYPE_TMTWIN:
+			return '/usr/share/enigma2/rc_models/tm/tmtwinoe/'
 		elif self.currentRcType == self.RCTYPE_VU:
 			return '/usr/share/enigma2/rc_models/vu/'
 
