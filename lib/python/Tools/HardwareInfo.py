@@ -9,7 +9,8 @@ class HardwareInfo:
 
 		HardwareInfo.device_name = "unknown"
 		try:
-			file = open("/proc/stb/info/model", "r")
+#			file = open("/proc/stb/info/model", "r")
+			file = open("/proc/stb/info/hwmodel", "r")
 			HardwareInfo.device_name = file.readline().strip()
 			file.close()
 			try:
@@ -44,4 +45,55 @@ class HardwareInfo:
 		return HardwareInfo.device_version
 
 	def has_hdmi(self):
-		return (HardwareInfo.device_name == 'dm7020hd' or HardwareInfo.device_name == 'dm800se' or HardwareInfo.device_name == 'dm500hd' or (HardwareInfo.device_name == 'dm8000' and HardwareInfo.device_version != None))
+#		return (HardwareInfo.device_name == 'dm7020hd' or HardwareInfo.device_name == 'dm800se' or HardwareInfo.device_name == 'dm500hd' or (HardwareInfo.device_name == 'dm8000' and HardwareInfo.device_version != None))
+		DEVICES_WITHOUT_HDMI = []
+		if HardwareInfo.device_name in DEVICES_WITHOUT_HDMI:
+			return False
+		else:
+			return True
+
+	def has_rfmod(self):
+		DEVICES_WITHOUT_RFMOD = [ 'tmsingle', 'tmsinglemini', 'ios300hd' , 'tmnanooe' ]
+		if HardwareInfo.device_name in DEVICES_WITHOUT_RFMOD:
+			return False
+		else:
+			return True
+
+	def has_micom(self):
+# var SystemInfo["FrontpanelDisplay"], SystemInfo["OledDisplay"] functioning similar with this function looks like not work properly on our device
+			#DEVICES_WITHOUT_MICOM = [ 'single', 'ios300hd' ]
+# ios300 will have micom 
+		DEVICES_WITHOUT_MICOM = []
+		if HardwareInfo.device_name in DEVICES_WITHOUT_MICOM:
+			return False
+		else:
+			return True
+
+	def has_vcr(self):
+		DEVICES_WITHOUT_VCR = [ 'tmsingle', 'tmsinglemini', 'tm2toe', 'ios300hd', 'ios200hd' , 'tmnanooe' ]
+		if HardwareInfo.device_name in DEVICES_WITHOUT_VCR:
+			return False
+		else:
+			return True
+
+	def has_yuv(self):
+		DEVICES_WITHOUT_YUV = [ 'tmsingle', 'tmsinglemini', 'tm2toe', 'ios300hd', 'ios200hd' , 'tmnanooe' ]
+		if HardwareInfo.device_name in DEVICES_WITHOUT_YUV:
+			return False
+		else:
+			return True
+
+	def support_1080p(self):
+		DEVICES_WITHOUT_1080P = []
+		if HardwareInfo.device_name in DEVICES_WITHOUT_1080P:
+			return False
+		else:
+			return True
+
+	def has_scart(self):
+		DEVICES_WITHOUT_SCART = [ 'tmsinglemini', 'tmnanooe' ]
+		if HardwareInfo.device_name in DEVICES_WITHOUT_SCART:
+			return False
+		else:
+			return True
+# ]

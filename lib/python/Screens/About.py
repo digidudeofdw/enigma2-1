@@ -14,6 +14,19 @@ class About(Screen):
 
 
 		AboutText = _("Hardware: ") + about.getHardwareTypeString() + "\n"
+
+		import fcntl, socket, struct
+		def getHwAddr(ifname):
+			s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+			info = fcntl.ioctl(s.fileno(), 0x8927,  struct.pack('256s', ifname[:15]))
+			return ''.join(['%02x:' % ord(char) for char in info[18:24]])[:-1]
+		macaddress = getHwAddr("eth0") 
+		self["MacAddress"] = StaticText(_("Mac Address:") + " " + macaddress)
+		AboutText += _("Mac Address:") + " " + macaddress + "\n"
+
+		from Tools.HardwareInfo import HardwareInfo
+		if HardwareInfo().has_micom():
+			AboutText += _("Micom Version: ") + about.getMicomVersionString() + "\n"
 		AboutText += _("Image: ") + about.getImageTypeString() + "\n"
 		AboutText += _("Kernel version: ") + about.getKernelVersionString() + "\n"
 
@@ -25,6 +38,9 @@ class About(Screen):
 		self["ImageVersion"] = StaticText(ImageVersion)
 		AboutText += ImageVersion + "\n"
 
+# [iq
+		AboutText += _("Powered by 4D") + "\n"
+# iq]
 		fp_version = getFPVersion()
 		if fp_version is None:
 			fp_version = ""
@@ -73,6 +89,63 @@ class About(Screen):
 				"up": self["AboutScrollLabel"].pageUp,
 				"down": self["AboutScrollLabel"].pageDown
 			})
+
+		self["hidden_action"] = ActionMap(["ColorActions"],
+		{
+			"red": self.red_action,
+			"blue": self.blue_action,
+			"info": self.info_action,
+			"1": self.first_action,
+			"2": self.second_action,
+			"3": self.third_action,
+		},-1)
+
+		self.key_status = -1
+
+	def red_action(self):
+		if self.key_status == 1:
+			self.key_status = 2
+		else:
+			self.key_status = -1
+
+	def blue_action(self):
+		if self.key_status == 2:
+			from Screens.ChangeRCU import ChangeRCU
+			self.session.open(ChangeRCU)
+			self.close()
+		else:
+			self.key_status = 1
+
+	def info_action(self):
+		if self.key_status == 1:
+			self.key_status = 2
+			print "info_action two"
+		else:
+			self.key_status = 1
+			print "info_action one"
+
+	def first_action(self):
+		if self.key_status == 2:
+			self.key_status = 3
+			print "first_action"
+		else:
+			self.key_status = -1
+	
+	def second_action(self):
+		if self.key_status == 3:
+			print "second_action"
+			self.key_status = 4
+		else:
+			self.key_status = -1 
+
+	def third_action(self):
+		if self.key_status == 4:
+			print "third_action"
+			from Screens.ModeSetup import Mode4DSSetup 
+			self.session.open(Mode4DSSetup)
+			self.close()
+		else:
+			self.key_status == -1
 
 	def showTranslationInfo(self):
 		self.session.open(TranslationInfo)

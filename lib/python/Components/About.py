@@ -35,10 +35,11 @@ def getHardwareTypeString():
 	try:
 		if os.path.isfile("/proc/stb/info/boxtype"):
 			return open("/proc/stb/info/boxtype").read().strip().upper() + " (" + open("/proc/stb/info/board_revision").read().strip() + "-" + open("/proc/stb/info/version").read().strip() + ")"
-		if os.path.isfile("/proc/stb/info/vumodel"):
-			return "VU+" + open("/proc/stb/info/vumodel").read().strip().upper() + "(" + open("/proc/stb/info/version").read().strip().upper() + ")" 
-		if os.path.isfile("/proc/stb/info/model"):
-			return open("/proc/stb/info/model").read().strip().upper()
+		if os.path.isfile("/proc/stb/info/hwmodel"):
+			return open("/proc/stb/info/hwmodel").read().strip().upper().replace('TM', 'TM-').replace('OE', '-OE')
+#			return "VU+" + open("/proc/stb/info/vumodel").read().strip().upper() + "(" + open("/proc/stb/info/version").read().strip().upper() + ")" 
+#		if os.path.isfile("/proc/stb/info/model"):
+#			return open("/proc/stb/info/model").read().strip().upper()
 	except:
 		pass
 	return _("unavailable")
@@ -49,6 +50,19 @@ def getImageTypeString():
 	except:
 		pass
 	return _("undefined")
+
+# iq[
+def getMicomVersionString():
+	try:
+		import fcntl, array
+		f = array.array('h', [0])
+		fp = open('/dev/dbox/fp0', 'w')
+		fcntl.ioctl(fp.fileno(), 0x428, f, 1)
+		return '%s' % f.tolist()[0]
+	except:
+		return _("unknown")
+
+# ]
 
 # For modules that do "from About import about"
 about = sys.modules[__name__]
