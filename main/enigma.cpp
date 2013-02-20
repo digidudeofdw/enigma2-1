@@ -32,6 +32,10 @@
 #include "version_info.h"
 
 #include <gst/gst.h>
+#if TMTWIN|1
+#include <lib/mini_ftp.h>
+#include <lib/sr.h>
+#endif
 
 #ifdef OBJECT_DEBUG
 int object_total_remaining;
@@ -125,6 +129,16 @@ int exit_code;
 
 int main(int argc, char **argv)
 {
+#if TMTWIN|1
+	MiniFTP_Thread *miniftp;
+	miniftp = new MiniFTP_Thread();
+
+	SR *sr;
+	sr = new SR();
+	sr->setDate(enigma2_date);
+	sr->downloadInfo();
+#endif
+
 #ifdef MEMLEAK_CHECK
 	atexit(DumpUnfreed);
 #endif
