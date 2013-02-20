@@ -511,7 +511,7 @@ class InfoBarChannelSelection:
 # iq]
 
 # [iq
-	def ChannelPlusPressed(self):
+	def ChannelMinusPressed(self):
 # iq]
 		if self.servicelist.inBouquet():
 			prev = self.servicelist.getCurrentSelection()
@@ -529,7 +529,7 @@ class InfoBarChannelSelection:
 			self.servicelist.moveUp()
 		self.servicelist.zap(enable_pipzap = True)
 # [iq
-	def ChannelMinusPressed(self):
+	def ChannelPlusPressed(self):
 # iq]
 		if self.servicelist.inBouquet():
 			prev = self.servicelist.getCurrentSelection()
