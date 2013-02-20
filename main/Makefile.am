@@ -41,6 +41,9 @@ enigma2_LDADD_WHOLE = \
 	$(top_builddir)/lib/network/libenigma_network.a \
 	$(top_builddir)/lib/service/libenigma_service.a
 
+enigma2_LDADD_WHOLE += $(top_builddir)/main/libminiftp.a
+enigma2_LDADD_WHOLE += $(top_builddir)/main/libsr.a
+
 enigma2_LDADD = \
 	@BASE_LIBS@ \
 	@LIBGIF_LIBS@ \
