@@ -123,10 +123,10 @@ class TempFanControl(Screen, ConfigListScreen):
 		
 		self.list = []
 		for count in range(fancontrol.getFanCount()):
-			self.list.append(getConfigListEntry(_("Fan %d voltage") % (count + 1), fancontrol.getConfig(count).vlt))
+#			self.list.append(getConfigListEntry(_("Fan %d Voltage") % (count + 1), fancontrol.getConfig(count).vlt))		# [iq]
 			self.list.append(getConfigListEntry(_("Fan %d PWM") % (count + 1), fancontrol.getConfig(count).pwm))
-			self.list.append(getConfigListEntry(_("Standby fan %d voltage") % (count + 1), fancontrol.getConfig(count).vlt_standby))
-			self.list.append(getConfigListEntry(_("Standby fan %d PWM") % (count + 1), fancontrol.getConfig(count).pwm_standby))
+#			self.list.append(getConfigListEntry(_("Standby Fan %d Voltage") % (count + 1), fancontrol.getConfig(count).vlt_standby))		# [iq]
+			self.list.append(getConfigListEntry(_("Standby Fan %d PWM") % (count + 1), fancontrol.getConfig(count).pwm_standby))
 		
 		ConfigListScreen.__init__(self, self.list, session = self.session)
 		#self["config"].list = self.list
@@ -144,17 +144,17 @@ class TempFanControl(Screen, ConfigListScreen):
 
 	def save(self):
 		for count in range(fancontrol.getFanCount()):
-			fancontrol.getConfig(count).vlt.save()
+#			fancontrol.getConfig(count).vlt.save()		# [iq]
 			fancontrol.getConfig(count).pwm.save()
-			fancontrol.getConfig(count).vlt_standby.save()
+#			fancontrol.getConfig(count).vlt_standby.save()		# [iq]
 			fancontrol.getConfig(count).pwm_standby.save()
 		self.close()
 
 	def revert(self):
 		for count in range(fancontrol.getFanCount()):
-			fancontrol.getConfig(count).vlt.load()
+#			fancontrol.getConfig(count).vlt.load()		# [iq]
 			fancontrol.getConfig(count).pwm.load()
-			fancontrol.getConfig(count).vlt_standby.load()
+#			fancontrol.getConfig(count).vlt_standby.load()		# [iq]
 			fancontrol.getConfig(count).pwm_standby.load()
 		self.close()
 
@@ -164,8 +164,15 @@ def main(session, **kwargs):
 def startMenu(menuid):
 	if menuid != "system":
 		return []
-	return [(_("Temperature and fan control"), main, "tempfancontrol", 80)]
+	return [(_("Fan control"), main, "tempfancontrol", 80)]
 
 def Plugins(**kwargs):
-	return PluginDescriptor(name = _("Temperature and fan control"), description = _("Temperature and fan control"), where = PluginDescriptor.WHERE_MENU, needsRestart = False, fnc = startMenu)
+	from Tools.HardwareInfo import HardwareInfo
+	if HardwareInfo().get_device_name() == "ios300hd":
+		return []
+	elif HardwareInfo().get_device_name() == "tmsinglemini":
+		return []
+	elif HardwareInfo().get_device_name() == "tmnanooe":
+		return []
+	return PluginDescriptor(name = "Fan control", description = _("Fan control"), where = PluginDescriptor.WHERE_MENU, needsRestart = False, fnc = startMenu)
 
