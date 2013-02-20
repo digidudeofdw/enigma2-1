@@ -48,8 +48,8 @@ keyDescriptions = [{
 		KEYIDS["KEY_RECORD"]: ("RECORD",)
 	},
 	{
-		KEYIDS["BTN_0"]: ("UP", "fp"),
-		KEYIDS["BTN_1"]: ("DOWN", "fp"),
+		KEYIDS["BTN_0"]: ("CH+",),
+		KEYIDS["BTN_1"]: ("CH-",),
 		KEYIDS["KEY_OK"]: ("OK", ""),
 		KEYIDS["KEY_UP"]: ("UP",),
 		KEYIDS["KEY_DOWN"]: ("DOWN",),
@@ -70,8 +70,8 @@ keyDescriptions = [{
 		KEYIDS["KEY_NEXT"]: ("ARROWRIGHT",),
 		KEYIDS["KEY_PREVIOUS"]: ("ARROWLEFT",),
 		KEYIDS["KEY_PREVIOUSSONG"]: ("RED", "SHIFT"),
-		KEYIDS["KEY_PLAYPAUSE"]: ("YELLOW", "SHIFT"),
-		KEYIDS["KEY_PLAY"]: ("GREEN", "SHIFT"),
+		KEYIDS["KEY_PLAYPAUSE"]: ("PLAYPAUSE",),
+		KEYIDS["KEY_PLAY"]: ("PLAY",),
 		KEYIDS["KEY_NEXTSONG"]: ("BLUE", "SHIFT"),
 		KEYIDS["KEY_CHANNELUP"]: ("BOUQUET+",),
 		KEYIDS["KEY_CHANNELDOWN"]: ("BOUQUET-",),
@@ -86,8 +86,14 @@ keyDescriptions = [{
 		KEYIDS["KEY_8"]: ("8",),
 		KEYIDS["KEY_9"]: ("9",),
 		KEYIDS["KEY_EXIT"]: ("EXIT",),
-		KEYIDS["KEY_STOP"]: ("TV", "SHIFT"),
-		KEYIDS["KEY_RECORD"]: ("RADIO", "SHIFT")
+		KEYIDS["KEY_STOP"]: ("STOP",),
+		KEYIDS["KEY_SUBTITLE"]: ("SUBTITLE",),
+		KEYIDS["KEY_RECORD"]: ("RECORD",),
+		KEYIDS["KEY_PROGRAM"]: ("PROGRAM",),	# added key : KEY_PROGRAM :binding timer
+# [ iq
+		KEYIDS["KEY_BACK"]: ("BACK",),
+		KEYIDS["KEY_FORWARD"]: ("FORWARD",)
+# iq]
 	},
 	{
 		KEYIDS["BTN_0"]: ("UP", "fp"),

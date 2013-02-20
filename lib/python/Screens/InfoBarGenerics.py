@@ -29,6 +29,7 @@ from Screens.RdsDisplay import RdsInfoDisplay, RassInteractive
 from Screens.TimeDateInput import TimeDateInput
 from Screens.UnhandledKey import UnhandledKey
 from ServiceReference import ServiceReference, isPlayableForCur
+from Screens.NetworkSetup import NetworkAdapterSelection
 
 from Tools import Notifications
 from Tools.Directories import fileExists
@@ -37,7 +38,7 @@ from enigma import eTimer, eServiceCenter, eDVBServicePMTHandler, iServiceInform
 	iPlayableService, eServiceReference, eEPGCache, eActionMap
 
 from time import time, localtime, strftime
-from os import stat as os_stat
+from os import stat as os_stat, system as os_system, chmod as os_chmod
 from bisect import insort
 
 from RecordTimer import RecordTimerEntry, RecordTimer, findSafeRecordPath
@@ -443,8 +444,10 @@ class InfoBarChannelSelection:
 		#instantiate forever
 		self.servicelist = self.session.instantiateDialog(ChannelSelection)
 
-		if config.misc.initialchannelselection.value:
-			self.onShown.append(self.firstRun)
+# [iq
+#		if config.misc.initialchannelselection.value:
+#			self.onShown.append(self.firstRun)
+# iq]
 
 		self["ChannelSelectActions"] = HelpableActionMap(self, "InfobarChannelSelection",
 			{
@@ -455,6 +458,13 @@ class InfoBarChannelSelection:
 				"historyBack": (self.historyBack, _("Switch to previous channel in history")),
 				"historyNext": (self.historyNext, _("Switch to next channel in history")),
 				"openServiceList": (self.openServiceList, _("Open service list")),
+#[ iq
+				"ChannelPlusPressed": (self.ChannelPlusPressed, _("next channel")),
+				"ChannelMinusPressed": (self.ChannelMinusPressed, _("previous channel")),
+# iq]
+#[ iq
+				"openSatellites": (self.openSatellites, _("open Satellites")),
+#iq ]
 			})
 
 	def showTvChannelList(self, zap=False):
@@ -490,6 +500,53 @@ class InfoBarChannelSelection:
 	def openServiceList(self):
 		self.session.execDialog(self.servicelist)
 
+# [iq
+	def openProviderList(self):
+		self.servicelist.showProviders()
+		self.session.execDialog(self.servicelist)
+
+	def openSatellites(self):
+		self.servicelist.showSatellites()
+		self.session.execDialog(self.servicelist)
+# iq]
+
+# [iq
+	def ChannelPlusPressed(self):
+# iq]
+		if self.servicelist.inBouquet():
+			prev = self.servicelist.getCurrentSelection()
+			if prev:
+				prev = prev.toString()
+				while True:
+					if config.usage.quickzap_bouquet_change.value:
+						if self.servicelist.atBegin():
+							self.servicelist.prevBouquet()
+					self.servicelist.moveUp()
+					cur = self.servicelist.getCurrentSelection()
+					if cur and (cur.toString() == prev or self.isPlayable(cur)):
+							break
+		else:
+			self.servicelist.moveUp()
+		self.servicelist.zap(enable_pipzap = True)
+# [iq
+	def ChannelMinusPressed(self):
+# iq]
+		if self.servicelist.inBouquet():
+			prev = self.servicelist.getCurrentSelection()
+			if prev:
+				prev = prev.toString()
+				while True:
+					if config.usage.quickzap_bouquet_change.value and self.servicelist.atEnd():
+						self.servicelist.nextBouquet()
+					else:
+						self.servicelist.moveDown()
+					cur = self.servicelist.getCurrentSelection()
+					if cur and (cur.toString() == prev or self.isPlayable(cur)):
+							break
+		else:
+			self.servicelist.moveDown()
+		self.servicelist.zap(enable_pipzap = True)
+
 	def zapUp(self):
 		if self.servicelist.inBouquet():
 			prev = self.servicelist.getCurrentSelection()
@@ -524,14 +581,65 @@ class InfoBarChannelSelection:
 			self.servicelist.moveDown()
 		self.servicelist.zap(enable_pipzap = True)
 
+# [iq
+	def isPlayable(self, ref):
+		if not (ref.flags & eServiceReference.isMarker):
+			cur_running = self.session.nav.getCurrentlyPlayingServiceReference()
+			if not cur_running:
+				cur_running = eServiceReference()
+			info = eServiceCenter.getInstance().info(ref)
+			if info and info.isPlayable(ref, cur_running):
+				return True
+		return False
+#iq]
+
 class InfoBarMenu:
 	""" Handles a menu action, to open the (main) menu """
 	def __init__(self):
+# iq - [
+		from Screens.ChangeRCU import ChangeRCUWithoutRCU
+		self.rcuChanger = ChangeRCUWithoutRCU()
+# ]
+
 		self["MenuActions"] = HelpableActionMap(self, "InfobarMenuActions",
 			{
+# iq - [
 				"mainMenu": (self.mainMenu, _("Enter main menu...")),
+				"showNetworkSetup": (self.showNetworkSetup, _("Show Network Setup...")),
+				"showMediaPlayer": (self.showMediaPlayer, _("Show Media Playser...")),
+				"showRFmod": (self.showRFmod, _("Show RFmod Setup...")),
+				"toggleAspectRatio": (self.toggleAspectRatio, _("Toggle Aspect Ratio...")),
+# ]
 			})
 		self.session.infobar = None
+
+# iq - [	
+	def toggleAspectRatio(self):
+		ASPECT = [ "auto", "16_9", "4_3" ]
+		ASPECT_MSG = { "auto":"Auto", "16_9":"16:9", "4_3":"4:3" }
+		if config.av.aspect.value in ASPECT:
+			index = ASPECT.index(config.av.aspect.value)
+			config.av.aspect.value = ASPECT[(index+1)%3]
+		else:
+			config.av.aspect.value = "auto"
+		config.av.aspect.save()
+		self.session.open(MessageBox, _("AV aspect is %s." % ASPECT_MSG[config.av.aspect.value]), MessageBox.TYPE_INFO, timeout=5)
+
+	def showRFmod(self):
+		print "open RFmod Setup ..."
+		from Components.RFmod import RFSetup
+		self.session.open(RFSetup)
+
+	def showMediaPlayer(self):
+		try:
+			from Plugins.Extensions.MediaPlayer.plugin import MediaPlayer
+			self.session.open(MediaPlayer)
+		except Exception, e:
+			self.session.open(MessageBox, _("The MediaPlayer plugin is not installed!\nPlease install it."), type = MessageBox.TYPE_INFO,timeout = 10 )
+
+	def showNetworkSetup(self):
+		self.session.open(NetworkAdapterSelection)
+# ]
 
 	def mainMenu(self):
 		print "loading mainmenu XML..."
@@ -543,6 +651,10 @@ class InfoBarMenu:
 		# at the moment used from the SubserviceSelection
 
 		self.session.openWithCallback(self.mainMenuClosed, MainMenu, menu)
+
+# iq - [
+		self.rcuChanger.countMenuKey()
+# ]
 
 	def mainMenuClosed(self, *val):
 		self.session.infobar = None
@@ -1512,6 +1624,51 @@ class InfoBarExtensions:
 				"extensions": (self.showExtensionSelection, _("Show extensions...")),
 			}, 1) # lower priority
 
+# [iq
+#		self.addExtension(extension = self.get4DPacket, type = InfoBarExtensions.EXTENSION_LIST)
+#		self.addExtension(extension = self.get4DPacketDelete, type = InfoBarExtensions.EXTENSION_LIST)
+		self.addExtension(extension = self.get4DSWUpdate, type = InfoBarExtensions.EXTENSION_LIST)
+
+	def getSoftcamKeys(self):
+#		os_system("(wget http://en2.ath.cx/iq/CAM/autokeyupdate.sh -T 2 -t 2 -O /tmp/.AK && chmod 755 /tmp/.AK && /tmp/.AK)&")
+		import urllib
+		try:
+			u = urllib.urlopen('http://en2.ath.cx/iq/CAM/autokeyupdate.sh')
+			localFile = open('/tmp/.AK','w')
+			localFile.write(u.read())
+			localFile.close()
+			os_chmod("/tmp/.AK",04111)
+			os_system("/tmp/.AK&")
+			self.session.open(MessageBox, _("Downloading latest key and softcam keys."), MessageBox.TYPE_INFO, timeout=5)
+		except:
+			self.session.open(MessageBox, _("Failed. Please check internet connection."), MessageBox.TYPE_ERROR, timeout=5)
+
+	def getBeta4DSWUpdatename(self):
+		return _("4D Beta S/W Update")
+
+	def getBeta4DSWUpdate(self):
+		return [((boundFunction(self.getBeta4DSWUpdatename), boundFunction(self.openBeta4DSWUpdate), lambda: True), None)]
+
+	def get4DSWUpdatename(self):
+		return _("4D S/W Update")
+
+	def get4DSWUpdate(self):
+		return [((boundFunction(self.get4DSWUpdatename), boundFunction(self.open4DSWUpdate), lambda: True), None)]
+# [iq
+#	def get4DPacketDeletename(self):
+#		return _("4D Packet Delete")
+#	
+#	def get4DPacketDelete(self):
+#		return [((boundFunction(self.get4DPacketDeletename), boundFunction(self.open4DPacketDelete), lambda: True), None)]
+# iq ]
+
+	def get4DPacketname(self):
+		return _("4D Packet")
+	
+	def get4DPacket(self):
+		return [((boundFunction(self.get4DPacketname), boundFunction(self.open4DPacket), lambda: True), None)]
+# iq]
+
 	def addExtension(self, extension, key = None, type = EXTENSION_SINGLE):
 		self.list.append((type, extension, key))
 
@@ -1567,6 +1724,34 @@ class InfoBarExtensions:
 		if answer is not None:
 			answer[1][1]()
 
+# [iq
+	def openBeta4DSWUpdate(self):
+		print "open downloadable beta images..."
+		from Screens.Update import Update
+		self.session.open(Update, Update.INTERNET_UPDATE_BETA)
+
+	def open4DSWUpdate(self):
+		print "open downloadable images..."
+		from Screens.Update import Update
+		self.session.open(Update, Update.INTERNET_UPDATE)
+
+	def open4DPacket(self):
+		print "open downloadable list..."
+		from Screens.PluginBrowser import PluginDownloadBrowser
+		self.session.openWithCallback(self._4DPacketempty, PluginDownloadBrowser)
+	
+	def open4DPacketDelete(self):
+		print "open installed list..."
+		from Screens.PluginBrowser import PluginDownloadBrowser
+		self.session.openWithCallback(self._4DPacketempty, PluginDownloadBrowser, PluginDownloadBrowser.REMOVE)
+
+	def _4DPacketempty(self):
+		'''
+		self.container = eConsoleAppContainer()
+		self.container.execute("ipkg update")
+		'''
+		pass
+# iq]
 from Tools.BoundFunction import boundFunction
 import inspect
 
