@@ -787,6 +787,12 @@ class ConfigInteger(ConfigSequence):
 	value = property(getValue, setValue)
 
 	def fromstring(self, value):
+# [iq
+		try:
+			return int(value)
+		except:
+			return int(value, 16)
+# iq]
 		return int(value)
 
 	def tostring(self, value):
@@ -963,6 +969,11 @@ class ConfigText(ConfigElement, NumericalTextInput):
 		except UnicodeDecodeError:
 			self.text = val.decode("utf-8", "ignore")
 			print "Broken UTF8!"
+# [iq
+		except:
+			self.text = ""
+# iq]
+
 
 	value = property(getValue, setValue)
 	_value = property(getValue, setValue)
@@ -1006,6 +1017,153 @@ class ConfigText(ConfigElement, NumericalTextInput):
 
 	def unsafeAssign(self, value):
 		self.value = str(value)
+# [iq
+class ConfigTextLeft(ConfigElement, NumericalTextInput):
+	def __init__(self, default = "", max_count=0):
+		ConfigElement.__init__(self)
+		NumericalTextInput.__init__(self, nextFunc = self.nextFunc, handleTimeout = False)
+
+		self.marked_pos = 0
+		self.allmarked = (default != "")
+		self.offset = 0
+		self.help_window = None
+		self.value = self.last_value = self.default = default
+
+		self.max_count=max_count
+		self.current_count=0
+		self.count_back=False
+
+	def validateMarker(self):
+		print "maked_pos = ",self.marked_pos
+		#self.marked_pos = self.current_count
+
+	def insertChar(self, ch, pos, owr):
+		print self.current_count,"/",len(self.text), "/", ch, "/", pos
+		print "## maked_pos = ",self.marked_pos, self.current_count
+		if self.count_back :
+			self.current_count -= 1
+			self.count_back=False
+
+		self.text = self.text[0:pos] + ch + self.text[pos+1:self.current_count+1] + "  " * ( self.max_count - self.current_count)
+				
+	def deleteChar(self, pos):
+		self.text = self.text[0:pos] + self.text[pos + 1:]
+
+		if self.current_count > 0 :
+				self.current_count = self.current_count - 1
+
+	def deleteAllChars(self):
+		self.text = ""
+		self.marked_pos = 0
+		self.current_count = 0
+
+	def handleKey(self, key):
+		# this will no change anything on the value itself
+		# so we can handle it here in gui element
+		if key == KEY_DELETE or key == KEY_BACKSPACE:
+			print "# KEY_BACKSPACE"
+			self.timeout()
+			if self.allmarked:
+				self.deleteAllChars()
+				self.allmarked = False
+			elif self.marked_pos > 0:
+				self.deleteChar(self.marked_pos-1)
+				if self.offset > 0:
+					self.offset -= 1
+				self.marked_pos -= 1
+		elif key == KEY_LEFT:
+			if self.marked_pos > 0:
+				self.marked_pos = self.marked_pos - 1
+				self.count_back=True
+			print "# KEY_LEFT => ",self.marked_pos, self.current_count
+			return
+		elif key == KEY_RIGHT:
+			if self.marked_pos < self.current_count:
+				self.marked_pos = self.marked_pos + 1
+				self.count_back=True
+			print "# KEY_RIGHT => ",self.marked_pos, self.current_count
+			return
+		elif key in KEY_NUMBERS:
+			print "# KEY_NUMBERS"
+			owr = self.lastKey == getKeyNumber(key)
+			newChar = self.getKey(getKeyNumber(key))
+			if self.allmarked:
+				self.deleteAllChars()
+				self.allmarked = False
+			self.insertChar(newChar, self.marked_pos, owr)
+		elif key == KEY_TIMEOUT:
+			print "# KEY_TIMEOUT"
+			self.timeout()
+			if self.help_window:
+				self.help_window.update(self)
+			return
+		else:
+			return
+
+		if self.help_window:
+			self.help_window.update(self)
+		self.validateMarker()
+		self.changed()
+
+	def nextFunc(self):
+		if self.current_count <  self.max_count :
+			self.current_count += 1
+			self.marked_pos += 1
+		#self.marked_pos += 1
+		self.validateMarker()
+		self.changed()
+
+	def getValue(self):
+		try:
+			return self.text.encode("utf-8")
+		except UnicodeDecodeError:
+			print "Broken UTF8!"
+			return self.text
+
+	def setValue(self, val):
+		try:
+			self.text = val.decode("utf-8")
+		except UnicodeDecodeError:
+			self.text = val.decode("utf-8", "ignore")
+			print "Broken UTF8!"
+
+	value = property(getValue, setValue)
+	_value = property(getValue, setValue)
+
+	def getText(self):
+		return self.text.encode("utf-8")
+
+	def getMulti(self, selected):
+		if self.allmarked:
+			mark = range(0, len(self.text))
+		else:
+			mark = [self.marked_pos]
+		print "mtext"[1-selected:],"//", self.text.encode("utf-8"), "//", mark
+		return ("mtext"[1-selected:], self.text.encode("utf-8")+" ", mark)
+
+	def onSelect(self, session):
+		self.allmarked = (self.value != "")
+		if session is not None:
+			from Screens.NumericalTextInputHelpDialog import NumericalTextInputHelpDialog
+			self.help_window = session.instantiateDialog(NumericalTextInputHelpDialog, self)
+			self.help_window.show()
+
+	def onDeselect(self, session):
+		self.marked_pos = 0
+		self.offset = 0
+		if self.help_window:
+			session.deleteDialog(self.help_window)
+			self.help_window = None
+		if not self.last_value == self.value:
+			self.changedFinal()
+			self.last_value = self.value
+
+	def getHTML(self, id):
+		return '<input type="text" name="' + id + '" value="' + self.value + '" /><br>\n'
+
+	def unsafeAssign(self, value):
+		self.value = str(value)
+# iq]
 
 class ConfigPassword(ConfigText):
 	def __init__(self, default = "", fixed_size = False, visible_width = False, censor = "*"):
@@ -1144,7 +1302,7 @@ class ConfigDirectory(ConfigText):
 
 	def getMulti(self, selected):
 		if self.text == "":
-			return ("mtext"[1-selected:], _("List of storage devices"), range(0))
+			return ("mtext"[1-selected:], _("List of Storage Devices"), range(0))
 		else:
 			return ConfigText.getMulti(self, selected)
 
