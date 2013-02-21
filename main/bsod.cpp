@@ -117,12 +117,14 @@ void bsodFatal(const char *component)
 	if (bsodhandled) return;
 	bsodhandled = true;
 
+#if 0 //TMTWIN
 	std::ostringstream os;
 	os << "/media/hdd/enigma2_crash_";
 	os << time(0);
 	os << ".log";
 
 	FILE *f = fopen(os.str().c_str(), "wb");
+#endif
 	
 	std::string lines = getLogBuffer();
 	
@@ -159,6 +161,7 @@ void bsodFatal(const char *component)
 			}
 		}
 	}
+#if 0 //TMTWIN
 
 	if (f)
 	{
@@ -241,7 +244,7 @@ void bsodFatal(const char *component)
 
 		fclose(f);
 	}
-
+#endif
 	ePtr<gMainDC> my_dc;
 	gMainDC::getInstance(my_dc);
 	
