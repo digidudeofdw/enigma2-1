@@ -48,6 +48,14 @@ class InfoBar(InfoBarBase, InfoBarShowHide,
 				"showMovies": (self.showMovies, _("Play recorded movies...")),
 				"showRadio": (self.showRadio, _("Show the radio player...")),
 				"showTv": (self.showTv, _("Show the tv player...")),
+# [iq
+				"openBouquetList": self.openBouquetList,
+				"showMediaPlayer": (self.showMediaPlayer, _("Show the media player...")),
+				"openTimerList": self.openTimerList,
+				"ZoomInOut":(self.ZoomInOut, _("Zoom In/Out TV...")), 
+				"ZoomOff":(self.ZoomOff, _("Zoom Off...")),
+				"HarddiskSetup": (self.HarddiskSetup, _("Select HDD")),
+# iq]
 			}, prio=2)
 		
 		self.allowPiP = True
@@ -71,8 +79,27 @@ class InfoBar(InfoBarBase, InfoBarShowHide,
 			})
 
 		self.current_begin_time=0
+# [iq
+		self.zoomrate=0
+		self.zoomin=1
+# iq]
 		assert InfoBar.instance is None, "class InfoBar is a singleton class and just one instance of this class is allowed!"
 		InfoBar.instance = self
+
+# iq - save & config list update
+	def serviceSave(self):  
+		from Components.config import configfile
+		slist = self.servicelist
+		config.servicelist.startupservice.value = slist.getCurrentSelection().toString()
+		path = ''
+		for i in slist.servicePath:
+			path += i.toString()
+			path += ';'
+		config.servicelist.startuproot.value = path
+		config.servicelist.save()
+		configfile.save()
+# iq]
+
 
 	def __onClose(self):
 		InfoBar.instance = None
@@ -91,6 +118,27 @@ class InfoBar(InfoBarBase, InfoBarShowHide,
 	def __checkServiceStarted(self):
 		self.__serviceStarted(True)
 		self.onExecBegin.remove(self.__checkServiceStarted)
+		self.serviceSave()		# [iq]
+	
+# iq]
+	def openBouquetList(self):
+		if config.usage.tvradiobutton_mode.value == "MovieList":
+			self.showTvChannelList(True)
+			self.showMovies()
+	
+	def showMediaPlayer(self):
+		try:
+			from Plugins.Extensions.MediaPlayer.plugin import MediaPlayer
+			self.session.open(MediaPlayer)
+			no_plugin = False
+		except Exception, e:
+			from Screens.MessageBox import MessageBox
+			self.session.open(MessageBox, _("The MediaPlayer plugin is not installed!\nPlease install it."), type = MessageBox.TYPE_INFO,timeout = 10 )
+
+	def openTimerList(self):
+		from Screens.TimerEdit import TimerEditList
+		self.session.open(TimerEditList)
+
 
 	def serviceStarted(self):  #override from InfoBarShowHide
 		new = self.servicelist.newServicePlayed()
@@ -130,6 +178,39 @@ class InfoBar(InfoBarBase, InfoBarShowHide,
 				self.session.nav.playService(ref)
 		else:
 			self.session.open(MoviePlayer, service, slist = self.servicelist, lastservice = ref)
+# [iq
+	def ZoomInOut(self):
+		zoomval=0
+		if self.zoomrate > 3:
+			self.zoomin = 0
+		elif self.zoomrate < -9:
+			self.zoomin = 1
+
+		if self.zoomin == 1:
+			self.zoomrate += 1
+		else:
+			self.zoomrate -= 1
+
+		if self.zoomrate < 0:
+		    zoomval=abs(self.zoomrate)+10
+		else:
+		    zoomval=self.zoomrate
+		print "zoomRate:", self.zoomrate
+		print "zoomval:", zoomval
+		file = open("/proc/stb/vmpeg/0/zoomrate", "w")
+		file.write('%d' % int(zoomval))
+		file.close()
+
+	def ZoomOff(self):
+		self.zoomrate = 0
+		self.zoomin = 1
+		open("/proc/stb/vmpeg/0/zoomrate", "w").write(str(0))
+
+	def HarddiskSetup(self):
+		from Screens.HarddiskSetup import HarddiskSelection
+		self.session.open(HarddiskSelection)
+# iq]
+
 
 class MoviePlayer(InfoBarBase, InfoBarShowHide, \
 		InfoBarMenu, \
