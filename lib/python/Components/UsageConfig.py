@@ -20,6 +20,14 @@ def InitUsageConfig():
 		enigma.eDVBDB.getInstance().setNumberingMode(configElement.value)
 		refreshServiceList()
 	config.usage.alternative_number_mode.addNotifier(alternativeNumberModeChange)
+# [iq
+	from Tools.HardwareInfo import HardwareInfo
+	boxtype = HardwareInfo().get_device_name()
+	if boxtype == "twin":
+		boxtype = "tmtwin"
+	elif boxtype == "ios100hd":
+		boxtype = "ios100"
+# iq]
 
 	config.usage.hide_number_markers = ConfigYesNo(default = False)
 	config.usage.hide_number_markers.addNotifier(refreshServiceList)
@@ -34,8 +42,12 @@ def InitUsageConfig():
 	config.usage.infobar_timeout = ConfigSelection(default = "5", choices = [("0", _("No timeout"))] + choicelist)
 	config.usage.show_infobar_on_zap = ConfigYesNo(default = True)
 	config.usage.show_infobar_on_skip = ConfigYesNo(default = True)
+	config.usage.sort_pluginlist = ConfigYesNo(default = True) # sort plugins list
 	config.usage.show_infobar_on_event_change = ConfigYesNo(default = False)
-	config.usage.show_second_infobar = ConfigSelection(default = None, choices = [(None, _("None")), ("0", _("No timeout"))] + choicelist + [("EPG",_("EPG"))]) 
+# [iq
+	#config.usage.show_second_infobar = ConfigSelection(default = None, choices = [(None, _("None")), ("0", _("no timeout"))] + choicelist) 
+	config.usage.show_second_infobar = ConfigSelection(default = "5", choices = [(None, _("None")), ("0", _("no timeout"))] + choicelist) 
+# iq]
 	config.usage.show_spinner = ConfigYesNo(default = True)
 	config.usage.enable_tt_caching = ConfigYesNo(default = True)
 	choicelist = []
@@ -55,11 +67,31 @@ def InitUsageConfig():
 		("standard", _("Standard")), ("swap", _("Swap PiP and main picture")),
 		("swapstop", _("Move PiP to main picture")), ("stop", _("Stop PiP")) ])
 
+# iq [
+	if HardwareInfo().get_device_name() == "ios300hd":
+		os.system("rm /hdd; ln -s /media/usb /hdd"); 
+	elif HardwareInfo().get_device_name() == "tmsinglemini":
+		os.system("rm /hdd; ln -s /media/usb /hdd");
+	elif HardwareInfo().get_device_name() == "tmnanooe":
+		os.system("rm /hdd; ln -s /media/usb /hdd");
+# ]
 	config.usage.default_path = ConfigText(default = resolveFilename(SCOPE_HDD))
 	config.usage.timer_path = ConfigText(default = "<default>")
 	config.usage.instantrec_path = ConfigText(default = "<default>")
-	config.usage.timeshift_path = ConfigText(default = "/media/hdd/")
-	config.usage.allowed_timeshift_paths = ConfigLocations(default = ["/media/hdd/"])
+# if [
+	if HardwareInfo().get_device_name() == "ios300hd":
+		config.usage.timeshift_path = ConfigText(default = "/media/usb/")
+		config.usage.allowed_timeshift_paths = ConfigLocations(default = ["/media/usb/"])
+	elif HardwareInfo().get_device_name() == "tmsinglemini":
+		config.usage.timeshift_path = ConfigText(default = "/media/usb/")
+		config.usage.allowed_timeshift_paths = ConfigLocations(default = ["/media/usb/"])
+	elif HardwareInfo().get_device_name() == "tmnanooe":
+		config.usage.timeshift_path = ConfigText(default = "/media/usb/")
+		config.usage.allowed_timeshift_paths = ConfigLocations(default = ["/media/usb/"])
+	else:
+		config.usage.timeshift_path = ConfigText(default = "/media/hdd/")
+		config.usage.allowed_timeshift_paths = ConfigLocations(default = ["/media/hdd/"])
+# ]
 
 	config.usage.movielist_trashcan = ConfigYesNo(default=True)
 	config.usage.movielist_trashcan_days = ConfigNumber(default=8)
@@ -383,12 +415,29 @@ def InitUsageConfig():
 	config.autolanguage.subtitle_defaultimpaired = ConfigYesNo(default = False)
 	config.autolanguage.subtitle_defaultdvb = ConfigYesNo(default = False)
 	config.autolanguage.subtitle_usecache = ConfigYesNo(default = True)
-	config.autolanguage.equal_languages = ConfigSelection(default = "15", choices = [
+#	config.autolanguage.equal_languages = ConfigSelection(default = "15", choices = [
+	config.autolanguage.equal_languages = ConfigSelection(default = "0", choices = [		# [iq]
 		("0", "None"),("1", "1"),("2", "2"),("3", "1,2"),
 		("4", "3"),("5", "1,3"),("6", "2,3"),("7", "1,2,3"),
 		("8", "4"),("9", "1,4"),("10", "2,4"),("11", "1,2,4"),
 		("12", "3,4"),("13", "1,3,4"),("14", "2,3,4"),("15", "All")])
 
+	# [ iqteam
+	config.fan_config = ConfigSubsection()
+	config.fan_config.offset = ConfigNumber(default = 0)
+	config.fan_config.default = ConfigNumber(default = 5)
+	config.fan_config.increment = ConfigNumber(default = 5)
+	config.fan_config.configured = ConfigYesNo(default = False)
+
+	config.swupdate = ConfigSubsection()
+	config.swupdate.folderprefix = ConfigText(default='', fixed_size=False)
+	config.swupdate.downloadlocation = ConfigSelection(choices = [])
+
+	config.vfd_scroll = ConfigYesNo(default = True)
+
+	config.usage.background_hddjob = ConfigYesNo(default = False)		# [iq]
+	config.usage.try_cooltvguide = ConfigYesNo(default = True)		# [iq]
+	# iqteam ]
 	config.streaming = ConfigSubsection()
 	config.streaming.stream_ecm = ConfigYesNo(default = False)
 	config.streaming.descramble = ConfigYesNo(default = True)
