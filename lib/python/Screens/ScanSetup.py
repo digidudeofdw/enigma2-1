@@ -6,6 +6,7 @@ from Components.ActionMap import NumberActionMap, ActionMap
 from Components.ConfigList import ConfigListScreen
 from Components.NimManager import nimmanager, getConfigSatlist
 from Components.Label import Label
+from Tools.Directories import resolveFilename, SCOPE_DEFAULTPARTITIONMOUNTDIR, SCOPE_DEFAULTDIR, SCOPE_DEFAULTPARTITION
 from Tools.HardwareInfo import HardwareInfo
 from Screens.InfoBar import InfoBar
 from Screens.MessageBox import MessageBox
@@ -279,6 +280,29 @@ class CableTransponderSearchSupport:
 		tmpstr += "\n\n..."
 		self.cable_search_session = self.session.openWithCallback(self.cableTransponderSearchSessionClosed, MessageBox, tmpstr, MessageBox.TYPE_INFO)
 
+class DefaultSatLists(DefaultWizard):
+	def __init__(self, session, silent = True, showSteps = False):
+		self.xmlfile = "defaultsatlists.xml"
+		DefaultWizard.__init__(self, session, silent, showSteps, neededTag = "services")
+		print "configuredSats:", nimmanager.getConfiguredSats()
+
+	def setDirectory(self):
+		self.directory = []
+		self.directory.append(resolveFilename(SCOPE_DEFAULTDIR))
+		import os
+# iq - spinner [
+#		os.system("mount %s %s" % (resolveFilename(SCOPE_DEFAULTPARTITION), resolveFilename(SCOPE_DEFAULTPARTITIONMOUNTDIR)))
+# ]
+		self.directory.append(resolveFilename(SCOPE_DEFAULTPARTITIONMOUNTDIR))
+				
+	def statusCallback(self, status, progress):
+		print "statusCallback:", status, progress
+		from Components.DreamInfoHandler import DreamInfoHandler
+		if status == DreamInfoHandler.STATUS_DONE:
+			self["text"].setText(_("The installation of the default services lists is finished.") + "\n\n" + _("Please press OK to continue."))
+			self.markDone()
+			self.disableKeys = False	
+
 class ScanSetup(ConfigListScreen, Screen, CableTransponderSearchSupport):
 	def __init__(self, session):
 		Screen.__init__(self, session)
@@ -434,11 +458,17 @@ class ScanSetup(ConfigListScreen, Screen, CableTransponderSearchSupport):
 	def newConfig(self):
 		cur = self["config"].getCurrent()
 		print "cur is", cur
-		if cur == self.typeOfScanEntry or \
-			cur == self.tunerEntry or \
-			cur == self.systemEntry or \
-			(self.modulationEntry and self.systemEntry[1].value == eDVBFrontendParametersSatellite.System_DVB_S2 and cur == self.modulationEntry):
-			self.createSetup()
+		try:		# [iq]
+			if cur == self.typeOfScanEntry or \
+				cur == self.tunerEntry or \
+				cur == self.systemEntry or \
+				(self.modulationEntry and self.systemEntry[1].value == eDVBFrontendParametersSatellite.System_DVB_S2 and cur == self.modulationEntry):
+				self.createSetup()
+# [iq
+		except:
+			pass
+# iq]
+
 
 	def createConfig(self, frontendData):
 			defaultSat = {
@@ -1047,3 +1077,190 @@ class ScanSimple(ConfigListScreen, Screen, CableTransponderSearchSupport):
 			if x == pos:
 				return 1
 		return 0
+# [iq
+from Components.Sources.StaticText import StaticText
+from Components.config import ConfigNothing
+import os
+class DefaultChannelLists(Screen, ConfigListScreen):
+	NONE = 0
+	MOTORIZED = 1
+	FIXED = 2
+
+	def __init__(self, session):
+		Screen.__init__(self, session)
+		self.skinName = [ "Setup" ]
+#		self.skinName = [ "ScanSetup" ]
+		self.setup_title = _("Default Channel Lists")
+		self["status"] = StaticText()
+
+		self.list = [ ]
+		self.onChangedEntry = [ ]
+		ConfigListScreen.__init__(self, self.list, session = session, on_change = self.changedEntry)
+
+		from Components.ActionMap import ActionMap
+		self["actions"] = ActionMap(["SetupActions"], 
+			{
+				"cancel": self.keyCancel,
+				"save": self.apply,
+			}, -2)
+
+		self["key_red"] = StaticText(_("Cancel"))
+		self["key_green"] = StaticText(_("Install"))
+
+		if not self.SelectionChanged in self["config"].onSelectionChanged:
+			self["config"].onSelectionChanged.append(self.SelectionChanged)
+
+		config.lists = ConfigSubsection()
+		config.lists.motorized = ConfigYesNo(default = False)
+		config.lists.fixed = ConfigYesNo(default = False)
+		
+		config.lists.motorized.addNotifier(self.changedMotorized)
+		config.lists.fixed.addNotifier(self.changedFixed)
+
+		self.introduction = "Please choose the default channel list\nyou want to install."
+
+		if not os.path.exists("/tmp/.channel.motorized"):
+			os.system("find /etc/.def_inst/ -name '*channel.motorized*' > /tmp/.channel.motorized")
+		self.chMotorized = open("/tmp/.channel.motorized", "r").readlines()
+		if self.chMotorized:
+			self.chMotorized = self.chMotorized[0]
+
+		if not os.path.exists("/tmp/.channel.non.motorized"):
+			os.system("find /etc/.def_inst/ -name '*channel.non.motorized*' > /tmp/.channel.non.motorized")
+		self.chNonMotorized = open("/tmp/.channel.non.motorized", "r").readlines()
+		if self.chNonMotorized:
+			self.chNonMotorized = self.chNonMotorized[0]
+
+		self.createSetup()
+#		self["introduction"] = Label(_("Please choose the default channel list\nyou want to install."))
+		self.onLayoutFinish.append(self.layoutFinished)
+
+	def changedMotorized(self, configElement):
+		if configElement.value:
+			if config.lists.fixed.value:
+				config.lists.fixed.value = False
+
+	def changedFixed(self, configElement):
+		if configElement.value:
+			if config.lists.motorized.value:
+				config.lists.motorized.value = False
+
+	def createSetup(self):
+		self.list = [ ]
+		try:
+			chlist_name = self.chMotorized.split("motorized-")[1].split("_")[0]
+			if chlist_name is not None:
+				self.list.append(getConfigListEntry(_("Motorized Dish : %s" % chlist_name), config.lists.motorized, _(self.introduction)))
+		except:
+			pass
+		try:
+			chlist_name = self.chNonMotorized.split("motorized-")[1].split("_")[0]
+			if chlist_name is not "":
+				self.list.append(getConfigListEntry(_("Fixed Dish : %s" % chlist_name), config.lists.fixed, _(self.introduction)))
+		except:
+			pass
+
+		self["config"].list = self.list
+		self["config"].l.setList(self.list)
+
+	def layoutFinished(self):
+		self.setTitle(self.setup_title)
+
+	def keyLeft(self):
+		ConfigListScreen.keyLeft(self)
+		self.createSetup()
+
+	def keyRight(self):
+		ConfigListScreen.keyRight(self)
+		self.createSetup()
+
+	def keyCancel(self):
+		self.close(False)
+
+	def apply(self):
+		if config.lists.motorized.value:
+			self.type = self.MOTORIZED
+		elif config.lists.fixed.value:
+			self.type = self.FIXED
+		else:
+			self.type = self.NONE
+
+
+		if self.type:
+			self.installedChLists = [] 
+			os.system("opkg list-installed enigma2-plugin-channel* | awk '{print $1}' > /tmp/installed_ch_lists")
+			fp = open("/tmp/installed_ch_lists", "r")
+			self.installedChLists = fp.readlines()
+			fp.close()
+			if self.installedChLists == []:
+				self.session.openWithCallback(self.installConfirmed, MessageBox, _("Do you really want to install channel list?"))
+			else:
+				self.session.openWithCallback(self.installConfirmed, MessageBox, _("After removing current channel list %s, do you really want to install channel list?" % self.installedChLists[0]))
+		else:
+			self.session.open(MessageBox, _("Not selected any channel list."), type = MessageBox.TYPE_ERROR)
+
+	def installConfirmed(self, ret):
+		if ret:
+			if self.type is self.MOTORIZED:
+				self.session.openWithCallback(self.installFinished, DefaultChannelListInstall, self.chMotorized, self.installedChLists)
+			else:
+				self.session.openWithCallback(self.installFinished, DefaultChannelListInstall, self.chNonMotorized, self.installedChLists)
+
+	def installFinished(self, ret):
+		if ret != 0:
+			self.session.open(MessageBox, _("Failed to install channel list."), MessageBox.TYPE_ERROR)
+		else:
+			self.session.open(MessageBox, _("Finished installing channel list."), MessageBox.TYPE_INFO, timeout=7)
+#			self.close(True)
+
+	def SelectionChanged(self):
+ 		self["status"].setText(self["config"].getCurrent()[2])
+
+	# for summary:
+	def changedEntry(self):
+		for x in self.onChangedEntry:
+			x()
+
+	def createSummary(self):
+		from Screens.Setup import SetupSummary
+		return SetupSummary
+
+
+class DefaultChannelListInstall(Screen):
+
+	def __init__(self, session, chName, removelists=[]):
+		Screen.__init__(self, session)
+		self.skinName = "HarddiskWait"
+		self.timer = eTimer()
+		self.removeLists = removelists
+		self.chName = chName
+		self.ret = 0
+
+		if "non" in self.chName:
+			text = _("Installing fixed channel list, please wait.")
+		else:
+			text = _("Installing motorized channel list, please wait.")
+
+		self.timer.callback.append(self.doInstall)
+		self["wait"] = Label(text)
+		self.timer.start(100)
+
+	def doInstall(self):
+		self.timer.stop()
+
+		if self.removeLists != []:
+			for chList in self.removeLists:
+				self.ret = os.system("opkg remove %s" % chList)
+				if self.ret != 0:
+					self.close(self.ret)
+
+		self.ret = os.system("opkg install " + self.chName)
+
+		from enigma import eDVBDB
+		eDVBDB.getInstance().reloadBouquets()
+		eDVBDB.getInstance().reloadServicelist()
+
+		self.close(self.ret)
+# iq]
+
+
