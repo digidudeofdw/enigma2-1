@@ -22,7 +22,7 @@ class VolumeControl:
 		VolumeControl.instance = self
 
 		config.audio = ConfigSubsection()
-		config.audio.volume = ConfigInteger(default = 50, limits = (0, 100))
+		config.audio.volume = ConfigInteger(default = 30, limits = (0, 100))
 
 		self.volumeDialog = session.instantiateDialog(Volume)
 		self.muteDialog = session.instantiateDialog(Mute)
@@ -41,6 +41,10 @@ class VolumeControl:
 		else:
 			config.audio.volume.value = self.volctrl.getVolume()
 		config.audio.volume.save()
+# [iq
+		from config import configfile
+		configfile.save()
+# iq]
 
 	def volUp(self):
 		if HdmiCec.instance.volumeForwardingEnabled: return
