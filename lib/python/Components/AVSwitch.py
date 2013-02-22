@@ -69,7 +69,13 @@ def InitAVSwitch():
 	config.av = ConfigSubsection()
 	config.av.yuvenabled = ConfigBoolean(default=True)
 	colorformat_choices = {"cvbs": _("CVBS"), "rgb": _("RGB"), "svideo": _("S-Video")}
-	
+
+# iq [
+	from Tools.HardwareInfo import HardwareInfo 
+	if not HardwareInfo().has_yuv():
+		config.av.yuvenabled.value = False
+# ]
+
 	# when YUV is not enabled, don't let the user select it
 	if config.av.yuvenabled.value:
 		colorformat_choices["yuv"] = _("YPbPr")

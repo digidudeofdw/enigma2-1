@@ -189,7 +189,12 @@ class Session:
 
 		self.popCurrent()
 		if callback is not None:
-			callback(*retval)
+# [iq
+			try:
+				callback(*retval)
+			except:
+				retval = False
+# iq]
 
 	def execBegin(self, first=True, do_show = True):
 		assert not self.in_exec
