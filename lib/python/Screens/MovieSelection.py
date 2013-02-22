@@ -548,39 +548,41 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase):
 				"cancel": (self.abort, _("Exit movie list")),
 				"ok": (self.itemSelected, _("Select movie")),
 			})
-		self["DirectionActions"] = HelpableActionMap(self, "DirectionActions",
-			{
-				"up": (self.keyUp, _("Go up the list")),
-				"down": (self.keyDown, _("Go down the list"))
-			}, prio = -2)
-
-		tPreview = _("Preview")
-		tFwd = _("skip forward") + " (" + tPreview +")"
-		tBack= _("skip backward") + " (" + tPreview +")"
-		sfwd = lambda: self.seekRelative(1, config.seek.selfdefined_46.value * 90000)
-		ssfwd = lambda: self.seekRelative(1, config.seek.selfdefined_79.value * 90000)
-		sback = lambda: self.seekRelative(-1, config.seek.selfdefined_46.value * 90000)
-		ssback = lambda: self.seekRelative(-1, config.seek.selfdefined_79.value * 90000)
-		self["SeekActions"] = HelpableActionMap(self, "InfobarSeekActions",
-			{
-				"playpauseService": (self.preview, _("Preview")),
-				"seekFwd": (sfwd, tFwd),
-				"seekFwdManual": (ssfwd, tFwd),
-				"seekBack": (sback, tBack),
-				"seekBackManual": (ssback, tBack),
-			}, prio=5)
+#		self["DirectionActions"] = HelpableActionMap(self, "DirectionActions",
+#			{
+#				"up": (self.keyUp, _("Go up the list")),
+#				"down": (self.keyDown, _("Go down the list"))
+#			}, prio = -2)
+#		
+#		tPreview = _("Preview")
+#		tFwd = _("skip forward") + " (" + tPreview +")"
+#		tBack= _("skip backward") + " (" + tPreview +")"
+#		sfwd = lambda: self.seekRelative(1, config.seek.selfdefined_46.value * 90000)
+#		ssfwd = lambda: self.seekRelative(1, config.seek.selfdefined_79.value * 90000)
+#		sback = lambda: self.seekRelative(-1, config.seek.selfdefined_46.value * 90000)
+#		ssback = lambda: self.seekRelative(-1, config.seek.selfdefined_79.value * 90000)
+#		self["SeekActions"] = HelpableActionMap(self, "InfobarSeekActions",
+#			{
+#				"playpauseService": (self.preview, _("Preview")),
+#				"seekFwd": sfwd, 
+#				"seekFwdManual": ssfwd, 
+#				"seekBack": sback, 
+#				"seekBackManual": ssback, 
+#			}, prio=5)
 		self.onShown.append(self.onFirstTimeShown)
 		self.onLayoutFinish.append(self.saveListsize)
 		self.list.connectSelChanged(self.updateButtons)
 		self.onClose.append(self.__onClose)
 		NavigationInstance.instance.RecordTimer.on_state_change.append(self.list.updateRecordings)
-		self.__event_tracker = ServiceEventTracker(screen=self, eventmap=
-			{
-				#iPlayableService.evSeekableStatusChanged: self.__seekableStatusChanged,
-				iPlayableService.evStart: self.__serviceStarted,
-				iPlayableService.evEOF: self.__evEOF,
-				#iPlayableService.evSOF: self.__evSOF,
-			})
+# [iq - 2012-01-12 - seek action fault on timeshift after MovieSelection
+#		self.__event_tracker = ServiceEventTracker(screen=self, eventmap=
+#			{
+#				#iPlayableService.evSeekableStatusChanged: self.__seekableStatusChanged,
+#				iPlayableService.evStart: self.__serviceStarted,
+#				iPlayableService.evEOF: self.__evEOF,
+#				#iPlayableService.evSOF: self.__evSOF,
+#			})
+# iq]
 		self.onExecBegin.append(self.asciiOn)
 
 	def asciiOn(self):
@@ -1555,6 +1557,11 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase):
 			# cancelled by user (passing any arg means it's a dialog return)
 			return
 		item = self.getCurrentSelection()
+# [iq
+		if not item or not item[0] or not item[1]:
+			return
+# iq]
+		current = item[0]
 		if not canDelete(item):
 			if item and isTrashFolder(item[0]):
 				# Red button to empty trashcan...
