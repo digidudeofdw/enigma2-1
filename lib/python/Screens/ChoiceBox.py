@@ -4,16 +4,42 @@ from Components.Label import Label
 from Components.ChoiceList import ChoiceEntryComponent, ChoiceList
 from Components.Sources.StaticText import StaticText
 import enigma
+import urllib
 
 class ChoiceBox(Screen):
-	def __init__(self, session, title = "", list = [], keys = None, selection = 0, skin_name = []):
+#	def __init__(self, session, title = "", list = [], keys = None, selection = 0, skin_name = []):
+	def __init__(self, session, title = "", list = [], keys = None, selection = 0, skin_name = [], extEntry = None):
 		Screen.__init__(self, session)
 
 		if isinstance(skin_name, str):
 			skin_name = [skin_name]
 		self.skinName = skin_name + ["ChoiceBox"] 
+		if title:
+			title = _(title)
+# [iq
+		try:
+			if skin_name[0] == "ExtensionsList":
+				from Components.Network import iNetwork
+				from Components.config import ConfigIP, NoSave
+				self.local_ip = NoSave(ConfigIP(default=iNetwork.getAdapterAttribute("eth0", "ip")))
 
-		self["text"] = Label(title)
+				if self.local_ip.getText() is not None:
+					self["text"] = Label("IP: getting...\n" + "Local IP: " + self.local_ip.getText())
+				else:
+					self["text"] = Label("IP: getting...\n" + "Local IP: getting...")
+			else:
+				if len(title) < 55:
+					Screen.setTitle(self, title)
+					self["text"] = Label("")
+				else:
+					self["text"] = Label(title)
+		except:
+# iq]
+			if len(title) < 55:
+				Screen.setTitle(self, title)
+				self["text"] = Label("")
+			else:
+				self["text"] = Label(title)
 		self.list = []
 		self.summarylist = []
 		if keys is None:
@@ -35,7 +61,8 @@ class ChoiceBox(Screen):
 		self["summary_selection"] = StaticText()
 		self.updateSummary(selection)
 				
-		self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"], 
+#		self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"], 
+		self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions", "InfobarChannelSelection"], 
 		{
 			"ok": self.go,
 			"back": self.cancel,
@@ -54,13 +81,41 @@ class ChoiceBox(Screen):
 			"yellow": self.keyYellow,
 			"blue": self.keyBlue,
 			"up": self.up,
-			"down": self.down
+			"down": self.down,
+# [iq
+			"openSatellites": self.extEntryReady,
+			"menu": self.extEntryGo,
+# iq]
 		}, -1)
 
+# [iq
+		self.extEntryExecuted = -1
+
+		try:
+			if skin_name[0] == "ExtensionsList":
+				self.StaticIPTimer = enigma.eTimer()
+				self.StaticIPTimer.callback.append(self.iptimeout)
+				self.iptimeout()
+		except:
+			pass
+
+	def extEntryReady(self):
+		if self.extEntry is not None:
+			if self.extEntryExecuted == 1 :
+				self.extEntryExecuted = 2
+			else:
+				self.extEntryExecuted = -1
+	def extEntryGo(self):
+		if self.extEntry is not None:
+			if self.extEntryExecuted == 2:
+				self.close(("extEntry", self.extEntry[0][0]))
+			self.extEntryExecuted = 1
+# iq]
 	def autoResize(self):
 		orgwidth = self.instance.size().width()
 		orgpos = self.instance.position()
-		textsize = self["text"].getSize()
+#		textsize = self["text"].getSize()
+		textsize = (textsize[0] + 50, textsize[1])		# [iq]
 		count = len(self.list)
 		if count > 10:
 			count = 10
@@ -160,3 +215,36 @@ class ChoiceBox(Screen):
 
 	def cancel(self):
 		self.close(None)
+# [iq
+	def iptimeout(self):
+		import os
+		static_ip =urllib.urlopen('http://en2.ath.cx/iprequest.php').read()
+#		if os.path.isfile("/tmp/extip"):
+#			fp = file('/tmp/extip', 'r')
+#			static_ip = fp.read()
+#			fp.close()
+		if static_ip=="":
+#			conn.reqest("GET","/iprequest.php")
+#			r1 = conn.getresponse()
+#			static_ip = r1.read()
+				#os.system("wget -O /tmp/extip -T 4 -t 1 http://en2.ath.cx/iprequest.php")
+			print "NOK : ", static_ip
+		else:
+			print "OK : ", static_ip
+			self.StaticIPTimer.stop()
+
+			self["text"].setText("IP: " + static_ip + "\nLocal IP: " + self.local_ip.getText())
+				
+			self["text"].show()
+			return
+#		else:
+#			conn.reqest("GET","/iprequest.php")
+#			r1 = conn.getresponse()
+#            data1 = r1.read()
+#			static_ip = r1.read()
+			#os.system("wget -O /tmp/extip -T 2 -t 1 http://en2.ath.cx/iprequest.php")
+
+		self.StaticIPTimer.stop()
+		self.StaticIPTimer.start(2000, True)	
+# iq]
+
