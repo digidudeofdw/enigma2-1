@@ -1527,6 +1527,7 @@ class InfoBarTimeshift:
 		else:
 			if not ts.startTimeshift():
 				self.timeshift_enabled = True
+				open("/proc/stb/lcd/symbol_timeshift", "w").write("1")
 
 				# we remove the "relative time" for now.
 				#self.pvrStateDialog["timeshift"].setRelative(time.time())
@@ -1553,6 +1554,7 @@ class InfoBarTimeshift:
 
 		# disable actions
 		self.__seekableStatusChanged()
+		open("/proc/stb/lcd/symbol_timeshift", "w").write("0")
 
 	# activates timeshift, and seeks to (almost) the end
 	def activateTimeshiftEnd(self, back = True):
@@ -1622,6 +1624,7 @@ class InfoBarExtensions:
 		self["InstantExtensionsActions"] = HelpableActionMap(self, "InfobarExtensions",
 			{
 				"extensions": (self.showExtensionSelection, _("Show extensions...")),
+				"getSoftcamKeys": self.getSoftcamKeys,		# [iq]
 			}, 1) # lower priority
 
 # [iq
@@ -1718,7 +1721,8 @@ class InfoBarExtensions:
 		list.extend([(x[0](), x) for x in extensionsList])
 
 		keys += [""] * len(extensionsList)
-		self.session.openWithCallback(self.extensionCallback, ChoiceBox, title=_("Please choose an extension..."), list = list, keys = keys, skin_name = "ExtensionsList")
+#		self.session.openWithCallback(self.extensionCallback, ChoiceBox, title=_("Please choose an extension..."), list = list, keys = keys, skin_name = "ExtensionsList")
+		self.session.openWithCallback(self.extensionCallback, ChoiceBox, title=_("Please choose an extension..."), list = list, keys = keys, skin_name = "ExtensionsList", extEntry = self.getBeta4DSWUpdate())		# [iq]
 
 	def extensionCallback(self, answer):
 		if answer is not None:
