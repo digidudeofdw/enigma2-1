@@ -195,6 +195,10 @@ class EPGSelection(Screen):
 		count = lst.getCurrentChangeCount()
 		if count == 0:
 			ref = lst.getCurrent()[1]
+# [iq - on multi epg selection, zapping to protected service stacks screen getting protect pin behind epg selectin screen
+			from Tools.Notifications import RemoveAllPopups
+			RemoveAllPopups()
+#iq]
 			if ref is not None:
 				self.zapFunc(ref.ref, preview = prev)
 
