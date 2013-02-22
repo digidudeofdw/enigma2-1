@@ -1,6 +1,9 @@
 from config import config, ConfigSubsection, ConfigSlider, ConfigYesNo, ConfigNothing
 from enigma import eDBoxLCD
 from Components.SystemInfo import SystemInfo
+# [ iqteam
+import fcntl
+# iqteam ]
 
 class LCD:
 	def __init__(self):
@@ -91,4 +94,14 @@ def InitLcd():
 		config.lcd.standby.apply = lambda : doNothing()
 
 	config.misc.standbyCounter.addNotifier(standbyCounterChanged, initial_call = False)
+# [iq
+	config.vfd_scroll.addNotifier(setFpmRotate)
+
+def setFpmRotate(configElement):
+	LCD_IOCTL_ROTATE_START = 4
+	lcd = open('/dev/dbox/lcd0', 'w')
+	on = 2 if configElement.value else 0
+	fcntl.ioctl(lcd, LCD_IOCTL_ROTATE_START, on)
+# iq]
+
 
