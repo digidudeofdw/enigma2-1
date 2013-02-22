@@ -583,6 +583,11 @@ Screens.Ci.InitCiConfig()
 
 profile("RcModel")
 import Components.RcModel
+# [iq
+profile("Init:RCU")
+import Screens.ChangeRCU
+Screens.ChangeRCU.SetPrivateRCU()
+#iq]
 
 #from enigma import dump_malloc_stats
 #t = eTimer()
