@@ -1,4 +1,5 @@
 from Screen import Screen
+from Screens.DefaultWizard import DefaultWizard
 from ServiceScan import ServiceScan
 from Components.config import config, ConfigSubsection, ConfigSelection, \
 	ConfigYesNo, ConfigInteger, getConfigListEntry, ConfigSlider, ConfigEnableDisable
