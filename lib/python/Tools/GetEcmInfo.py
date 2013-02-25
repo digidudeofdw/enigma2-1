@@ -60,13 +60,18 @@ class GetEcmInfo:
 					self.textvalue = _("FTA")
 				elif using == 'emu':
 					self.textvalue = "EMU (%ss)" % (info.get('ecm time', '?'))
+# [iq
+				elif using == 'sci':
+					self.textvalue = "LOCAL (%ss)" % (info.get('ecm time', '?'))
+# iq]
 				else:
 					hops = info.get('hops', None)
 					if hops and hops != '0':
 						hops = ' @' + hops
 					else:
 						hops = ''
-					self.textvalue = info.get('address', '?') + hops + " (%ss)" % info.get('ecm time', '?')
+#					self.textvalue = info.get('address', '?') + hops + " (%ss)" % info.get('ecm time', '?')
+					self.textvalue = "NET (%ss)" % info.get('ecm time', '?')	# [iq 
 			else:
 				decode = info.get('decode', None)
 				if decode:

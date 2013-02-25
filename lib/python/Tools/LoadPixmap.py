@@ -18,7 +18,7 @@ def LoadPixmap(path, desktop = None, cached = False):
 	if ptr and desktop:
 		desktop.makeCompatiblePixmap(ptr)
 
-	if cached:
+#	if cached:		# [iq]
 		pixmap_cache[path] = ptr
 
 	return ptr

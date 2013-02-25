@@ -30,12 +30,28 @@ SCOPE_PLUGINS = 9
 SCOPE_MEDIA = 10
 SCOPE_PLAYLIST = 11
 SCOPE_CURRENT_SKIN = 12
+SCOPE_DEFAULTDIR = 13
+SCOPE_DEFAULTPARTITION = 14
+SCOPE_DEFAULTPARTITIONMOUNTDIR = 15
+
 SCOPE_METADIR = 16
 SCOPE_CURRENT_PLUGIN = 17
 
 PATH_CREATE = 0
 PATH_DONTCREATE = 1
 PATH_FALLBACK = 2
+
+# songingeun - [
+HDD_PATH="/hdd/movie/"
+from Tools.HardwareInfo import HardwareInfo
+if HardwareInfo().get_device_name() == 'ios300hd':
+	HDD_PATH="/media/usb/movie/"
+elif HardwareInfo().get_device_name() == 'tmsinglemini':
+	HDD_PATH="/media/usb/movie/"
+elif HardwareInfo().get_device_name() == 'tmnanooe':
+	HDD_PATH="/media/usb/movie/"
+# ]
+
 defaultPaths = {
 		SCOPE_TRANSPONDERDATA: (eEnv.resolve("${sysconfdir}/"), PATH_DONTCREATE),
 		SCOPE_SYSETC: (eEnv.resolve("${sysconfdir}/"), PATH_DONTCREATE),
@@ -47,12 +63,16 @@ defaultPaths = {
 
 		SCOPE_SKIN: (eEnv.resolve("${datadir}/enigma2/"), PATH_DONTCREATE),
 		SCOPE_SKIN_IMAGE: (eEnv.resolve("${datadir}/enigma2/"), PATH_DONTCREATE),
-		SCOPE_HDD: ("/hdd/movie/", PATH_DONTCREATE),
+#		SCOPE_HDD: ("/hdd/movie/", PATH_DONTCREATE),
+		SCOPE_HDD: (HDD_PATH, PATH_DONTCREATE),
 		SCOPE_MEDIA: ("/media/", PATH_DONTCREATE),
 		SCOPE_PLAYLIST: (eEnv.resolve("${sysconfdir}/enigma2/playlist/"), PATH_CREATE),
 
 		SCOPE_USERETC: ("", PATH_DONTCREATE), # user home directory
-
+		
+		SCOPE_DEFAULTDIR: (eEnv.resolve("${datadir}/enigma2/defaults/"), PATH_CREATE),
+		SCOPE_DEFAULTPARTITION: ("/dev/mtdblock6", PATH_DONTCREATE),
+		SCOPE_DEFAULTPARTITIONMOUNTDIR: (eEnv.resolve("${datadir}/enigma2/dealer"), PATH_CREATE),
 		SCOPE_METADIR: (eEnv.resolve("${datadir}/meta"), PATH_CREATE),
 	}
 
