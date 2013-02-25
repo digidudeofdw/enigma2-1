@@ -49,3 +49,9 @@ def AddPopup(text, type, timeout, id = None):
 		RemovePopup(id)
 	print "AddPopup, id =", id
 	AddNotificationWithID(id, MessageBox, text = text, type = type, timeout = timeout, close_on_any_key = True)
+
+# [iq
+def RemoveAllPopups():
+	for x in notifications:
+		notifications.remove(x)
+# iq]
