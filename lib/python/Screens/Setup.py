@@ -54,10 +54,13 @@ class SetupSummary(Screen):
 		self.parent["config"].onSelectionChanged.remove(self.selectionChanged)
 
 	def selectionChanged(self):
-		self["SetupEntry"].text = self.parent.getCurrentEntry()
-		self["SetupValue"].text = self.parent.getCurrentValue()
-		if hasattr(self.parent,"getCurrentDescription"):
-			self.parent["description"].text = self.parent.getCurrentDescription()
+		try:		# [iq]
+			self["SetupEntry"].text = self.parent.getCurrentEntry()
+			self["SetupValue"].text = self.parent.getCurrentValue()
+# [iq - dead when choice audio language selection or subtitle settings after changing setup mode on cutomize
+		except:
+			self.close()
+# iq]
 
 class Setup(ConfigListScreen, Screen):
 
