@@ -1,5 +1,7 @@
 import os
 import time
+from os import system, listdir, statvfs, popen, makedirs, stat, major, minor, path, access
+from Tools.Directories import SCOPE_HDD, resolveFilename, pathExists
 from Tools.CList import CList
 from SystemInfo import SystemInfo
 from Components.Console import Console
@@ -13,15 +15,16 @@ def readFile(filename):
 
 def getProcMounts():
 	try:
-		mounts = open("/proc/mounts", 'r')
+		mounts = open("/proc/mounts")
 	except IOError, ex:
-		print "[Harddisk] Failed to open /proc/mounts", ex
+		print "[Harddisk] Failed to open /proc/mounts", ex 
 		return []
-	result = [line.strip().split(' ') for line in mounts]
-	for item in result:
-		# Spaces are encoded as \040 in mounts
-		item[1] = item[1].replace('\\040', ' ')
-	return result
+	return [line.strip().split(' ') for line in mounts]
+
+def createMovieFolder():
+	movie = resolveFilename(SCOPE_HDD)
+	if not pathExists(movie):
+		makedirs(movie)
 
 def isFileSystemSupported(filesystem):
 	try:
@@ -44,6 +47,11 @@ DEVTYPE_UDEV = 0
 DEVTYPE_DEVFS = 1
 
 class Harddisk:
+# [ iq ]
+	INIT_READY = 0
+	INIT_MOUNT = 1
+	INIT_CREATE_FOLDER = 2
+
 	def __init__(self, device, removable):
 		self.device = device
 
@@ -90,6 +98,10 @@ class Harddisk:
 		print "new Harddisk", self.device, '->', self.dev_path, '->', self.disk_path
 		if not removable:
 			self.startIdle()
+# [ iq ]
+		from enigma import eTimer
+		self.initTimer = eTimer()
+		self.initTimer.callback.append(self.initCallback)
 
 	def __lt__(self, ob):
 		return self.device < ob.device
@@ -150,7 +162,7 @@ class Harddisk:
 				model = readFile(self.sysfsPath('device/model'))
 				return vendor + '(' + model + ')'
 			else:
-				raise Exception, "no hdX or sdX"
+				raise Exception, "no hdX or sdX" 
 		except Exception, e:
 			print "[Harddisk] Failed to get model:", e
 			return "-?-"
@@ -207,19 +219,67 @@ class Harddisk:
 		if dev is None:
 			# not mounted, return OK
 			return 0
-		cmd = 'umount ' + dev
+		#cmd = 'umount ' + dev
+		cmd = 'umount -f ' + dev + '; rm -rf ' + dev		# [iq]
 		print "[Harddisk]", cmd
 		res = os.system(cmd)
 		return (res >> 8)
 
 	def createPartition(self):
-		cmd = 'printf "8,\n;0,0\n;0,0\n;0,0\ny\n" | sfdisk -f -uS ' + self.disk_path
-		res = os.system(cmd)
+		cmd = ''
+		size = self.diskSize()
+		if size > 128000:
+			# Start at sector 8 to better support 4k aligned disks
+			print "[HD] Detected >128GB disk, using 4k alignment"
+			cmd = 'printf "8,\n;0,0\n;0,0\n;0,0\ny\n" | sfdisk -f -uS ' + self.disk_path
+		else:
+			# Smaller disks (CF cards, sticks etc) don't need that
+			cmd = 'printf "0,\n;\n;\n;\ny\n" | sfdisk -f -uS ' + self.disk_path
+		res = system(cmd)
 		return (res >> 8)
+
+# [iq
+	def checkPartition(self):
+		res = 1
+		time.sleep(1)	
+		for tries in range(5):
+			if path.exists(self.partitionPath("1")):
+				print "[initialize] exist dev 1"
+				res = 0
+				break
+			else:
+				time.sleep(1)	
+		return res
+# iq]
 
 	def mkfs(self):
 		# No longer supported, use createInitializeJob instead
-		return 1
+# [iq
+		if isFileSystemSupported("ext4"):
+			cmd = 'printf "y\n" | mkfs.ext4 '
+		else:
+			cmd = 'printf "y\n" | mkfs.ext3 '
+
+		size = self.diskSize()
+		if size > 1500000:
+			# out of memory while format 2GB hdd with options sparse_super 
+			cmd += '-T largefile -O'
+		elif size > 250000:
+			# No more than 256k i-nodes (prevent problems with fsck memory requirements)
+			cmd += '-T largefile -O sparse_super -N 262144'
+		elif size > 16384:
+			# between 16GB and 250GB: 1 i-node per megabyte
+			cmd += '-T largefile -O sparse_super'
+		elif size > 2048:
+			# Over 2GB: 32 i-nodes per megabyte
+			cmd = cmd + '-T largefile -N' + str(size * 32)
+		cmd += ' -m0 -O dir_index ' + self.partitionPath("1")
+
+		print "[mkfs]", cmd
+		res = system(cmd)
+		return (res >> 8)
+# iq]
+
 
 	def mount(self):
 		# try mounting through fstab first
@@ -228,33 +288,61 @@ class Harddisk:
 		else:
 			# if previously mounted, use the same spot
 			dev = self.mount_device
-		try:
-			fstab = open("/etc/fstab")
-			lines = fstab.readlines()
-		except IOError:
-			return -1
-		fstab.close()
-		for line in lines:
-			parts = line.strip().split(" ")
-			fspath = os.path.realpath(parts[0])
-			if fspath == dev:
-				print "[Harddisk] mounting:", fspath
-				cmd = "mount -t auto " + fspath
-				res = os.system(cmd)
-				return (res >> 8)
+# iq [
+#		try:
+#			fstab = open("/etc/fstab")
+#			lines = fstab.readlines()
+#		except IOError:
+#			return -1
+#		fstab.close()
+#		for line in lines:
+#			parts = line.strip().split(" ")
+#			fspath = path.realpath(parts[0])
+#			if path.realpath(fspath) == dev:
+#				print "[Harddisk] mounting:", fspath
+#				#cmd = "mount -t ext3 " + fspath
+#				cmd = "mkdir -p " + line.split()[1] + "; mount " + fspath + " " + line.split()[1]		# [iq]
+#				res = system(cmd)
+#				return (res >> 8)
+# ]
 		# device is not in fstab
 		res = -1
 		if self.type == DEVTYPE_UDEV:
 			# we can let udev do the job, re-read the partition table
-			res = os.system('sfdisk -R ' + self.disk_path)
+			res = system('sleep 2; sfdisk -R ' + self.disk_path)
 			# give udev some time to make the mount, which it will do asynchronously
-			from time import sleep
-			sleep(3)
+#			from time import sleep
+#			sleep(3)
 		return (res >> 8)
+
+	def createMovieFolder(self):
+		if not pathExists(resolveFilename(SCOPE_HDD)):
+			try:
+				makedirs(resolveFilename(SCOPE_HDD))
+			except OSError:
+				return -1
+		return 0
 
 	def fsck(self):
 		# No longer supported, use createCheckJob instead
-		return 1
+		#return 1 
+
+# [iq
+		if self.findMount():
+			if self.unmount() != 0:
+				print "[initialize] Failed to unmount"
+				return -1
+			dev = self.mount_device
+		else:
+			# otherwise, assume there is one partition
+			dev = self.partitionPath("1")
+
+		cmd = 'fsck.ext3 -f -p ' + dev
+
+		res = system(cmd)
+		return (res >> 8)
+# iq]
+
 
 	def killPartitionTable(self):
 		zero = 512 * '\0'
@@ -271,6 +359,131 @@ class Harddisk:
 		for i in range(3):
 			h.write(zero)
 		h.close()
+
+# [iq
+	def readPartitionTable(self):
+		cmd = "sfdisk -R " + self.dev_path
+		res = system(cmd)
+		return res
+
+	errorList = [ _("Everything is fine"), _("Creating partition failed"), _("Mkfs failed"), _("Mount failed"), _("Create movie folder failed"), _("Fsck failed"), _("Please Reboot"), _("Filesystem contains uncorrectable errors"), _("Unmount failed"), _("Reading partition table failed")]
+
+	def initialize(self):
+		if self.unmount() != 0:
+			print "[initialize] Failed to unmount"
+			return -8
+
+		self.killPartitionTable()
+
+		self.readPartitionTable()
+
+		if self.createPartition() != 0:
+			print "[initialize] Failed to create partition"
+			return -1
+
+		if self.mkfs() != 0:
+			print "[initialize] Failed to create file system"
+			return -2
+
+#		if self.checkPartition():
+#			print "[initialize] not exist dev 1"
+#			return -2
+
+#		if self.mount() != 0:
+#			print "[initialize] Failed to mount"
+#			return -3
+
+#		if self.createMovieFolder() != 0:
+#			print "[initialize] Failed to create movie folder"
+#			return -4
+
+		# [iq - for pli sata formatting, sometimes udev action remove comes after action add]
+		self.initStatus = self.INIT_READY
+		self.initTimer.start(1000, True)
+
+		return 0
+
+	def initCallback(self):
+		self.initStatus = self.initStatus + 1
+		if self.initStatus == self.INIT_MOUNT:
+			self.unmount()
+			self.mount()
+			self.initTimer.start(3000, True)
+		elif self.initStatus == self.INIT_CREATE_FOLDER:
+			if self.createMovieFolder() != 0:
+				self.initStatus = self.initStatus - 1
+				self.initTimer.start(1000, True)
+		else:
+			self.initStatus = self.INIT_READY
+
+	def check(self):
+		res = self.fsck()
+		mntRes = self.mount()
+
+		if res & 2 == 2:
+			return -6
+
+		if res & 4 == 4:
+			return -7
+
+		if res != 0 and res != 1:
+			# A sum containing 1 will also include a failure
+			return -5
+
+		if mntRes != 0:
+			return -3 
+
+		return 0
+# iq]
+
+# [iq - why removed?
+	def convertExt3ToExt4(self):
+		res = 0
+
+		if not isFileSystemSupported('ext4'):
+			raise Exception, _("You system does not support ext4")
+
+		if not path.exists('/sbin/tune2fs'):
+			cmd = 'opkg update; opkg install e2fsprogs-tune2fs'
+			res = system(cmd)
+			if res != 0:
+				print "[convertExt3ToExt4] Failed to install e2fsprogs-tune2fs package"
+				return (res >> 8)
+
+		if self.findMount():
+			if self.unmount() != 0:
+				print "[convertExt3ToExt4] Failed to unmount"
+				return -1
+			dev = self.mount_device
+		else:
+			# otherwise, assume there is one partition
+			dev = self.partitionPath("1")
+
+		cmd = 'fsck.ext3 -p ' + dev
+		res = system(cmd)
+		if res != 0:
+			print "[convertExt3ToExt4] Failed to check ext3"
+			return (res >> 8)
+
+		cmd = 'tune2fs -O extents uninit_bg dir_index ' + dev
+		res = system(cmd)
+		if res != 0:
+			print "[convertExt3ToExt4] Failed to tune2fs"
+			return (res >> 8)
+
+		cmd = 'fsck.ext4 -f -p -D ' + dev
+		res = system(cmd)
+
+		if self.mount() != 0:
+			print "[e2fsprogs-tune2fs] Failed to mount"
+			return -3
+
+		if self.createMovieFolder() != 0:
+			print "[e2fsprogs-tune2fs] Failed to create movie folder"
+			return -4
+
+		return 0
+# iq]
 
 	def createInitializeJob(self):
 		job = Task.Job(_("Initializing storage device..."))
@@ -293,42 +506,21 @@ class Harddisk:
 		task.check = lambda: not os.path.exists(self.partitionPath("1"))
 		task.weighting = 1
 
-		if os.path.exists('/usr/sbin/parted'):
-			use_parted = True
-		else:
-			if size > 2097151:
-				addInstallTask(job, 'parted')
-				use_parted = True
-			else:
-				use_parted = False
-
-		task = Task.LoggingTask(job, _("Creating partition"))
+		size = self.diskSize()
+		print "[HD] size: %s MB" % size
+		task = Task.LoggingTask(job, _("Create Partition"))
 		task.weighting = 5
-		if use_parted:
-			task.setTool('parted')
-			if size < 1024:
-				# On very small devices, align to block only
-				alignment = 'min'
-			else:
-				# Prefer optimal alignment for performance
-				alignment = 'opt'
-			if size > 2097151:
-				parttype = 'gpt'
-			else:
-				parttype = 'msdos'
-			task.args += ['-a', alignment, '-s', self.disk_path, 'mklabel', parttype, 'mkpart', 'primary', '0%', '100%']
+		task.setTool('sfdisk')
+		task.args.append('-f')
+		task.args.append('-uS')
+		task.args.append(self.disk_path)
+		if size > 128000:
+			# Start at sector 8 to better support 4k aligned disks
+			print "[HD] Detected >128GB disk, using 4k alignment"
+			task.initial_input = "8,\n;0,0\n;0,0\n;0,0\ny\n"
 		else:
-			task.setTool('sfdisk')
-			task.args.append('-f')
-			task.args.append('-uS')
-			task.args.append(self.disk_path)
-			if size > 128000:
-				# Start at sector 8 to better support 4k aligned disks
-				print "[HD] Detected >128GB disk, using 4k alignment"
-				task.initial_input = "8,\n;0,0\n;0,0\n;0,0\ny\n"
-			else:
-				# Smaller disks (CF cards, sticks etc) don't need that
-				task.initial_input = "0,\n;\n;\n;\ny\n"
+			# Smaller disks (CF cards, sticks etc) don't need that
+			task.initial_input = "0,\n;\n;\n;\ny\n"
 
 		task = Task.ConditionTask(job, _("Waiting for partition"))
 		task.check = lambda: os.path.exists(self.partitionPath("1"))
@@ -362,16 +554,12 @@ class Harddisk:
 		task.check = self.mountDevice
 		task.weighting = 1
 
+		task = Task.PythonTask(job, _("Create movie directory"))
+		task.weighting = 1
+		task.work = createMovieFolder
+
 		return job
-
-	def initialize(self):
-		# no longer supported
-		return -5
-
-	def check(self):
-		# no longer supported
-		return -5
-
+		
 	def createCheckJob(self):
 		job = Task.Job(_("Checking filesystem..."))
 		if self.findMount():
@@ -394,9 +582,15 @@ class Harddisk:
 	def createExt4ConversionJob(self):
 		if not isFileSystemSupported('ext4'):
 			raise Exception, _("You system does not support ext4")
-		job = Task.Job(_("Converting ext3 to ext4..."))
-		if not os.path.exists('/sbin/tune2fs'):
-			addInstallTask(job, 'e2fsprogs-tune2fs')
+		job = Task.Job(_("Convert ext3 to ext4..."))
+		if not path.exists('/sbin/tune2fs'):
+			task = Task.LoggingTask(job, "update packages")
+			task.setTool('opkg')
+			task.args.append('update')
+			task = Task.LoggingTask(job, "Install e2fsprogs-tune2fs")
+			task.setTool('opkg')
+			task.args.append('install')
+			task.args.append('e2fsprogs-tune2fs')
 		if self.findMount():
 			# Create unmount task if it was not mounted
 			UnmountTask(job, self)
@@ -758,7 +952,9 @@ class HarddiskManager:
 		dev, part = self.splitDeviceName(dev)
 		description = "External Storage %s" % dev
 		try:
-			description = readFile("/sys" + phys + "/model")
+# NOTE : mount information  
+#			description = readFile("/sys" + phys + "/model")
+			description = readFile("/sys" + "/block/"+ dev +"/device" + "/model")
 		except IOError, s:
 			print "couldn't read model: ", s
 		from Tools.HardwareInfo import HardwareInfo
@@ -806,10 +1002,10 @@ class UnmountTask(Task.LoggingTask):
 			open('/dev/nomount.%s' % dev, "wb").close()
 		except Exception, e:
 			print "ERROR: Failed to create /dev/nomount file:", e
-		self.setTool('umount')
-		self.args.append('-f')
-		for dev in self.hdd.enumMountDevices():
-			self.args.append(dev)
+		dev = self.hdd.mountDevice()
+		if dev:
+#			self.setCmdline('umount -f ' + dev)
+			self.setCmdline('umount -f ' + dev + '; rm -rf ' + dev)		# [iq]
 			self.postconditions.append(Task.ReturncodePostcondition())
 			self.mountpoints.append(dev)
 		if not self.mountpoints:
@@ -844,9 +1040,10 @@ class MountTask(Task.LoggingTask):
 		fstab.close()
 		for line in lines:
 			parts = line.strip().split(" ")
-			fspath = os.path.realpath(parts[0])
-			if os.path.realpath(fspath) == dev:
-				self.setCmdline("mount -t auto " + fspath)
+			fspath = path.realpath(parts[0])
+			if path.realpath(fspath) == dev:
+#				self.setCmdline("mount -t ext3 " + fspath)
+				self.setCmdline("mkdir -p " + line.split()[1] + "; mount " + fspath)		# [iq]
 				self.postconditions.append(Task.ReturncodePostcondition())
 				return
 		# device is not in fstab
