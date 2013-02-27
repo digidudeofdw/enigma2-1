@@ -2,21 +2,106 @@ from Screen import Screen
 from Components.ChoiceList import ChoiceEntryComponent, ChoiceList
 from Components.Sources.StaticText import StaticText
 from Components.ActionMap import ActionMap, NumberActionMap
-from Components.Label import MultiColorLabel
-from Components.config import ConfigIP, NoSave
+from Components.Label import MultiColorLabel, Label
+from Components.config import ConfigIP, NoSave, configfile, config, Config, ConfigSubsection
 from Components.Network import iNetwork
 from Components.Console import Console
-from enigma import eTimer
-import os, fcntl, array
+from Components.Harddisk import harddiskmanager
+from Components.About import about
+from Components.FanControl import fancontrol
+from Components.Sensors import sensors
+from Components.Sources.Sensor import SensorSource
+from Components.NimManager import nimmanager, InitNimManager
+from Tools.HardwareInfo import HardwareInfo
+from Screens.MessageBox import MessageBox
+from Screens.Standby import QuitMainloopScreen
+from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
+from enigma import eTimer, eServiceReference, eDVBDB, quitMainloop
+from enigma import eDVBResourceManager, iDVBFrontend
+from enigma import eDVBCI_UI, eDVBCIInterfaces
+import os, fcntl, array, socket, struct
 
 class TestMenu(Screen):
+# 1.0.0	- 
+	TEST_PROG_VERSION = "1.0.0"
 	skin = """
         <screen name="TestMenu" position="fill" title="Test Menu" flags="wfNoBorder">
 			<eLabel position="fill" backgroundColor="transpBlack" zPosition="-50"/>
-			<widget name="menulist" position="60,75" scrollbarMode="showNever" size="400,400" zPosition="2" font="Regular; 22" foregroundColor="white" backgroundColor="transpBlack" transparent="1"/>
-			<widget name="lan" position="460,185" size="250,30" foregroundColors="transpBlack,red,green" backgroundColors="transpBlack,red,green" zPosition="1" foregroundColor="white" font="Regular;22" />
-			<widget name="sc0" position="460,220" size="250,30" foregroundColors="transpBlack,red,green" backgroundColors="transpBlack,red,green" zPosition="1" foregroundColor="white" font="Regular;22" />
-			<widget name="sc1" position="460,245" size="250,30" foregroundColors="transpBlack,red,green" backgroundColors="transpBlack,red,green" zPosition="1" foregroundColor="white" font="Regular;22" />
+
+			<widget name="label0"		position="80,55"	size="540,29"	foregroundColor="#0006c8f3" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+
+			<widget name="menulist"		position="80,90"	size="540,210"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22"  zPosition="1" backgroundColorSelected="white" foregroundColorSelected="black" />
+
+			<widget name="lan_i"		position="80,350"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="sc0_i"		position="80,380"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="sc1_i"		position="80,410"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="ci0_i"		position="80,440"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="ci1_i"		position="80,470"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="sata_i"		position="80,500"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="usb0_i"		position="80,530"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="usb1_i"		position="80,560"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="usb2_i"		position="80,590"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+
+			<widget name="lan_s"		position="280,350"	size="340,29"	foregroundColors="#00ff4500,#007fff00" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="sc0_s"		position="280,380"	size="340,29"	foregroundColors="#00ff4500,#007fff00" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="sc1_s"		position="280,410"	size="340,29"	foregroundColors="#00ff4500,#007fff00" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="ci0_s"		position="280,440"	size="340,29"	foregroundColors="#00ff4500,#007fff00" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="ci1_s"		position="280,470"	size="340,29"	foregroundColors="#00ff4500,#007fff00" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="sata_s"		position="280,500"	size="340,29"	foregroundColors="#00ff4500,#007fff00" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="usb0_s"		position="280,530"	size="340,29"	foregroundColors="#00ff4500,#007fff00" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="usb1_s"		position="280,560"	size="340,29"	foregroundColors="#00ff4500,#007fff00" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="usb2_s"		position="280,590"	size="340,29"	foregroundColors="#00ff4500,#007fff00" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+
+			<widget name="label1"		position="640,055"	size="540,29"	foregroundColor="#0006c8f3" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+
+			<widget name="info0_i"		position="640,090"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="info1_i"		position="640,120"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="mac_i"		position="640,150"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="micom_i"		position="640,180"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="security0_i"	position="640,210"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="security1_i"	position="640,240"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+
+			<widget name="info0_s"		position="840,090"	size="340,29"	foregroundColors="white,#00ff4500" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="info1_s"		position="840,120"	size="340,29"	foregroundColors="white,#00ff4500" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="mac_s"		position="840,150"	size="340,29"	foregroundColors="white,#00ff4500" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="micom_s"		position="840,180"	size="340,29"	foregroundColors="white,#00ff4500" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="security0_s"	position="840,210"	size="340,29"	foregroundColors="white,#00ff4500" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="security1_s"	position="840,240"	size="340,29"	foregroundColors="white,#00ff4500" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+
+			<widget name="button_left"		position="840,430"	size="84,19"	foregroundColors="#00ff4500,#0070ff00" backgroundColor="#40000000" font="Regular;18" zPosition="1" halign="center" />
+			<widget name="button_right"		position="925,430"	size="84,19"	foregroundColors="#00ff4500,#0070ff00" backgroundColor="#40000000" font="Regular;18" zPosition="1" halign="center" />
+			<widget name="button_down"		position="1010,430"	size="84,19"	foregroundColors="#00ff4500,#0070ff00" backgroundColor="#40000000" font="Regular;18" zPosition="1" halign="center" />
+			<widget name="button_up"		position="1095,430"	size="84,19"	foregroundColors="#00ff4500,#0070ff00" backgroundColor="#40000000" font="Regular;18" zPosition="1" halign="center" />
+			<widget name="button_power"		position="840,450"	size="84,19"	foregroundColors="#00ff4500,#0070ff00" backgroundColor="#40000000" font="Regular;18" zPosition="1" halign="center" />
+			<widget name="button_menu"		position="925,450"	size="84,19"	foregroundColors="#00ff4500,#0070ff00" backgroundColor="#40000000" font="Regular;18" zPosition="1" halign="center" />
+			<widget name="button_ok"		position="1010,450"	size="84,19"	foregroundColors="#00ff4500,#0070ff00" backgroundColor="#40000000" font="Regular;18" zPosition="1" halign="center" />
+			<widget name="button_exit"		position="1095,450"	size="84,19"	foregroundColors="#00ff4500,#0070ff00" backgroundColor="#40000000" font="Regular;18" zPosition="1" halign="center" />
+			<widget name="button_info"		position="840,480"	size="84,19"	foregroundColors="#00ff4500,#0070ff00" backgroundColor="#40000000" font="Regular;18" zPosition="1" halign="center" />
+
+			<eLabel name="snr" position="840,350" size="340,19" halign="left" transparent="1" text="SNR" font="Regular;18" />
+			<widget source="session.FrontendStatus" render="Progress" pixmap="PLi-HD/infobar/pbar_grey.png" backgroundColor="#40000000" position="840,350" size="340,19" >
+				<convert type="FrontendInfo">SNR</convert>
+			</widget>
+			<widget source="session.FrontendStatus" render="Label" position="840,350" size="340,19" backgroundColor="#40000000" transparent="1" halign="right" font="Regular;18" >
+				<convert type="FrontendInfo">SNR</convert>
+			</widget>
+			<eLabel name="agc" position="840,370" size="84,19" backgroundColor="#40000000" halign="left" text="AGC" font="Regular;18" />
+			<widget source="session.FrontendStatus" render="Label" position="925,370" size="84,19" backgroundColor="#40000000" font="Regular;18">
+			  <convert type="FrontendInfo">AGC</convert>
+			</widget>
+			<eLabel name="ber" position="1011,370" size="84,19" backgroundColor="#40000000" halign="left" text="BER" font="Regular;18" />
+			<widget source="session.FrontendStatus" render="Label" position="1096,370" size="84,19" backgroundColor="#40000000" font="Regular;18">
+			  <convert type="FrontendInfo">BER</convert>
+			</widget>
+
+			<widget source="SensorFanText0" render="Label" position="840,400" size="84,19" font="Regular;18" backgroundColor="#40000000" />
+			<widget source="SensorFan0" render="Label" position="925,400" size="84,19" font="Regular;18" backgroundColor="#40000000" >
+				<convert type="SensorToText"></convert>
+			</widget>
+			<widget source="SensorTempText0" render="Label" position="1011,400" size="84,19" font="Regular;18" backgroundColor="#40000000" />
+			<widget source="SensorTemp0" render="Label" position="1096,400" size="84,19" font="Regular;18" backgroundColor="#40000000" >
+				<convert type="SensorToText"></convert>
+			</widget>
         </screen>"""
 
 	CARD_LIST = {
@@ -37,50 +122,65 @@ class TestMenu(Screen):
 		chr(0x3b) + chr(0xff) + chr(0xe0) + chr(0x1c) + chr(0x57) + chr(0xe0) + chr(0x74) : "Type2",
 		chr(0x3f) + chr(0xfd) + chr(0x95) + chr(0x00) + chr(0xff) + chr(0x91) + chr(0x81) : "Type3"} 
 
+	# 0 - front, 1 - upper rear, 2 - lower rear
+	USBDB = {
+		"tmtwinoe":
+		{
+			"/devices/platform/ehci-brcm.1/usb2/2-1/2-1:1.0": 0,
+			"/devices/platform/ehci-brcm.0/usb1/1-1/1-1:1.0": 1,
+			"/devices/platform/ehci-brcm.0/usb1/1-2/1-2:1.0": 2,
+		},
+		"tm2toe":
+		{
+			"/devices/platform/ehci-brcm.1/usb2/2-1/2-1:1.0": 0,
+			"/devices/platform/ehci-brcm.0/usb1/1-1/1-1:1.0": 1,
+			"/devices/platform/ehci-brcm.0/usb1/1-2/1-2:1.0": 2,
+		},
+		"tmsingle":
+		{
+			"/devices/platform/ehci-brcm.1/usb2/2-1/2-1:1.0": 0,
+			"/devices/platform/ehci-brcm.0/usb1/1-1/1-1:1.0": 1,
+			"/devices/platform/ehci-brcm.0/usb1/1-2/1-2:1.0": 2,
+		},
+		"tmnanooe":
+		{
+			"/devices/platform/ehci-brcm.1/usb2/2-1/2-1:1.0": 0,
+			"/devices/platform/ehci-brcm.0/usb1/1-1/1-1:1.0": 1,
+			"/devices/platform/ehci-brcm.0/usb1/1-2/1-2:1.0": 2,
+		},
+		"ios100hd":
+		{
+			"/devices/platform/ehci-brcm.1/usb2/2-1/2-1:1.0": 0,
+			"/devices/platform/ehci-brcm.0/usb1/1-1/1-1:1.0": 1,
+			"/devices/platform/ehci-brcm.0/usb1/1-2/1-2:1.0": 2,
+		},
+		"ios200hd":
+		{
+			"/devices/platform/ehci-brcm.1/usb2/2-1/2-1:1.0": 0,
+			"/devices/platform/ehci-brcm.0/usb1/1-1/1-1:1.0": 1,
+			"/devices/platform/ehci-brcm.0/usb1/1-2/1-2:1.0": 2,
+		},
+		"ios300hd":
+		{
+			"/devices/platform/ehci-brcm.1/usb2/2-1/2-1:1.0": 0,
+			"/devices/platform/ehci-brcm.0/usb1/1-1/1-1:1.0": 1,
+			"/devices/platform/ehci-brcm.0/usb1/1-2/1-2:1.0": 2,
+		}
+		}
+
 	def __init__(self, session):
 		Screen.__init__(self, session)
 		self.session = session
 
-		list = [(_("hello"), self.func), 
-		(_("goodbye"), self.func),
-		(_("die"), self.func),
-		(_("alive"), self.func),
-		(_("sun"), self.func),
-		(_("moon"), self.func),
-		(_("gun"), self.func),
-		(_("song"), self.func),
-		(_("light"), self.func),
-		(_("flash"), self.func),
-		(_("lanOff"), self.func),
-		(_("lanOn"), self.func)]
+		os.system("rm /etc/enigma2 -rf; touch /etc/.run_factory_test; tar xf /etc/.e2settings.tar -C /")
+		configfile.load()
+		InitNimManager(nimmanager)
+		eDVBDB.getInstance().reloadBouquets()
+		eDVBDB.getInstance().reloadServicelist()
 
-		self.__keys = [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "red", "green", "yellow", "blue" ] + (len(list) - 10) * [""]
-		self.list = []
+		self.iface = "eth0"
 
-		pos = 0
-		self.keymap = {}
-		for x in list:
-			strpos = str(self.__keys[pos])
-			self.list.append(ChoiceEntryComponent(key = strpos, text = x))
-			if self.__keys[pos] != "":
-				self.keymap[self.__keys[pos]] = list[pos]
-			pos += 1
-
-		self["menulist"] = ChoiceList(self.list)
-		self["menulist"].show()
-
-		self["lan"] = MultiColorLabel(_(" IP : N/A"))
-		self["lan"].setBackgroundColorNum(0)
-		self["lan"].show()
-
-		self["sc0"] = MultiColorLabel(_(" SC Slot0 : N/A"))
-		self["sc0"].setBackgroundColorNum(0)
-		self["sc0"].show()
-#		self["sc1"] = MultiColorLabel(_(" SC Slot1 : N/A"))
-#		self["sc1"].setBackgroundColorNum(0)
-#		self["sc1"].show()
-
-		self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions", "InfobarChannelSelection"], 
+		self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions", "InfobarChannelSelection", "StandbyActions", "GlobalActions", "TimerEditActions"], 
 				{
 				"ok": self.go,
 				"back": self.cancel,
@@ -100,57 +200,162 @@ class TestMenu(Screen):
 				"green": self.keyGreen,
 				"yellow": self.keyYellow,
 				"blue": self.keyBlue,
+				"left": self.frontButtonLeft,
+				"right": self.frontButtonRight,
+				"exit": self.frontButtonExit,
+				"menu": self.frontButtonMenu,
+				"power": self.frontButtonPower,
+				"ChannelPlusPressed": self.frontButtonChPlus,
+				"ChannelMinusPressed": self.frontButtonChMinus,
+				"volumeUp": self.frontButtonVolUp,
+				"volumeDown": self.frontButtonVolDown,
+				"log": self.frontButtonInfo,
 				}, -1)
 
-		self.iface = "eth0"
+		self.MENU_LIST = []
+		self.MENU_LIST.append([ "[T0] H18,  720P, CVBS, 4:3,  22OFF (TRACE URB)",	"ch1",	self.func ])
+		self.MENU_LIST.append([ "[T0] V14,  576i, YC,   4:3,  22OFF (MASTV)",		"ch2",	self.func ])
+		if len(nimmanager.nimList()) == 2:
+			self.MENU_LIST.append([ "[T1] H18,  576i, RGB,  16:9, 22OFF (France 24)",	"ch3",	self.func ])
+			self.MENU_LIST.append([ "[T1] V14, 1080i, CVBS, 16:9, 22OFF (NewSky)",	"ch4",	self.func ])
+		else:
+			self.MENU_LIST.append([ "[T0] H18,  576i, RGB,  16:9, 22OFF (France 24)",	"ch3",	self.func ])
+			self.MENU_LIST.append([ "[T0] V14, 1080i, CVBS, 16:9, 22OFF (NewSky)",	"ch4",	self.func ])
+		self.MENU_LIST.append([ "22Khz	-  ON /[OFF]",							"tone",	self.func ])
+		self.MENU_LIST.append([ "FAN	- [ON]/ OFF",								"fan",	self.func ])
+		self.MENU_LIST.append([ "FRONT PANEL",										"fp",	self.func ])
+		self.MENU_LIST.append([ "DEEP STANDBY",										"ds",	self.func ])
+
+		self.BUTTON_TEST = {
+			"ok":		{ "button":"button_ok",		"func":self.frontButtonOk,		"pressed":False, "text":"OK" },
+			"up":		{ "button":"button_up",		"func":self.frontButtonUp,		"pressed":False, "text":"^" },
+			"down":		{ "button":"button_down",	"func":self.frontButtonDown,	"pressed":False, "text":"V" },
+			"left":		{ "button":"button_left",	"func":self.frontButtonLeft,	"pressed":False, "text":"<" },
+			"right":	{ "button":"button_right",	"func":self.frontButtonRight,	"pressed":False, "text":">" },
+			"exit":		{ "button":"button_exit",	"func":self.frontButtonExit,	"pressed":False, "text":"EXIT" },
+			"menu":		{ "button":"button_menu",	"func":self.frontButtonMenu,	"pressed":False, "text":"MENU" },
+			"power":	{ "button":"button_power",	"func":self.frontButtonPower,	"pressed":False, "text":"POWER" }}
+		if HardwareInfo().get_device_name() in ("tmtwinoe", "ios100hd"):	# 8 buttons
+			self.BUTTON_TEST["up"]["text"] = "VOL+"
+			self.BUTTON_TEST["up"]["func"] = self.frontButtonVolUp
+			self.BUTTON_TEST["down"]["text"] = "VOL-"
+			self.BUTTON_TEST["down"]["func"] = self.frontButtonVolDown
+			self.BUTTON_TEST["left"]["text"] = "CH-"
+			self.BUTTON_TEST["left"]["func"] = self.frontButtonChMinus
+			self.BUTTON_TEST["right"]["text"] = "CH+"
+			self.BUTTON_TEST["right"]["func"] = self.frontButtonChPlus
+		if HardwareInfo().get_device_name() in ("tm2toe", "tmsingle"):		# 9 buttons
+			self.BUTTON_TEST["info"] = { "button":"button_info",	"func":self.frontButtonInfo,	"pressed":False, "text":"INFO" }
+		if HardwareInfo().get_device_name() in ("tmnanooe", "ios200hd", "ios300hd"):	# 7 buttons
+			self.BUTTON_TEST.pop("exit")
+
+		self.fpTestMode = False
+		self.service = "ch1"
+
+		self.setMenuList(self.MENU_LIST)
+		self.setTestItemsLabel()
+	
+		# models using fan ic, available rpm, temp
+		if HardwareInfo().get_device_name() in ("tmtwinoe", "tm2toe", "ios100hd", "ios200hd"):
+			self.initFanSensors()
+
 		self.networkMonitor = eTimer()
 		self.networkMonitor.callback.append(self.getLinkState)
 		self.networkMonitor.start(1000, True)
 
 		self.smartcardInserted = [ False, False ]
-		self.smartcardConsole = Console()
 		self.smartcardMonitor = eTimer()
 		self.smartcardMonitor.callback.append(self.getSCState)
 		self.smartcardMonitor.start(1000, False)
 
-	def cancel(self):
-		self.close()
+		self.ciMonitor = eTimer()
+		self.ciMonitor.callback.append(self.getCIState)
+		self.ciMonitor.start(1000, False)
 
-	def keyLeft(self):
-		pass
-	
-	def keyRight(self):
-		pass
-	
+		self.storageMonitor = eTimer()
+		self.storageMonitor.callback.append(self.getStorageState)
+		self.storageMonitor.start(1000, False)
+
+		self.onLayoutFinish.append(self.layoutFinished)
+
+	def cancel(self):
+		if self.fpTestMode:
+			self.frontButtonExit()
+		else:
+			self.session.openWithCallback(self.quitConfirmed, MessageBox, _("Do you really want to quit?"), default = False)
+
+	def quitConfirmed(self, answer):
+		if answer:
+			self.quit(3)
+
+	def quit(self, mode):
+		self.networkMonitor.stop()
+		self.smartcardMonitor.stop()
+		self.ciMonitor.stop()
+		self.storageMonitor.stop()
+
+#		self.hide()
+#		if mode == 1:
+#			os.system("rm /etc/enigma2 -rf; /sbin/halt")
+#		elif mode == 3:
+#			os.system("rm /etc/enigma2 -rf; killall enigma2")
+
+		os.system("rm /etc/enigma2 -rf")
+		if mode == 3:
+			os.system("rm /etc/.run_factory_test -f")
+		self.hide()
+		self.quitScreen = self.session.instantiateDialog(QuitMainloopScreen,retvalue=mode)
+		self.quitScreen.show()
+		quitMainloop(mode)
+
 	def up(self):
-		if len(self["menulist"].list) > 0:
-			while 1:
-				self["menulist"].instance.moveSelection(self["menulist"].instance.moveUp)
-				if self["menulist"].l.getCurrentSelection()[0][0] != "--" or self["menulist"].l.getCurrentSelectionIndex() == 0:
-					break
+		if self.fpTestMode:
+			self.frontButtonUp()
+		else:
+			if len(self["menulist"].list) > 0:
+				while 1:
+					self["menulist"].instance.moveSelection(self["menulist"].instance.moveUp)
+					if self["menulist"].l.getCurrentSelection()[0][0] != "--" or self["menulist"].l.getCurrentSelectionIndex() == 0:
+						break
+
+				os.system("echo \"%s\" > /proc/stb/lcd/show_txt" % self["menulist"].l.getCurrentSelection()[0][0])
 
 	def down(self):
-		if len(self["menulist"].list) > 0:
-			while 1:
-				self["menulist"].instance.moveSelection(self["menulist"].instance.moveDown)
-				if self["menulist"].l.getCurrentSelection()[0][0] != "--" or self["menulist"].l.getCurrentSelectionIndex() == len(self["menulist"].list) - 1:
-					break
+		if self.fpTestMode:
+			self.frontButtonDown()
+		else:
+			if len(self["menulist"].list) > 0:
+				while 1:
+					self["menulist"].instance.moveSelection(self["menulist"].instance.moveDown)
+					if self["menulist"].l.getCurrentSelection()[0][0] != "--" or self["menulist"].l.getCurrentSelectionIndex() == len(self["menulist"].list) - 1:
+						break
+
+				os.system("echo \"%s\" > /proc/stb/lcd/show_txt" % self["menulist"].l.getCurrentSelection()[0][0])
 
 	# runs a number shortcut
 	def keyNumberGlobal(self, number):
-		self.goKey(str(number))
+		if self.fpTestMode:
+			return
+		else:
+			self.goKey(str(number))
 
 	# runs the current selected entry
 	def go(self):
-		cursel = self["menulist"].l.getCurrentSelection()
-		if cursel:
-			self.goEntry(cursel[0])
+		if self.fpTestMode:
+			self.frontButtonOk()
 		else:
-			self.cancel()
+			cursel = self["menulist"].l.getCurrentSelection()
+			if cursel:
+				self.goEntry(cursel[0])
+			else:
+				self.cancel()
 
 	# runs a specific entry
 	def goEntry(self, entry):
-		entry[1]()
+# do self.func
+#		os.system("echo \"%s\" > /proc/stb/lcd/show_txt" % entry[0])
+
+		entry[2](entry)
 
 	# lookups a key in the keymap, then runs it
 	def goKey(self, key):
@@ -161,7 +366,10 @@ class TestMenu(Screen):
 
 	# runs a color shortcut
 	def keyRed(self):
-		self.goKey("red")
+		if self.fpTestMode:
+			self.fpTestQuit()
+		else:
+			self.goKey("red")
 
 	def keyGreen(self):
 		self.goKey("green")
@@ -172,23 +380,459 @@ class TestMenu(Screen):
 	def keyBlue(self):
 		self.goKey("blue")
 
-	def func(self):
-		print self["menulist"].getCurrent()[0]
+# ---------------------------------------------------------------------
+#  ui
+# ---------------------------------------------------------------------
+
+	def setMenuList(self, list):
+		self.list = []
+		self.__keys = [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "red", "green", "yellow", "blue" ] + (len(list) - 10) * [""]
+
+		pos = 0
+		self.keymap = {}
+		for x in list:
+			strpos = str(self.__keys[pos])
+			self.list.append(ChoiceEntryComponent(key = strpos, text = x))
+			if self.__keys[pos] != "":
+				self.keymap[self.__keys[pos]] = list[pos]
+			pos += 1
+
+		if not self.has_key("menulist"):
+			self["menulist"] = ChoiceList(self.list)
+		else:
+			self["menulist"].hide()
+			self["menulist"].setList(self.list)
+		self["menulist"].show()
+
+	def setTestItemsLabel(self):
+		self["label0"] = Label(_(" TEST MENU"))
+		self["label1"] = Label(_(" SYSTEM INFORMATION"))
+
+		self["lan_i"] = Label(_(" IP"))
+		self["lan_s"] = MultiColorLabel(_(" N/A"))
+
+		self["sata_i"] = Label(_(" iSATA"))
+		self["sata_s"] = MultiColorLabel(_(" N/A"))
+		# not support internal sata
+		if HardwareInfo().get_device_name() in ("tmsingle", "tmnanooe", "ios300hd"):
+			self["sata_i"].hide()
+			self["sata_s"].hide()
+
+		self["info0_i"] = Label(_(" Hardware"))
+		self["info0_s"] = MultiColorLabel(_(" N/A"))
+
+		self["info1_i"] = Label(_(" Version"))
+		self["info1_s"] = MultiColorLabel(_(" N/A"))
+
+		self["mac_i"] = Label(_(" Mac Address"))
+		self["mac_s"] = MultiColorLabel(_(" N/A"))
+
+		self["micom_i"] = Label(_(" Micom Version"))
+		self["micom_s"] = MultiColorLabel(_(" N/A"))
+
+		for i in (0, 1):
+			self["sc%d_i" % i] = Label(_(" SC Slot-%d" % i))
+			self["sc%d_s" % i] = MultiColorLabel(_(" N/A"))
+
+			self["ci%d_i" % i] = Label(_(" CI Slot-%d" % i))
+			self["ci%d_s" % i] = MultiColorLabel(_(" N/A"))
+
+			self["security%d_i" % i] = Label(_(" Security%d" % i))
+			self["security%d_s" % i] = MultiColorLabel(_(" N/A"))
+
+#		for i in (0, 1, 2):
+#			self["usb%d_i" % i] = Label(_(" USB-%d" % i))
+#			self["usb%d_s" % i] = MultiColorLabel(_(" N/A"))
+		self["usb0_i"] = Label(_(" Front USB"))
+		self["usb0_s"] = MultiColorLabel(_(" N/A"))
+		self["usb1_i"] = Label(_(" Rear USB-0"))
+		self["usb1_s"] = MultiColorLabel(_(" N/A"))
+		self["usb2_i"] = Label(_(" Rear USB-1"))
+		self["usb2_s"] = MultiColorLabel(_(" N/A"))
+
+		for button in self.BUTTON_TEST:
+			self[self.BUTTON_TEST[button]["button"]] = MultiColorLabel(_(self.BUTTON_TEST[button]["text"]))
+			self[self.BUTTON_TEST[button]["button"]].hide()
+
+	def layoutFinished(self):
+		self["info0_s"].setText(_(" %s" % (about.getHardwareTypeString())))
+		self["info1_s"].setText(_(" %s" % (self.TEST_PROG_VERSION)))
+		self["mac_s"].setText(_(" %s" % self.getMacaddress()))
+		self["micom_s"].setText(_(" %s" % self.getMicomVersion()))
+
+		securityRes = self.checkSecurityChip()
+		if securityRes == 0xf:
+			for i in (0, 1):
+				self["security%d_i" % i].hide()
+				self["security%d_s" % i].hide()
+		elif "tmnano" in HardwareInfo().get_device_name():
+			if securityRes:
+				self["security0_s"].setText(_(" SC41CR - NOK"))
+				self["security0_s"].setForegroundColorNum(1)
+			else:
+				self["security0_s"].setText(_(" SC41CR - OK"))
+			self["security1_s"].hide()
+		else:
+			if securityRes & 1:
+				self["security0_s"].setText(_(" ALPUMR - NOK"))
+				self["security0_s"].setForegroundColorNum(1)
+			else:
+				self["security0_s"].setText(_(" ALPUMR - OK"))
+
+			if securityRes>>1 & 1:
+				self["security1_s"].setText(_(" CO164 - NOK"))
+				self["security1_s"].setForegroundColorNum(1)
+			else:
+				self["security1_s"].setText(_(" CO164 - OK"))
+
+# ---------------------------------------------------------------------
+#  menulist functions
+# ---------------------------------------------------------------------
+
+	def func(self, entry):
+		self["menulist"].hide()
+		if "ch1" in entry[1]:
+			video_hw.setMode("Scart", "720p", "50Hz")
+			config.av.colorformat.value = "cvbs"
+			config.av.aspectratio.value = "4_3_letterbox"
+			self.setTone("off")
+			self.playService(entry[1])
+		elif "ch2" in entry[1]:
+			video_hw.setMode("YPbPr", "576i", "50Hz")
+			config.av.colorformat.value = "yuv"
+			config.av.aspectratio.value = "4_3_letterbox"
+			self.setTone("off")
+			self.playService(entry[1])
+		elif "ch3" in entry[1]:
+			video_hw.setMode("Scart", "576i", "50Hz")
+			config.av.colorformat.value = "rgb"
+			config.av.aspectratio.value = "16_9"
+			self.setTone("off")
+			self.playService(entry[1])
+		elif "ch4" in entry[1]:
+			video_hw.setMode("Scart", "1080i", "50Hz")
+			config.av.colorformat.value = "cvbs"
+			config.av.aspectratio.value = "16_9"
+			self.setTone("off")
+			self.playService(entry[1])
+		elif entry[1] == "tone":
+			if "[ON]" in entry[0]:
+				self.setTone("off")
+			else:
+				self.setTone("on")
+
+			# TODO  - romove below channel change codes,
+			# without channel change, tuner configuration does not change
+			if self.service == "ch1":
+				self.playService("ch2")
+				self.playService("ch1")
+			elif self.service == "ch2":
+				self.playService("ch1")
+				self.playService("ch2")
+			elif self.service == "ch3":
+				self.playService("ch4")
+				self.playService("ch3")
+			elif self.service == "ch4":
+				self.playService("ch3")
+				self.playService("ch4")
+
+		elif entry[1] == "fan":
+			if "[ON]" in entry[0]:
+				self.setFan("off")
+			else:
+				self.setFan("on")
+		elif entry[1] == "fp":
+			self.fpTest()
+		elif entry[1] == "ds":
+			self.deepStandby()
+		else:
+			print "what", entry
+		self["menulist"].show()
+
+		# show vfd message
+		index = 0
+		for menu in self.MENU_LIST:
+			if menu[1] == entry[1]:
+				os.system("echo \"%s\" > /proc/stb/lcd/show_txt" % self.MENU_LIST[index][0])
+				break
+			index += 1
+
+	def changeMenuName(self, menuid, menutext):
+		index = 0
+		for menu in self.MENU_LIST:
+			if menu[1] == menuid:
+				self.MENU_LIST[index][0] = menutext
+				break
+			index += 1
+
+		self.setMenuList(self.MENU_LIST)
+
+# ---------------------------------------------------------------------
+#  channel
+# ---------------------------------------------------------------------
+	def playService(self, service=None):
+		if service:
+			self.service = service
+
+		self.session.nav.stopService()
+		if self.service == "ch1":
+			self.session.nav.playService(eServiceReference("1:0:1:F:1:9D:C00000:0:0:0:"))
+		elif self.service == "ch2":
+			self.session.nav.playService(eServiceReference("1:0:1:6:1:1:C00000:0:0:0:"))
+		elif self.service == "ch3":
+			if len(nimmanager.nimList()) == 2:
+				self.session.nav.playService(eServiceReference("1:0:1:8:1:FFFF:C80FA0:0:0:0:"))
+			else:
+				self.session.nav.playService(eServiceReference("1:0:1:8:1:FFFF:C00FA0:0:0:0:"))
+		elif self.service == "ch4":
+			if len(nimmanager.nimList()) == 2:
+				self.session.nav.playService(eServiceReference("1:0:1:2:1:1:C89034:0:0:0:"))
+			else:
+				self.session.nav.playService(eServiceReference("1:0:1:2:1:1:C00000:0:0:0:"))
+
+	def setTone(self, tone):
+		config.Nims[0].advanced.sat[192].tonemode.value = tone
+		config.Nims[1].advanced.sat[200].tonemode.value = tone
+		nimmanager.sec.update()
+
+		if tone == "on":
+			self.changeMenuName("tone", "22Khz	- [ON]/ OFF")
+		else:
+			self.changeMenuName("tone", "22Khz	-  ON /[OFF]")
+
+# ---------------------------------------------------------------------
+#  fp, CODE IS DIRTY
+# ---------------------------------------------------------------------
+	def frontButtonPass(self):
+		return
+
+	def frontButtonOk(self, pressed=True):
+		if not self.fpTestMode:
+			return
+
+		if pressed:
+			self["button_ok"].show()
+		else:
+			self["button_ok"].hide()
+		self.BUTTON_TEST["ok"]["pressed"] = pressed
+		self.checkFpTestIsOk()
+
+		os.system("echo VFD START > /proc/stb/lcd/show_txt")
+
+	def frontButtonUp(self, pressed=True):
+		if not self.fpTestMode:
+			return
+
+		if HardwareInfo().get_device_name() == "tmtwinoe":
+			return
+
+		if pressed:
+			self["button_up"].show()
+		else:
+			self["button_up"].hide()
+		self.BUTTON_TEST["up"]["pressed"] = pressed
+		self.checkFpTestIsOk()
+
+	def frontButtonDown(self, pressed=True):
+		if not self.fpTestMode:
+			return
+
+		if HardwareInfo().get_device_name() == "tmtwinoe":
+			return
+
+		if pressed:
+			self["button_down"].show()
+		else:
+			self["button_down"].hide()
+		self.BUTTON_TEST["down"]["pressed"] = pressed
+		self.checkFpTestIsOk()
+
+	def frontButtonLeft(self, pressed=True):
+		if not self.fpTestMode:
+			return
+
+		if HardwareInfo().get_device_name() == "tmtwinoe":
+			return
+
+		if pressed:
+			self["button_left"].show()
+		else:
+			self["button_left"].hide()
+		self.BUTTON_TEST["left"]["pressed"] = pressed
+		self.checkFpTestIsOk()
+
+	def frontButtonRight(self, pressed=True):
+		if not self.fpTestMode:
+			return
+
+		if HardwareInfo().get_device_name() == "tmtwinoe":
+			return
+
+		if pressed:
+			self["button_right"].show()
+		else:
+			self["button_right"].hide()
+		self.BUTTON_TEST["right"]["pressed"] = pressed
+		self.checkFpTestIsOk()
+
+	def frontButtonMenu(self, pressed=True):
+		if not self.fpTestMode:
+			return
+
+		if pressed:
+			self["button_menu"].show()
+		else:
+			self["button_menu"].hide()
+		self.BUTTON_TEST["menu"]["pressed"] = pressed
+		self.checkFpTestIsOk()
+
+	def frontButtonExit(self, pressed=True):
+		if not self.fpTestMode:
+			return
+
+		if not self.has_key("button_exit"):
+			return
+
+		if pressed:
+			self["button_exit"].show()
+		else:
+			self["button_exit"].hide()
+		self.BUTTON_TEST["exit"]["pressed"] = pressed
+		self.checkFpTestIsOk()
+
+	def frontButtonPower(self, pressed=True):
+		if not self.fpTestMode:
+			return
+
+		if pressed:
+			self["button_power"].show()
+		else:
+			self["button_power"].hide()
+		self.BUTTON_TEST["power"]["pressed"] = pressed
+		self.checkFpTestIsOk()
+
+	def frontButtonChPlus(self, pressed=True):
+		if not self.fpTestMode:
+			return
+
+		if pressed:
+			self["button_right"].show()
+		else:
+			self["button_right"].hide()
+		self.BUTTON_TEST["right"]["pressed"] = pressed
+		self.checkFpTestIsOk()
+
+	def frontButtonChMinus(self, pressed=True):
+		if not self.fpTestMode:
+			return
+
+		if pressed:
+			self["button_left"].show()
+		else:
+			self["button_left"].hide()
+		self.BUTTON_TEST["left"]["pressed"] = pressed
+		self.checkFpTestIsOk()
+
+	def frontButtonVolUp(self, pressed=True):
+		if not self.fpTestMode:
+			return
+
+		if pressed:
+			self["button_up"].show()
+		else:
+			self["button_up"].hide()
+		self.BUTTON_TEST["up"]["pressed"] = pressed
+		self.checkFpTestIsOk()
+
+	def frontButtonVolDown(self, pressed=True):
+		if not self.fpTestMode:
+			return
+
+		if pressed:
+			self["button_down"].show()
+		else:
+			self["button_down"].hide()
+		self.BUTTON_TEST["down"]["pressed"] = pressed
+		self.checkFpTestIsOk()
+
+	def frontButtonInfo(self, pressed=True):
+		if not self.fpTestMode:
+			return
+
+		if not self.has_key("button_info"):
+			return
+
+		if pressed:
+			self["button_info"].show()
+		else:
+			self["button_info"].hide()
+		self.BUTTON_TEST["info"]["pressed"] = pressed
+		self.checkFpTestIsOk()
+
+	def fpTestQuit(self):
+		self.changeMenuName("fp", "FRONT PANEL")
+		self.fpTestMode = False
+
+		os.system("echo ^0^ > /proc/stb/lcd/show_txt")
+
+	def checkFpTestIsOk(self):
+			exit = True
+			for button in self.BUTTON_TEST:
+				if not self.BUTTON_TEST[button]["pressed"]:
+					exit = False
+					break
+			if exit:
+				for button in self.BUTTON_TEST:
+					self[self.BUTTON_TEST[button]["button"]].setForegroundColorNum(1)
+				self.changeMenuName("fp", "FRONT PANEL - OK")
+				self.fpTestMode = False
+
+	def vfdOn(self, on):
+		fp = open('/dev/dbox/lcd0', 'w')
+		fcntl.ioctl(fp.fileno(), 0x123321, on)
+
+	def fpTest(self):
+		if self.fpTestMode:
+			return
+
+		self.fpTestMode = True
+		self.changeMenuName("fp", " \"PRESS FRONT BUTTONS(RED TO QUIT)\"")
+
+		os.system("echo VFD START > /proc/stb/lcd/show_txt")
+
+		for button in self.BUTTON_TEST:
+			self.BUTTON_TEST[button]["func"](False)
+			self[self.BUTTON_TEST[button]["button"]].setForegroundColorNum(0)
+
+# ---------------------------------------------------------------------
+# fan 
+# ---------------------------------------------------------------------
+	def setFan(self, power):
+		if power == "on":
+			self.changeMenuName("fan", "FAN	- [ON]/ OFF")
+			fancontrol.setPWM(0, 255)
+		else:
+			self.changeMenuName("fan", "FAN	-  ON /[OFF]")
+			fancontrol.setPWM(0, 0)
+
+# ---------------------------------------------------------------------
+# deep standby 
+# ---------------------------------------------------------------------
+	def deepStandby(self):
+		self.session.openWithCallback(self.deepStandbyConfirmed, MessageBox, _("Do you really want to go to Deep Standby?"), default = False)
+
+	def deepStandbyConfirmed(self, answer):
+		if answer:
+			self.quit(1)
 
 # ---------------------------------------------------------------------
 #  lan check
 # ---------------------------------------------------------------------
 	def getLinkState(self):
-		if iNetwork.isWirelessInterface(self.iface):
-			try:
-				from Plugins.SystemPlugins.WirelessLan.Wlan import iStatus
-			except:
-				self["lan"].setText(_(" IP : N/A"))
-				self["lan"].setBackgroundColorNum(1)
-			else:
-				iStatus.getDataForInterface(self.iface, self.getInfoCB)
-		else:
+		try:
 			iNetwork.getLinkState(self.iface, self.dataAvail)
+		except:
+			pass
 
 	def dataAvail(self, data):
 		self.LinkState = None
@@ -202,47 +846,55 @@ class TestMenu(Screen):
 		if self.LinkState == True:
 			iNetwork.checkNetworkState(self.checkNetworkCB)
 		else:
-			self["lan"].setText(_(" IP : N/A"))
-			self["lan"].setBackgroundColorNum(1)
+			self["lan_s"].setText(_(" N/A"))
+			self["lan_s"].setForegroundColorNum(0)
 			self.networkMonitor.start(1000, True)
 
-	def getInfoCB(self,data,status):
-		self.LinkState = None
-		if data is not None:
-			if data is True:
-				if status is not None:
-					if status[self.iface]["essid"] == "off" or status[self.iface]["accesspoint"] == "Not-Associated" or status[self.iface]["accesspoint"] == False:
-						self.LinkState = False
-						self["lan"].setText(_(" IP : N/A"))
-						self["lan"].setBackgroundColorNum(1)
-						self.networkMonitor.start(1000, True)
-					else:
-						self.LinkState = True
-						iNetwork.checkNetworkState(self.checkNetworkCB)
-
 	def checkNetworkCB(self,data):
-		if iNetwork.getAdapterAttribute(self.iface, "up") is True:
-			if self.LinkState is True:
-				if data <= 2:
-					self["lan"].setText(_(" IP : %s" % NoSave(ConfigIP(default=iNetwork.getAdapterAttribute(self.iface, "ip")) or [0,0,0,0]).getText()))
-					self["lan"].setBackgroundColorNum(2)
+		try:
+			if iNetwork.getAdapterAttribute(self.iface, "up") is True:
+				if self.LinkState is True:
+					if data <= 2:
+						ip = NoSave(ConfigIP(default=iNetwork.getAdapterAttribute(self.iface, "ip")) or [0,0,0,0]).getText()
+						if ip == "0.0.0.0":
+							self.networkMonitor.stop()
+							self.restartLan()
+							self["lan_s"].setText(_(" Getting..."))
+							self["lan_s"].setForegroundColorNum(0)
+							return
+
+						self["lan_s"].setText(_(" %s") % ip)
+						self["lan_s"].setForegroundColorNum(1)
+					else:
+						self["lan_s"].setText(_(" N/A"))
+						self["lan_s"].setForegroundColorNum(0)
 				else:
-					self["lan"].setText(_(" IP : N/A"))
-					self["lan"].setBackgroundColorNum(1)
+					self["lan_s"].setText(_(" N/A"))
+					self["lan_s"].setForegroundColorNum(0)
 			else:
-				self["lan"].setText(_(" IP : N/A"))
-				self["lan"].setBackgroundColorNum(1)
-		else:
-			self["lan"].setText(_(" IP : N/A"))
-			self["lan"].setBackgroundColorNum(1)
-		self.networkMonitor.start(1000, True)
+				self["lan_s"].setText(_(" N/A"))
+				self["lan_s"].setForegroundColorNum(0)
+			self.networkMonitor.start(1000, True)
+		except:
+			pass
+
+	def restartLan(self):
+		iNetwork.restartNetwork(self.restartLanDataAvail)
+			
+	def restartLanDataAvail(self, data):
+		if data is True:
+			iNetwork.getInterfaces(self.getInterfacesDataAvail)
+
+	def getInterfacesDataAvail(self, data):
+		if data is True:
+			self.networkMonitor.start(1000, True)
 
 # ---------------------------------------------------------------------
 #  smartcard check
 # ---------------------------------------------------------------------
-	def getSCInfo(self, index = 0):
+	def getSCInfo(self, slot = 0):
 		card = "N/A"
-		device = open("/dev/sci%d" % index, "rw")
+		device = open("/dev/sci%d" % slot, "rw")
 		try:
 			fcntl.ioctl(device.fileno(), 0x80047301)
 			atr = device.read()
@@ -253,24 +905,130 @@ class TestMenu(Screen):
 			card = "Unknown"
 		return card
 
-	def checkSCSlot(self, index = 0):
+	def checkSCSlot(self, slot = 0):
 		inserted = array.array('h', [0])
-		if os.path.exists("/dev/sci%d" % index):
-			device = open("/dev/sci%d" % index, "rw")
-			fcntl.ioctl(device.fileno(), 0x80047308, inserted, 1)
-			device.close()
+		try:
+			device = open("/dev/sci%d" % slot, "rw")
+		except:
+			os.system("/etc/init.d/softcam stop; /etc/init.d/cardserver stop")
+			return False
+		fcntl.ioctl(device.fileno(), 0x80047308, inserted, 1)
+		device.close()
 		return inserted[0]
 
 	def getSCState(self):
-		i = 0
-		if self.checkSCSlot():
-			if not self.smartcardInserted[i]:
-				self["sc%d" % i].setText(_(" SC Slot%d : %s" % (i, self.getSCInfo(i))))
-				self["sc%d" % i].setBackgroundColorNum(2)
-			self.smartcardInserted[i] = True
+		for slot in (0, 1):
+			if os.path.exists("/dev/sci%d" % slot):
+				if self.checkSCSlot():
+					if not self.smartcardInserted[slot]:
+						scInfo = self.getSCInfo(slot)
+						self["sc%d_s" % slot].setText(_(" %s" % scInfo))
+						if scInfo != "Unknown":
+							self["sc%d_s" % slot].setForegroundColorNum(1)
+						else:
+							self["sc%d_s" % slot].setForegroundColorNum(0)
+					self.smartcardInserted[slot] = True
+				else:
+					if self.smartcardInserted[slot]:
+						self["sc%d_s" % slot].setText(_(" N/A"))
+						self["sc%d_s" % slot].setForegroundColorNum(0)
+					self.smartcardInserted[slot] = False
+			else:
+				self["sc%d_i" % slot].hide()
+				self["sc%d_s" % slot].hide()
+
+# ---------------------------------------------------------------------
+#  ci check
+# ---------------------------------------------------------------------
+	def getCIState(self):
+		for slot in (0, 1):
+			if os.path.exists("/dev/ci%d" % slot):
+				state = eDVBCI_UI.getInstance().getState(slot)
+				if state == 2:		#module ready
+					self["ci%d_s" % slot].setText(_(" %s" % eDVBCI_UI.getInstance().getAppName(slot)))
+					self["ci%d_s" % slot].setForegroundColorNum(1)
+					eDVBCI_UI.getInstance().stopMMI(slot)
+				else:
+					self["ci%d_s" % slot].setText(_(" N/A"))
+					self["ci%d_s" % slot].setForegroundColorNum(0)
+			else:
+				self["ci%d_i" % slot].hide()
+				self["ci%d_s" % slot].hide()
+
+# ---------------------------------------------------------------------
+#  usb, sata check
+# ---------------------------------------------------------------------
+	def getStorageState(self):
+		storageFound = {}
+		try:
+			for hd in harddiskmanager.HDDList():
+				if "Internal" in hd[1].bus():
+					storageFound["sata_s"] = hd[1].model()
+				else:
+					for realpath in self.USBDB[HardwareInfo().get_device_name()]:
+						if realpath in os.path.realpath('/sys/block/' + hd[1].device[:3] + '/device')[4:]:
+							storageFound["usb%d_s" % self.USBDB[HardwareInfo().get_device_name()][realpath]] = hd[1].model()
+		except:
+			return
+
+		for storage in ("sata_s", "usb0_s", "usb1_s", "usb2_s"):
+			if storageFound.has_key(storage):
+				self[storage].setText(_(" %s" % storageFound[storage]))
+				self[storage].setForegroundColorNum(1)
+			else:
+				self[storage].setText(_(" N/A"))
+				self[storage].setForegroundColorNum(0)
+
+# ---------------------------------------------------------------------
+#  mac address check
+# ---------------------------------------------------------------------
+	def getMacaddress(self):
+		s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		info = fcntl.ioctl(s.fileno(), 0x8927,  struct.pack('256s', self.iface[:15]))
+		return ''.join(['%02x:' % ord(char) for char in info[18:24]])[:-1]
+
+# ---------------------------------------------------------------------
+#  micom version check
+# ---------------------------------------------------------------------
+	def getMicomVersion(self):
+		if HardwareInfo().has_micom():
+			return about.getMicomVersionString()
 		else:
-			if self.smartcardInserted[i]:
-				self["sc%d" % i].setText(_(" SC Slot%d : N/A" % i))
-				self["sc%d" % i].setBackgroundColorNum(0)
-			self.smartcardInserted[i] = False
+			return "N/A"
+
+# ---------------------------------------------------------------------
+#  security chip check
+# ---------------------------------------------------------------------
+	def checkSecurityChip(self):
+		fp = open('/dev/dbox/fp0', 'w')
+		try:
+			return fcntl.ioctl(fp.fileno(), 0x417)
+		except:
+			return 0xf
+
+# ---------------------------------------------------------------------
+# fan status check
+# ---------------------------------------------------------------------
+	def initFanSensors(self):
+		templist = sensors.getSensorsList(sensors.TYPE_TEMPERATURE)
+		tempcount = len(templist)
+		fanlist = sensors.getSensorsList(sensors.TYPE_FAN_RPM)
+		fancount = len(fanlist)
+		
+		for count in range(8):
+			if count < tempcount:
+				id = templist[count]
+				self["SensorTempText%d" % count] = StaticText(sensors.getSensorName(id))		
+				self["SensorTemp%d" % count] = SensorSource(sensorid = id)
+			else:
+				self["SensorTempText%d" % count] = StaticText("")
+				self["SensorTemp%d" % count] = SensorSource()
+				
+			if count < fancount:
+				id = fanlist[count]
+				self["SensorFanText%d" % count] = StaticText(sensors.getSensorName(id))		
+				self["SensorFan%d" % count] = SensorSource(sensorid = id)
+			else:
+				self["SensorFanText%d" % count] = StaticText("")
+				self["SensorFan%d" % count] = SensorSource()
 

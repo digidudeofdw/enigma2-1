@@ -455,6 +455,11 @@ def runScreenTest():
 
 	screensToRun.append((100, InfoBar.InfoBar))
 
+# iq - [
+	if os.path.exists("/etc/.run_factory_test"):
+		from Screens.TestMenu import TestMenu
+		screensToRun.append((-100, TestMenu))
+# ]
 	screensToRun.sort()
 
 	enigma.ePythonConfigQuery.setQueryFunc(configfile.getResolvedKey)
