@@ -655,7 +655,13 @@ class RecordTimer(timer.Timer):
 
 		list.append('</timers>\n')
 
-		file = open(self.Filename + ".writing", "w")
+# iq - [
+		try:
+			file = open(self.Filename + ".writing", "w")
+		except:
+			return
+		#file = open(self.Filename + ".writing", "w")
+# ]
 		for x in list:
 			file.write(x)
 		file.flush()
