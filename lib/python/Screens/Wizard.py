@@ -237,7 +237,9 @@ class Wizard(Screen):
 			"9": self.keyNumberGlobal,
 			"0": self.keyNumberGlobal
 # iq - [
-			,"menu": self.countMenuKey
+			"prevSubservice": self.checkTestMenuKey0,
+			"nextSubservice": self.checkTestMenuKey1,
+			"menu": self.countMenuKey
 # ]
 		}, -1)
 
@@ -249,6 +251,8 @@ class Wizard(Screen):
 		self["VirtualKB"].setEnabled(False)
 
 # iq - [	
+		self.testMenuKeyCount = 0
+
 		# support only tm models
 		self.devices = { "tm2toe":1, "tmtwinoe":2, "tmsingle":4, "tmnanooe":4 }
 		self.models = { 1:"TM-2T", 2:"TM-TWIN", 4:"TM-SINGLE/TM-NANO-OE" }
@@ -300,6 +304,28 @@ class Wizard(Screen):
 
 	def showVfdMessage(self, ret):
 		os.system("echo \"RCU: %s\" > /proc/stb/lcd/show_txt" % self.models.get(self.rcu))
+
+	def checkTestMenuKey0(self):
+		if self.testMenuKeyCount == 0:
+			self.testMenuKeyCount = 1
+		elif self.testMenuKeyCount == 2:
+			self.testMenuKeyCount = 3
+		else:
+			self.testMenuKeyCount = 0
+
+	def checkTestMenuKey1(self):
+		if self.testMenuKeyCount == 4:
+			self.goTestMenu()
+
+	def goTestMenu(self):
+		self.timeoutTimer.stop()
+
+		from Screens.TestMenu import TestMenu
+		self.session.openWithCallback(self.enableTimeoutTimer, TestMenu)
+
+	def enableTimeoutTimer(self):
+		#self.updateValues()
+		self.timeoutTimer.start(1000)
 # ]
 
 	def red(self):
@@ -438,6 +464,15 @@ class Wizard(Screen):
 		self.finished()
 
 	def keyNumberGlobal(self, number):
+# iq - [
+		if self.testMenuKeyCount == 1:
+			self.testMenuKeyCount = 2
+		elif self.testMenuKeyCount == 3:
+			self.testMenuKeyCount = 4
+		else:
+			self.testMenuKeyCount = 0
+# ]
+
 		if (self.wizard[self.currStep]["config"]["screen"] != None):
 			self.configInstance.keyNumberGlobal(number)
 		elif (self.wizard[self.currStep]["config"]["type"] == "dynamic"):
