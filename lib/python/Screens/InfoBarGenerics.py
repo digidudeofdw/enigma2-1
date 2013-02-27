@@ -958,7 +958,15 @@ class InfoBarEPG:
 		self.openEventView()
 
 	def openEventView(self):
-		ref = self.session.nav.getCurrentlyPlayingServiceOrGroup()
+		if config.usage.try_cooltvguide.value:
+			cooltvguidePath = "/usr/lib/enigma2/python/Plugins/Extensions/CoolTVGuide"
+			import os
+			if os.path.exists(cooltvguidePath + "/plugin.py") or os.path.exists(cooltvguidePath + "/plugin.pyo"):
+				import Plugins.Extensions.CoolTVGuide.plugin
+				Plugins.Extensions.CoolTVGuide.plugin.main(self.session, kwargs=None)
+				return
+
+		ref = self.session.nav.getCurrentlyPlayingServiceReference()
 		self.getNowNext()
 		epglist = self.epglist
 		if not epglist:
