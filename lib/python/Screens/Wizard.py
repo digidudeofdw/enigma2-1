@@ -33,8 +33,6 @@ class WizardSummary(Screen):
 		self["text"].setText(text)
 
 class Wizard(Screen):
-	instance = None
-
 	def createSummary(self):
 			print "WizardCreateSummary"
 			return WizardSummary
@@ -204,9 +202,7 @@ class Wizard(Screen):
 
 		self.configInstance = None
 		self.currentConfigIndex = None
-
-		Wizard.instance = self
-
+		
 		self.lcdCallbacks = []
 		
 		self.disableKeys = False
@@ -235,7 +231,7 @@ class Wizard(Screen):
 			"7": self.keyNumberGlobal,
 			"8": self.keyNumberGlobal,
 			"9": self.keyNumberGlobal,
-			"0": self.keyNumberGlobal
+			"0": self.keyNumberGlobal,
 # iq - [
 			"prevSubservice": self.checkTestMenuKey0,
 			"nextSubservice": self.checkTestMenuKey1,
@@ -308,13 +304,19 @@ class Wizard(Screen):
 	def checkTestMenuKey0(self):
 		if self.testMenuKeyCount == 0:
 			self.testMenuKeyCount = 1
-		elif self.testMenuKeyCount == 2:
-			self.testMenuKeyCount = 3
-		else:
-			self.testMenuKeyCount = 0
+			print "checkTestMenuKey0", self.testMenuKeyCount
+			self.goTestMenu()
+#		elif self.testMenuKeyCount == 2:
+#			self.testMenuKeyCount = 3
+#			print "checkTestMenuKey0", self.testMenuKeyCount
+#		else:
+#			self.testMenuKeyCount = 0
+#			print "checkTestMenuKey0", self.testMenuKeyCount
+
 
 	def checkTestMenuKey1(self):
 		if self.testMenuKeyCount == 4:
+			print "checkTestMenuKey1", self.testMenuKeyCount
 			self.goTestMenu()
 
 	def goTestMenu(self):
@@ -383,15 +385,11 @@ class Wizard(Screen):
 	def exitWizardQuestion(self, ret = False):
 		if (ret):
 			self.markDone()
-			self.exit()
+			self.close()
 		
 	def markDone(self):
 		pass
-
-	def exit(self):
-		Wizard.instance = None
-		self.close()
-
+	
 	def getStepWithID(self, id):
 		print "getStepWithID:", id
 		count = 0
@@ -427,7 +425,7 @@ class Wizard(Screen):
 		if ((currStep == self.numSteps and self.wizard[currStep]["nextstep"] is None) or self.wizard[currStep]["id"] == "end"): # wizard finished
 			print "wizard finished"
 			self.markDone()
-			self.exit()
+			self.close()
 		else:
 			self.codeafter = True
 			self.runCode(self.wizard[currStep]["codeafter"])
@@ -563,14 +561,14 @@ class Wizard(Screen):
 		else:
 			if firstset:
 				self["text"].setText(text)
-
+		
 	def updateValues(self):
 		print "Updating values in step " + str(self.currStep)
 		# calling a step which doesn't exist can only happen if the condition in the last step is not fulfilled
 		# if a non-existing step is called, end the wizard 
 		if self.currStep > len(self.wizard):
 			self.markDone()
-			self.exit()
+			self.close()
 			return
 
 		self.timeoutTimer.stop()
@@ -588,7 +586,7 @@ class Wizard(Screen):
 			print "keys*******************:", self.wizard[self.currStep].keys()
 			if self.wizard[self.currStep].has_key("laststep"): # exit wizard, if condition of laststep doesn't hold
 				self.markDone()
-				self.exit()
+				self.close()
 				return
 			else:
 				self.currStep += 1
