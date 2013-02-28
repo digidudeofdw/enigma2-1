@@ -754,7 +754,7 @@ class InfoBarEPG:
 		self["EPGActions"] = HelpableActionMap(self, "InfobarEPGActions",
 			{
 				"showEventInfo": (self.showDefaultEPG, _("Show EPG...")),
-				"showEventInfoPlugin": (self.showEventInfoPlugins, _("List EPG functions...")),
+				"showEventInfoPlugin": self.showEventInfoPlugins, #_("List EPG functions...")),
 				"showInfobarOrEpgWhenInfobarAlreadyVisible": self.showEventInfoWhenNotVisible,
 			})
 
@@ -1090,9 +1090,9 @@ class InfoBarSeek:
 				"unPauseService": (self.unPauseService, _("Continue playback")),
 
 				"seekFwd": (self.seekFwd, _("Seek forward")),
-				"seekFwdManual": (self.seekFwdManual, _("Seek forward (enter time)")),
+				"seekFwdManual": (self.seekFwdManual, #_("Seek forward (enter time)")),
 				"seekBack": (self.seekBack, _("Seek backward")),
-				"seekBackManual": (self.seekBackManual, _("Seek backward (enter time)"))
+				"seekBackManual": self.seekBackManual,# _("Seek backward (enter time)"))
 			}, prio=-1)
 			# give them a little more priority to win over color buttons
 
@@ -1496,8 +1496,8 @@ class InfoBarTimeshift:
 	def __init__(self):
 		self["TimeshiftActions"] = HelpableActionMap(self, "InfobarTimeshiftActions",
 			{
-				"timeshiftStart": (self.startTimeshift, _("Start timeshift")),  # the "yellow key"
-				"timeshiftStop": (self.stopTimeshift, _("Stop timeshift"))      # currently undefined :), probably 'TV'
+				"timeshiftStart": self.startTimeshift,# _("Start timeshift")),  # the "yellow key"
+				"timeshiftStop": self.stopTimeshift,# _("Stop timeshift"))      # currently undefined :), probably 'TV'
 			}, prio=1)
 		self["TimeshiftActivateActions"] = ActionMap(["InfobarTimeshiftActivateActions"],
 			{
@@ -1631,7 +1631,7 @@ class InfoBarExtensions:
 
 		self["InstantExtensionsActions"] = HelpableActionMap(self, "InfobarExtensions",
 			{
-				"extensions": (self.showExtensionSelection, _("Show extensions...")),
+				"extensions": self.showExtensionSelection,# _("Show extensions...")),
 				"getSoftcamKeys": self.getSoftcamKeys,		# [iq]
 			}, 1) # lower priority
 
@@ -1916,7 +1916,7 @@ class InfoBarInstantRecord:
 	def __init__(self):
 		self["InstantRecordActions"] = HelpableActionMap(self, "InfobarInstantRecord",
 			{
-				"instantRecord": (self.instantRecord, _("Instant recording...")),
+				"instantRecord": self.instantRecord,# _("Instant recording...")),
 			})
 		self.recording = []
 
@@ -2103,7 +2103,7 @@ class InfoBarSubserviceSelection:
 	def __init__(self):
 		self["SubserviceSelectionAction"] = HelpableActionMap(self, "InfobarSubserviceSelectionActions",
 			{
-				"subserviceSelection": (self.subserviceSelection, _("Subservice list...")),
+				"subserviceSelection": self.subserviceSelection,# _("Subservice list...")),
 			})
 
 		self["SubserviceQuickzapAction"] = HelpableActionMap(self, "InfobarSubserviceQuickzapActions",
@@ -2233,7 +2233,7 @@ class InfoBarRedButton:
 	def __init__(self):
 		self["RedButtonActions"] = HelpableActionMap(self, "InfobarRedButtonActions",
 			{
-				"activateRedButton": (self.activateRedButton, _("Red button...")),
+				"activateRedButton": self.activateRedButton,# _("Red button...")),
 			})
 		self.onHBBTVActivation = [ ]
 		self.onRedButtonActivation = [ ]
@@ -2594,7 +2594,7 @@ class InfoBarTeletextPlugin:
 		if self.teletext_plugin is not None:
 			self["TeletextActions"] = HelpableActionMap(self, "InfobarTeletextActions",
 				{
-					"startTeletext": (self.startTeletext, _("View teletext..."))
+					"startTeletext": self.startTeletext, # _("View teletext..."))
 				})
 		else:
 			print "no teletext plugin found!"
