@@ -592,7 +592,7 @@ class TestMenu(Screen):
 
 	def setTone(self, tone):
 		config.Nims[0].advanced.sat[192].tonemode.value = tone
-		config.Nims[1].advanced.sat[200].tonemode.value = tone
+		config.Nims[1].advanced.sat[201].tonemode.value = tone
 		nimmanager.sec.update()
 
 		if tone == "on":
