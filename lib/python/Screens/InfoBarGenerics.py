@@ -1090,7 +1090,7 @@ class InfoBarSeek:
 				"unPauseService": (self.unPauseService, _("Continue playback")),
 
 				"seekFwd": (self.seekFwd, _("Seek forward")),
-				"seekFwdManual": (self.seekFwdManual, #_("Seek forward (enter time)")),
+				"seekFwdManual": self.seekFwdManual, #_("Seek forward (enter time)")),
 				"seekBack": (self.seekBack, _("Seek backward")),
 				"seekBackManual": self.seekBackManual,# _("Seek backward (enter time)"))
 			}, prio=-1)
