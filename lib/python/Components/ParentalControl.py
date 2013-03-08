@@ -32,6 +32,7 @@ def InitParentalControl():
 	config.ParentalControl.setuppinactive = ConfigYesNo(default = False)
 	config.ParentalControl.type = ConfigSelection(default = "blacklist", choices = [(LIST_WHITELIST, _("whitelist")), (LIST_BLACKLIST, _("blacklist"))])
 	config.ParentalControl.setuppin = ConfigPIN(default = -1)
+	config.ParentalControl.mastersetuppin = ConfigPIN(default = 2011)
 	
 	config.ParentalControl.retries = ConfigSubsection()
 	config.ParentalControl.retries.setuppin = ConfigSubsection()
