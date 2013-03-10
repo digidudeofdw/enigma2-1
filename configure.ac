@@ -171,6 +171,7 @@ data/rc_models/tm/tmsingleoe/Makefile
 data/rc_models/tm/ios100/Makefile
 data/rc_models/tm/ios200/Makefile
 data/rc_models/tm/ios300/Makefile
+data/rc_models/tm/ios300hd/Makefile
 data/rc_models/tm/tmnanooe/Makefile
 data/rc_models/vu/Makefile
 data/rc_models/xp1000/Makefile
