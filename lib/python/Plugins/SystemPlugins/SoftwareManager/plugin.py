@@ -54,7 +54,10 @@ config.plugins.softwaremanager.overwriteConfigFiles = ConfigSelection(
 				 ("N", _("No, never")),
 				 ("ask", _("Always ask"))
 				], "Y")
-config.plugins.softwaremanager.onSetupMenu = ConfigYesNo(default=False)
+# iq - [
+#config.plugins.softwaremanager.onSetupMenu = ConfigYesNo(default=False)
+config.plugins.softwaremanager.onSetupMenu = ConfigYesNo(default=True)
+# ]
 config.plugins.softwaremanager.onBlueButton = ConfigYesNo(default=False)
 
 def write_cache(cache_file, cache_data):
