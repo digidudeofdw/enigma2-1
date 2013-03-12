@@ -25,13 +25,16 @@ def InitParentalControl():
 	global parentalControl
 	parentalControl = ParentalControl()
 	config.ParentalControl = ConfigSubsection()
-	config.ParentalControl.configured = ConfigYesNo(default = False)
+	config.ParentalControl.configured = ConfigYesNo(default = True)		# [iq]
 	config.ParentalControl.mode = ConfigSelection(default = "simple", choices = [("simple", _("simple")), ("complex", _("complex"))])
 	config.ParentalControl.storeservicepin = ConfigSelection(default = "never", choices = [("never", _("never")), ("5", _("%d minutes") % 5), ("30", _("%d minutes") % 30), ("60", _("%d minutes") % 60), ("standby", _("until standby/restart"))])
 	config.ParentalControl.servicepinactive = ConfigYesNo(default = False)
-	config.ParentalControl.setuppinactive = ConfigYesNo(default = False)
+	config.ParentalControl.setuppinactive = ConfigYesNo(default = True)		# [iq]
 	config.ParentalControl.type = ConfigSelection(default = "blacklist", choices = [(LIST_WHITELIST, _("whitelist")), (LIST_BLACKLIST, _("blacklist"))])
-	config.ParentalControl.setuppin = ConfigPIN(default = -1)
+# iq - [
+#	config.ParentalControl.setuppin = ConfigPIN(default = -1)
+	config.ParentalControl.setuppin = ConfigPIN(default = 0000)
+# ]
 	config.ParentalControl.mastersetuppin = ConfigPIN(default = 2011)
 	
 	config.ParentalControl.retries = ConfigSubsection()
