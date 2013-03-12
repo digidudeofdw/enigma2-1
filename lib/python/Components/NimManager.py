@@ -1302,9 +1302,11 @@ def InitNimManager(nimmgr):
 	def configDiSEqCModeChanged(configElement):
 		section = configElement.section
 		if configElement.value == "1_2" and isinstance(section.longitude, ConfigNothing):
-			section.longitude = ConfigFloat(default = [5,100], limits = [(0,359),(0,999)])
+			#section.longitude = ConfigFloat(default = [5,100], limits = [(0,359),(0,999)])
+			section.longitude = ConfigFloat(default = [0,000], limits = [(0,359),(0,999)])		# [iq]
 			section.longitudeOrientation = ConfigSelection(longitude_orientation_choices, "east")
-			section.latitude = ConfigFloat(default = [50,767], limits = [(0,359),(0,999)])
+			#section.latitude = ConfigFloat(default = [50,767], limits = [(0,359),(0,999)])
+			section.latitude = ConfigFloat(default = [51,500], limits = [(0,359),(0,999)])		# [iq]
 			section.latitudeOrientation = ConfigSelection(latitude_orientation_choices, "north")
 			section.tuningstepsize = ConfigFloat(default = [0,360], limits = [(0,9),(0,999)])
 			section.turningspeedH = ConfigFloat(default = [2,3], limits = [(0,9),(0,9)])
@@ -1415,9 +1417,11 @@ def InitNimManager(nimmgr):
 			nim.diseqcC = ConfigSatlist(list = diseqc_satlist_choices)
 			nim.diseqcD = ConfigSatlist(list = diseqc_satlist_choices)
 			nim.positionerMode = ConfigSelection(positioner_mode_choices, "usals")
-			nim.longitude = ConfigFloat(default=[5,100], limits=[(0,359),(0,999)])
+			#nim.longitude = ConfigFloat(default=[5,100], limits=[(0,359),(0,999)])
+			nim.longitude = ConfigFloat(default=[0,000], limits=[(0,359),(0,999)])		# [iq]
 			nim.longitudeOrientation = ConfigSelection(longitude_orientation_choices, "east")
-			nim.latitude = ConfigFloat(default=[50,767], limits=[(0,359),(0,999)])
+			#nim.latitude = ConfigFloat(default=[50,767], limits=[(0,359),(0,999)])
+			nim.latitude = ConfigFloat(default=[51,500], limits=[(0,359),(0,999)])		# [iq]
 			nim.latitudeOrientation = ConfigSelection(latitude_orientation_choices, "north")
 			nim.tuningstepsize = ConfigFloat(default = [0,360], limits = [(0,9),(0,999)])
 			nim.turningspeedH = ConfigFloat(default = [2,3], limits = [(0,9),(0,9)])
