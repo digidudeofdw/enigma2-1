@@ -107,8 +107,11 @@ self.selectKey("RIGHT")
 		</step>
 		<step id="channels">
 			<condition>
+			<!-- iq
 from Components.NimManager import nimmanager
 self.condition = nimmanager.somethingConnected() and config.misc.installwizard.hasnetwork.value and config.misc.installwizard.ipkgloaded.value
+-->
+self.condition = False
 			</condition>
 			<text value="Do you want to install a channel list?" />
 			<config screen="InstallWizard" module="InstallWizard" args="1" type="ConfigList" />
@@ -162,7 +165,10 @@ self.condition = nimmanager.somethingConnected() and not config.misc.installwiza
 		</step>
 		<step id="softcam">
 			<condition>
+			<!-- iq
 self.condition = config.misc.installwizard.hasnetwork.value and config.misc.installwizard.ipkgloaded.value
+-->
+self.condition = False
 			</condition>
 			<text value="Would you like to install a softcam?" />
 			<config screen="InstallWizard" module="InstallWizard" args="2" type="ConfigList" />
