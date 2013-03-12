@@ -118,7 +118,21 @@ class QuitMainloopScreen(Screen):
 			3: _("The user interface of your receiver is restarting"),
 			4: _("Your frontprocessor will be upgraded\nPlease wait until your receiver reboots\nThis may take a few minutes"),
 			5: _("The user interface of your receiver is restarting\ndue to an error in mytest.py"),
-			42: _("Unattended upgrade in progress\nPlease wait until your receiver reboots\nThis may take a few minutes") }.get(retvalue)
+# iq - [
+#			42: _("Unattended upgrade in progress\nPlease wait until your receiver reboots\nThis may take a few minutes") }.get(retvalue)
+			42: _("Unattended upgrade in progress\nPlease wait until your receiver reboots\nThis may take a few minutes"),
+			64: _("Full factory reset in progress\nPlease wait until your receiver reboots\nThis may take a few minutes"),
+			65: _("Factory reset in progress\nPlease wait until your receiver reboots\nThis may take a few minutes"),
+			90: _("S/W update in progress\nPlease wait until your receiver reboots\nThis may take a few minutes"),
+			91: _("S/W update in progress\nPlease wait until your receiver reboots\nThis may take a few minutes"),
+			92: _("S/W update in progress\nPlease wait until your receiver reboots\nThis may take a few minutes"),
+			93: _("S/W update in progress\nPlease wait until your receiver reboots\nThis may take a few minutes"),
+			94: _("S/W update in progress\nPlease wait until your receiver reboots\nThis may take a few minutes"),
+			95: _("S/W update in progress\nPlease wait until your receiver reboots\nThis may take a few minutes"),
+			96: _("S/W update in progress\nPlease wait until your receiver reboots\nThis may take a few minutes"),
+			97: _("S/W update in progress\nPlease wait until your receiver reboots\nThis may take a few minutes")}.get(retvalue)
+# ]
+
 		self["text"] = Label(text)
 
 inTryQuitMainloop = False
