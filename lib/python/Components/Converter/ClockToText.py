@@ -97,7 +97,10 @@ class ClockToText(Converter, object):
 			d = _("%A %e %B")
 		elif self.type == self.VFD:
 			# TRANSLATORS: VFD hour:minute daynum short monthname in strftime() format! See 'man strftime'
-			d = _("%k:%M %e/%m")
+# iq - [
+#			d = _("%k:%M %e/%m")
+			d = _("%e/%m %k:%M")
+# ]
 		elif self.type == self.FORMAT:
 			d = self.fmt_string
 		else:
