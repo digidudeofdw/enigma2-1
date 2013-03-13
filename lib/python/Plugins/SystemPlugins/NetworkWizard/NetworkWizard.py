@@ -9,7 +9,7 @@ from Tools.Directories import resolveFilename, SCOPE_PLUGINS, SCOPE_SKIN_IMAGE
 from enigma import eTimer
 from os import system
 
-class NetworkWizard(WizardLanguage, Rc):
+'''	original skin
 	skin = """
 		<screen position="0,0" size="720,576" title="Welcome..." flags="wfNoBorder" >
 			<widget name="text" position="153,40" size="340,300" font="Regular;22" />
@@ -25,6 +25,32 @@ class NetworkWizard(WizardLanguage, Rc):
 			<widget name="arrowdown2" pixmap="skin_default/arrowdown.png" position="-100,-100" zPosition="11" size="37,70" alphatest="on" />
 			<widget name="arrowup" pixmap="skin_default/arrowup.png" position="-100,-100" zPosition="11" size="37,70" alphatest="on" />
 			<widget name="arrowup2" pixmap="skin_default/arrowup.png" position="-100,-100" zPosition="11" size="37,70" alphatest="on" />
+			<widget source="VKeyIcon" render="Pixmap" pixmap="skin_default/buttons/key_text.png" position="40,260" zPosition="0" size="35,25" transparent="1" alphatest="on" >
+				<convert type="ConditionalShowHide" />
+			</widget>
+			<widget name="HelpWindow" pixmap="skin_default/buttons/key_text.png" position="125,170" zPosition="1" size="1,1" transparent="1" alphatest="on" />	
+		</screen>"""
+'''
+
+class NetworkWizard(WizardLanguage, Rc):
+# [ iq - TODO adjust VKeyIcon ]
+	skin = """
+		<screen name="NetworkWizard" position="fill" title="Welcome..." flags="wfNoBorder" >
+			<panel name="WizardMarginsTemplate"/>
+			<panel name="WizardPictureLangTemplate"/>
+			<panel name="RemoteControlTemplate"/>
+			<panel position="left" size="10,*" />
+			<panel position="right" size="10,*" />
+			<panel position="fill">
+				<widget name="text" position="top" size="*,270" font="Regular;23" valign="center" />
+				<panel position="fill" layout="stack">
+					<widget source="list" render="Listbox" position="fill" scrollbarMode="showOnDemand" >
+						<convert type="StringList" />
+					</widget>
+					<widget name="config" position="fill" zPosition="1" scrollbarMode="showOnDemand" transparent="1" />
+				</panel>
+			</panel>
+
 			<widget source="VKeyIcon" render="Pixmap" pixmap="skin_default/buttons/key_text.png" position="40,260" zPosition="0" size="35,25" transparent="1" alphatest="on" >
 				<convert type="ConditionalShowHide" />
 			</widget>
