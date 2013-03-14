@@ -70,8 +70,8 @@ class InfoBar(InfoBarBase, InfoBarShowHide,
 				InfoBarPlugins, InfoBarServiceErrorPopupSupport:
 			x.__init__(self)
 
-		self.helpList.append((self["actions"], "InfobarActions", [("showMovies")]))# , _("Watch recordings..."))]))
-		self.helpList.append((self["actions"], "InfobarActions", [("showRadio")]))#, _("Listen to the radio..."))]))
+#		self.helpList.append((self["actions"], "InfobarActions", [("showMovies")]))# , _("Watch recordings..."))]))
+#		self.helpList.append((self["actions"], "InfobarActions", [("showRadio")]))#, _("Listen to the radio..."))]))
 
 		self.__event_tracker = ServiceEventTracker(screen=self, eventmap=
 			{
