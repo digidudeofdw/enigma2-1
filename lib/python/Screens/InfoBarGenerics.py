@@ -1496,8 +1496,12 @@ class InfoBarTimeshift:
 	def __init__(self):
 		self["TimeshiftActions"] = HelpableActionMap(self, "InfobarTimeshiftActions",
 			{
-				"timeshiftStart": self.startTimeshift,# _("Start timeshift")),  # the "yellow key"
-				"timeshiftStop": self.stopTimeshift,# _("Stop timeshift"))      # currently undefined :), probably 'TV'
+# iq - boundFunction calls stopTimeshift of PermanentTimeshift [ 
+#				"timeshiftStart": self.startTimeshift,# _("Start timeshift")),  # the "yellow key"
+#				"timeshiftStop": self.stopTimeshift,# _("Stop timeshift"))      # currently undefined :), probably 'TV'
+				"timeshiftStart": self.startTimeshiftNP,# _("Start timeshift")),  # the "yellow key"
+				"timeshiftStop": self.stopTimeshiftNP,# _("Stop timeshift"))      # currently undefined :), probably 'TV'
+# ]
 			}, prio=1)
 		self["TimeshiftActivateActions"] = ActionMap(["InfobarTimeshiftActivateActions"],
 			{
@@ -1522,7 +1526,10 @@ class InfoBarTimeshift:
 		service = self.session.nav.getCurrentService()
 		return service and service.timeshift()
 
-	def startTimeshift(self):
+# iq - [
+#	def startTimeshift(self):
+	def startTimeshiftNP(self):
+# ]
 		print "enable timeshift"
 		ts = self.getTimeshift()
 		if ts is None:
@@ -1549,9 +1556,12 @@ class InfoBarTimeshift:
 				self.__seekableStatusChanged()
 			else:
 				print "timeshift failed"
-
-	def stopTimeshift(self, answer = True):
-		if not answer or self.checkTimeshiftRunning(self.stopTimeshift):
+# iq - [
+#	def stopTimeshift(self, answer = True):
+#		if not answer or self.checkTimeshiftRunning(self.stopTimeshift):
+	def stopTimeshiftNP(self, answer = True):
+		if not answer or self.checkTimeshiftRunning(self.stopTimeshiftNP):
+# ]
 			return
 		ts = self.getTimeshift()
 		if ts is None:
@@ -1607,16 +1617,22 @@ class InfoBarTimeshift:
 		self.__seekableStatusChanged()
 
 	def checkTimeshiftRunning(self, returnFunction, answer = None):
+		self.returnFunction = returnFunction
 		if answer is None:
 			if self.timeshift_enabled and self.check_timeshift and config.usage.check_timeshift.value:
-				self.session.openWithCallback(boundFunction(self.checkTimeshiftRunning, returnFunction), MessageBox, _("Stop timeshift?"), simple = True)
+# iq - [
+#				self.session.openWithCallback(boundFunction(self.checkTimeshiftRunning, returnFunction), MessageBox, _("Stop timeshift?"), simple = True)
+				self.session.openWithCallback(boundFunction(self.checkTimeshiftRunning, returnFunction), MessageBox, _("Stop timeshift?"), simple = False)
+# ]
 				return True
 			else:
 				self.check_timeshift = True
 				return False
 		elif answer:
 			self.check_timeshift = False
+			print "?????", self.returnFunction
 			boundFunction(returnFunction, True)()
+			print "!!!!!"
 		else:
 			boundFunction(returnFunction, False)()
 
