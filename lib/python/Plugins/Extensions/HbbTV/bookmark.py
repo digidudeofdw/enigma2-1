@@ -123,10 +123,13 @@ class BookmarkManager(SimpleConfigParser):
 
 		import os
 		if not os.path.exists(_dbFileName):
-			f = file('/proc/stb/info/vumodel')
+# iq]
+			f = file('/proc/stb/info/hwmodel')
 			model = f.read().strip()
 			f.close()
-			manualmode = (model == "solo2" or model == "duo2")
+#			manualmode = (model == "solo2" or model == "duo2")
+			manualmode = (model == "tmtwinoe" or model == "tm2toe" or model == "tmsingleoe" or model == "tmnanooe" or model == "ios100hd" or model == "ios200hd" or model == "ios300hd")
+# [iq
 
 			os.system('echo "[__SYS__]" > %s'%(_dbFileName))
 			os.system('echo "category_current_idx = 1" >> %s'%(_dbFileName))
@@ -137,7 +140,8 @@ class BookmarkManager(SimpleConfigParser):
 			os.system('echo "id = 1" >> %s'%(_dbFileName))
 			os.system('echo "name = My favorite" >> %s'%(_dbFileName))
 			os.system('echo "[b-1]" >> %s'%(_dbFileName))
-			os.system('echo "url = http://www.google.com" >> %s'%(_dbFileName))
+#			os.system('echo "url = http://www2.vuplus.com/" >> %s'%(_dbFileName))
+			os.system('echo "url = http://www.google.com/" >> %s'%(_dbFileName))
 			os.system('echo "id = 1" >> %s'%(_dbFileName))
 			os.system('echo "parent = 1" >> %s'%(_dbFileName))
 			os.system('echo "title = Vuplus Home" >> %s'%(_dbFileName))
