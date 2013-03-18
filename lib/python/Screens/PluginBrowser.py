@@ -316,7 +316,9 @@ class PluginDownloadBrowser(Screen):
 # iq [
 #					self.startIpkgListInstalled(self.PLUGIN_PREFIX + 'settings-*')
 					self.container.execute(self.ipkg + Ipkg.opkgExtraDestinations() + " list_installed " + self.PLUGIN_PREFIX + "settings-* ; " + self.ipkg + Ipkg.opkgExtraDestinations() + " list_installed " + self.PLUGIN_PREFIX + "channel.*")
-					self.startIpkgListInstalled(self.PLUGIN_PREFIX + 'settings-*')
+# iq[
+					self.startIpkgListInstalled(self.PLUGIN_PREFIX + 'settings-*') or self.startIpkgListInstalled(self.PLUGIN_PREFIX + 'channel*')
+# iq]
 				else:
 					self.runSettingsInstall()
 			elif self.type == self.REMOVE:
@@ -380,7 +382,9 @@ class PluginDownloadBrowser(Screen):
 				self.pluginlist.remove(plugin)
 				break
 		self.plugins_changed = True
-		if self["list"].l.getCurrentSelection()[0].name.startswith("settings-"):
+# iq[
+		if self["list"].l.getCurrentSelection()[0].name.startswith("settings-") or self["list"].l.getCurrentSelection()[0].name.startswith("channel."):
+# iq]
 			self.reload_settings = True
 		self.expanded = []
 		self.updateList()
@@ -410,7 +414,12 @@ class PluginDownloadBrowser(Screen):
 				self["list"].instance.show()
 			else:
 				self["text"].setText("No new plugins found")
-				self.session.open(MessageBox, _("Add your myserver list in Mainmenu."), type = MessageBox.TYPE_INFO, timeout = 20)
+		else:
+			if self.pluginlist:
+				self.updateList()
+				self["list"].instance.show()
+			else:
+				self["text"].setText(_("No new plugins found"))
 
 	def dataAvail(self, str):
 		#prepend any remaining data from the previous call
@@ -719,8 +728,6 @@ class OldPluginDownloadBrowser(Screen):
 		if self["list"].l.getCurrentSelection()[0].name.startswith("settings-"):
 			self.reload_settings = True
 # [iq
-#		if self["list"].l.getCurrentSelection()[0].name.startswith("channel."):
-#			self.reload_settings = True
 		if self["list"].l.getCurrentSelection()[0].name.startswith("channel."):
 			self.reload_settings = True
 		self.session.open(MessageBox, _("Reloading bouquets and services..."), type = MessageBox.TYPE_INFO, timeout = 15, default = False)
@@ -834,20 +841,6 @@ class OldPluginDownloadBrowser(Screen):
 		from os import statvfs
 		s=statvfs("/")
 		percent  = str(100 - ((100 * s.f_bavail)/ s.f_blocks))
-					
-		self["percent"].setText(percent+'%')
-		self["free_progress"].setValue(int(percent))
-		self["free_progress"].show()
-
-#		from os import system
-#		system("df | grep /dev/root > /tmp/nand_info")
-#		readFp=open("/tmp/nand_info", "r")
-#		lines = readFp.readlines()
-#		readFp.close()
-#		lines = lines[0] # change list to string
-#		lines = lines.split('%') #  "rootfs 54528 48960 5568 90% /" ==> "rootfs 54528 48960 5568 90" , " /"
-#		lines = lines[0].split(' ')
-#		percent = lines.pop()
 					
 		self["percent"].setText(percent+'%')
 		self["free_progress"].setValue(int(percent))
