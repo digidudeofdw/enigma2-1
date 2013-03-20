@@ -16,7 +16,10 @@ from operator import itemgetter
 class ProtectedScreen:
 	def __init__(self):
 		if self.isProtected():
-			self.onFirstExecBegin.append(boundFunction(self.session.openWithCallback, self.pinEntered, PinInput, pinList = [self.protectedWithPin()], triesEntry = self.getTriesEntry(), title = self.getPinText(), windowTitle = _("Enter pin code")))
+# iq - [
+#			self.onFirstExecBegin.append(boundFunction(self.session.openWithCallback, self.pinEntered, PinInput, pinList = [self.protectedWithPin()], triesEntry = self.getTriesEntry(), title = self.getPinText(), windowTitle = _("Enter pin code")))
+			self.onFirstExecBegin.append(boundFunction(self.session.openWithCallback, self.pinEntered, PinInput, pinList = [self.protectedWithMasterPin(), self.protectedWithPin()], triesEntry = self.getTriesEntry(), title = self.getPinText(), windowTitle = _("Enter pin code")))
+# ]
 
 	def getTriesEntry(self):
 		return config.ParentalControl.retries.setuppin
@@ -26,6 +29,11 @@ class ProtectedScreen:
 
 	def isProtected(self):
 		return True
+
+# iq - [
+	def protectedWithMasterPin(self):
+		return config.ParentalControl.mastersetuppin.value
+# ]
 
 	def protectedWithPin(self):
 		return config.ParentalControl.setuppin.value
