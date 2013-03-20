@@ -15,7 +15,9 @@ dist_pkgdata_DATA = \
 	startwizard.xml \
 	freesat.t1 \
 	freesat.t2 \
-	unicable.xml
+	unicable.xml \
+	defaultwizard.xml \
+	defaultsatlists.xml 
 
 if HAVE_TEXTLCD
 dist_pkgdata_DATA += skin_text.xml

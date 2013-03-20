@@ -6,7 +6,7 @@ from Tools.StbHardware import getFPWasTimerWakeup
 from enigma import eTimer
 
 config.hdmicec = ConfigSubsection()
-config.hdmicec.enabled = ConfigYesNo(default = True)
+config.hdmicec.enabled = ConfigYesNo(default = False) # iq
 config.hdmicec.control_tv_standby = ConfigYesNo(default = True)
 config.hdmicec.control_tv_wakeup = ConfigYesNo(default = True)
 config.hdmicec.report_active_source = ConfigYesNo(default = True)
@@ -268,6 +268,10 @@ class HdmiCec:
 					self.wakeup()
 				elif cmd != 0x36 and config.hdmicec.tv_wakeup_detection.value == "activity":
 					self.wakeup()
+# iq[
+				elif config.hdmicec.tv_wakeup_detection.value == "activity":
+					self.wakeup()
+# iq]
 
 	def configVolumeForwarding(self, configElement):
 		if configElement.value:
