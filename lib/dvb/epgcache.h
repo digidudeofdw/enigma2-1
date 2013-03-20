@@ -135,20 +135,20 @@ private:
 	__u8 ByteSize;
 	__u8 type;
 	static descriptorMap descriptors;
-	static __u8 data[];
+	static __u8 data[4108];
 	static int CacheSize;
 	static bool isCacheCorrupt;
 	static void load(FILE *);
 	static void save(FILE *);
 	static void cacheCorrupt(const char* context);
+public:
+	eventData(const eit_event_struct* e=NULL, int size=0, int type=0);
+	~eventData();
 	const eit_event_struct* get() const;
 	operator const eit_event_struct*() const
 	{
 		return get();
 	}
-public:
-	eventData(const eit_event_struct* e = NULL, int size = 0, int type = 0, int tsidonid = 0);
-	~eventData();
 	int getEventID()
 	{
 		return (EITdata[0] << 8) | EITdata[1];
@@ -248,7 +248,11 @@ class eEPGCache: public eMainloop, private eThread, public Object
 		void timeMHW2DVB( u_char day, u_char hours, u_char minutes, u_char *return_time);
 		void storeMHWTitle(std::map<__u32, mhw_title_t>::iterator itTitle, std::string sumText, const __u8 *data);
 #endif
-		void readData(const __u8 *data, int source);
+		void readData(const __u8 *data);
+		void readDataViasat(const __u8 *data);
+#ifdef ENABLE_NETMED
+		void readDataNetmed(const __u8 *data);
+#endif
 		void startChannel();
 		void startEPG();
 		bool finishEPG();
@@ -306,7 +310,6 @@ private:
 	unsigned int enabledSources;
 	unsigned int historySeconds;
 
-	std::vector<int> onid_blacklist;
 	eventCache eventDB;
 	updateMap channelLastUpdated;
 	static pthread_mutex_t cache_lock, channel_map_lock;
@@ -342,6 +345,7 @@ private:
 public:
 	static eEPGCache *getInstance() { return instance; }
 
+	void crossepgImportEPGv21(std::string dbroot);
 	void save();
 	void load();
 #ifndef SWIG
@@ -389,8 +393,7 @@ public:
 	enum {
 		SIMILAR_BROADCASTINGS_SEARCH,
 		EXAKT_TITLE_SEARCH,
-		PARTIAL_TITLE_SEARCH,
-		START_TITLE_SEARCH
+		PARTIAL_TITLE_SEARCH
 	};
 	enum {
 		CASE_CHECK,
