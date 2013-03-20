@@ -13,17 +13,21 @@ def getImageVersionString():
 			st = os.stat('/usr/lib/ipkg/status')
 		tm = time.localtime(st.st_mtime)
 		if tm.tm_year >= 2011:
-			return time.strftime("%Y-%m-%d %H:%M:%S", tm)
+			return time.strftime("%Y-%m-%d %H:%M:%S", tm)	
 	except:
 		pass
 	return _("unavailable")
 
 def getEnigmaVersionString():
 	import enigma
+	list = []
 	enigma_version = enigma.getEnigmaVersionString()
 	if '-(no branch)' in enigma_version:
 		enigma_version = enigma_version [:-12]
-	return enigma_version
+#iq [
+		list = enigma_version.split("-")
+	return list[1] + "-" + list[2] + "-" + list[0]
+#iq ]
 
 def getKernelVersionString():
 	try:
