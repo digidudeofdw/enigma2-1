@@ -1496,12 +1496,8 @@ class InfoBarTimeshift:
 	def __init__(self):
 		self["TimeshiftActions"] = HelpableActionMap(self, "InfobarTimeshiftActions",
 			{
-# iq - boundFunction calls stopTimeshift of PermanentTimeshift [ 
-#				"timeshiftStart": self.startTimeshift,# _("Start timeshift")),  # the "yellow key"
-#				"timeshiftStop": self.stopTimeshift,# _("Stop timeshift"))      # currently undefined :), probably 'TV'
-				"timeshiftStart": self.startTimeshiftNP,# _("Start timeshift")),  # the "yellow key"
-				"timeshiftStop": self.stopTimeshiftNP,# _("Stop timeshift"))      # currently undefined :), probably 'TV'
-# ]
+				"timeshiftStart": self.startTimeshift,# _("Start timeshift")),  # the "yellow key"
+				"timeshiftStop": self.stopTimeshift,# _("Stop timeshift"))      # currently undefined :), probably 'TV'
 			}, prio=1)
 		self["TimeshiftActivateActions"] = ActionMap(["InfobarTimeshiftActivateActions"],
 			{
@@ -1526,10 +1522,7 @@ class InfoBarTimeshift:
 		service = self.session.nav.getCurrentService()
 		return service and service.timeshift()
 
-# iq - [
-#	def startTimeshift(self):
-	def startTimeshiftNP(self):
-# ]
+	def startTimeshift(self):
 		print "enable timeshift"
 		ts = self.getTimeshift()
 		if ts is None:
@@ -1541,6 +1534,9 @@ class InfoBarTimeshift:
 			print "hu, timeshift already enabled?"
 		else:
 			if not ts.startTimeshift():
+# iq - [
+				self.check_timeshift = True
+# ]
 				self.timeshift_enabled = True
 				open("/proc/stb/lcd/symbol_timeshift", "w").write("1")
 
@@ -1556,23 +1552,41 @@ class InfoBarTimeshift:
 				self.__seekableStatusChanged()
 			else:
 				print "timeshift failed"
-# iq - [
-#	def stopTimeshift(self, answer = True):
-#		if not answer or self.checkTimeshiftRunning(self.stopTimeshift):
-	def stopTimeshiftNP(self, answer = True):
-		if not answer or self.checkTimeshiftRunning(self.stopTimeshiftNP):
-# ]
-			return
-		ts = self.getTimeshift()
-		if ts is None:
-			return
-		ts.stopTimeshift()
-		self.timeshift_enabled = False
-		self.pvrStateDialog.hide()
 
-		# disable actions
-		self.__seekableStatusChanged()
-		open("/proc/stb/lcd/symbol_timeshift", "w").write("0")
+	def stopTimeshift(self, answer = True):
+# iq - [
+#		if not answer or self.checkTimeshiftRunning(self.stopTimeshift):
+#			return
+#
+#		ts = self.getTimeshift()
+#		if ts is None:
+#			return
+#		ts.stopTimeshift()
+#		self.timeshift_enabled = False
+#		self.pvrStateDialog.hide()
+#
+#		# disable actions
+#		self.__seekableStatusChanged()
+#		open("/proc/stb/lcd/symbol_timeshift", "w").write("0")
+
+		if not answer or self.checkTimeshiftRunning(self.stopTimeshiftChecked):
+			return
+
+		self.stopTimeshiftChecked()
+
+	def stopTimeshiftChecked(self, answer = True):
+		if answer:
+			ts = self.getTimeshift()
+			if ts is None:
+				return
+			ts.stopTimeshift()
+			self.timeshift_enabled = False
+			self.pvrStateDialog.hide()
+
+			# disable actions
+			self.__seekableStatusChanged()
+			open("/proc/stb/lcd/symbol_timeshift", "w").write("0")
+# ]
 
 	# activates timeshift, and seeks to (almost) the end
 	def activateTimeshiftEnd(self, back = True):
@@ -1630,9 +1644,7 @@ class InfoBarTimeshift:
 				return False
 		elif answer:
 			self.check_timeshift = False
-			print "?????", self.returnFunction
 			boundFunction(returnFunction, True)()
-			print "!!!!!"
 		else:
 			boundFunction(returnFunction, False)()
 
