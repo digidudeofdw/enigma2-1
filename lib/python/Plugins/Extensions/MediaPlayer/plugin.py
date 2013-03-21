@@ -305,7 +305,9 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 			self.show()
 
 	def __onClose(self):
-		self.mediaPlayerInfoBar.doClose()
+# iq [
+#	self.mediaPlayerInfoBar.doClose()
+# iq ]
 		self.session.nav.playService(self.oldService)
 
 	def __evUpdatedInfo(self):
