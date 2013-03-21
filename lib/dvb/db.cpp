@@ -298,6 +298,9 @@ DEFINE_REF(eDVBDB);
 
 void eDVBDB::reloadServicelist()
 {
+// iq - [
+	m_services.clear();
+// ]
 	loadServicelist(eEnv::resolve("${sysconfdir}/enigma2/lamedb").c_str());
 }
 
