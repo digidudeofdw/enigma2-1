@@ -89,11 +89,13 @@ class MediaPixmap(Pixmap):
 		self.coverArtFileName = "/tmp/.id3coverart"
 		self.picload.startDecode(self.coverArtFileName)
 
-class MediaPlayerInfoBar(Screen):
-
-	def __init__(self, session):
-		Screen.__init__(self, session)
-		self.skinName = "MoviePlayer"
+#iq [
+#class MediaPlayerInfoBar(Screen):
+#
+#	def __init__(self, session):
+#		Screen.__init__(self, session)
+#		self.skinName = "MoviePlayer"
+#iq
 
 class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoBarCueSheetSupport, InfoBarNotifications, InfoBarSubtitleSupport, HelpableScreen):
 	ALLOW_SUSPEND = True
@@ -209,12 +211,16 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 
 		InfoBarSeek.__init__(self, actionmap = "MediaPlayerSeekActions")
 
-		self.mediaPlayerInfoBar = self.session.instantiateDialog(MediaPlayerInfoBar)
+# iq[
+#	self.mediaPlayerInfoBar = self.session.instantiateDialog(MediaPlayerInfoBar)
+# iq]
 
 		self.onClose.append(self.delMPTimer)
 		self.onClose.append(self.__onClose)
-		self.onShow.append(self.__onShow)
-		self.onHide.append(self.__onHide)
+# iq [
+#		self.onShow.append(self.__onShow)
+#		self.onHide.append(self.__onHide)
+# iq ]
 
 		self.righttimer = False
 		self.rightKeyTimer = eTimer()
@@ -224,8 +230,10 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 		self.leftKeyTimer = eTimer()
 		self.leftKeyTimer.callback.append(self.leftTimerFire)
 
-		self.hideMediaPlayerInfoBar = eTimer()
-		self.hideMediaPlayerInfoBar.callback.append(self.timerHideMediaPlayerInfoBar)
+# iq [
+#	self.hideMediaPlayerInfoBar = eTimer()
+#		self.hideMediaPlayerInfoBar.callback.append(self.timerHideMediaPlayerInfoBar)
+# iq ]
 
 		self.currList = "filelist"
 		self.isAudioCD = False
@@ -248,17 +256,18 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 				iPlayableService.evUser+12: self.__evPluginError,
 				iPlayableService.evUser+13: self["coverArt"].embeddedCoverArt
 			})
-
-	def __onShow(self):
-		self.mediaPlayerInfoBar.hide()
-
-	def __onHide(self):
-		self.mediaPlayerInfoBar.show()
-		self.hideMediaPlayerInfoBar.start(5000, True)
-
-	def timerHideMediaPlayerInfoBar(self):
-		self.hideMediaPlayerInfoBar.stop()
-		self.mediaPlayerInfoBar.hide()
+#iq [
+#	def __onShow(self):
+#		self.mediaPlayerInfoBar.hide()
+#
+#	def __onHide(self):
+#		self.mediaPlayerInfoBar.show()
+#		self.hideMediaPlayerInfoBar.start(5000, True)
+#
+#	def timerHideMediaPlayerInfoBar(self):
+#		self.hideMediaPlayerInfoBar.stop()
+#		self.mediaPlayerInfoBar.hide()
+#iq]
 
 	def doNothing(self):
 		pass
@@ -516,13 +525,16 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 
 		if self.currList == "playlist":
 			if self.playlist.getCurrentIndex() == self.playlist.getSelectionIndex():
-				if self.shown:
-					self.hide()
-				elif self.mediaPlayerInfoBar.shown:
-					self.mediaPlayerInfoBar.hide()
-					self.hideMediaPlayerInfoBar.stop()
-				else:
-					self.mediaPlayerInfoBar.show()
+				self.hide()
+#iq [
+#				if self.shown:
+#					self.hide()
+#				elif self.mediaPlayerInfoBar.shown:
+#					self.mediaPlayerInfoBar.hide()
+#					self.hideMediaPlayerInfoBar.stop()
+#				else:
+#					self.mediaPlayerInfoBar.show()
+#iq]
 			else:
 				self.changeEntry(self.playlist.getSelectionIndex())
 
@@ -1000,11 +1012,14 @@ class MediaPlayerLCDScreen(Screen):
 		elif line == 4:
 			self["text4"].setText(text)
 
-def main(session, answer = True, **kwargs):
-	if not answer or InfoBar.instance.checkTimeshiftRunning(boundFunction(main, session)):
-		return
-	if answer:
-		session.open(MediaPlayer)
+def main(session, **kwargs):
+	session.open(MediaPlayer)
+#iq[
+#	if not answer or InfoBar.instance.checkTimeshiftRunning(boundFunction(main, session)):
+#		return
+#	if answer:
+#		session.open(MediaPlayer)
+#iq]
 
 def menu(menuid, **kwargs):
 	if menuid == "mainmenu" and config.mediaplayer.onMainMenu.getValue():
