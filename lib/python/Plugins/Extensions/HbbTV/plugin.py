@@ -981,6 +981,11 @@ class HbbTVHelper(Screen, InfoBarNotifications):
 			pmtid = info.getInfo(iServiceInformation.sPMTPID)
 			demux = info.getInfoString(iServiceInformation.sLiveStreamDemuxId)
 
+# iq - [
+			if pmtid == -1:
+				return None
+# ]
+
 			from aitreader import eAITSectionReader
 			reader = eAITSectionReader(demux, pmtid, sid)
 			if reader.doOpen():
