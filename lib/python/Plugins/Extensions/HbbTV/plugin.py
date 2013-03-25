@@ -933,10 +933,10 @@ class HbbTVHelper(Screen, InfoBarNotifications):
 			_g_ssm_ = SimpleSharedMemory()
 			_g_ssm_.doConnect()
 
-		self.__et = ServiceEventTracker(screen=self, eventmap={
-				iPlayableService.evHBBTVInfo: self._cb_detectedAIT,
-				iPlayableService.evUpdatedInfo: self._cb_updateInfo
-			})
+#		self.__et = ServiceEventTracker(screen=self, eventmap={
+#				iPlayableService.evHBBTVInfo: self._cb_detectedAIT,
+#				iPlayableService.evUpdatedInfo: self._cb_updateInfo
+#			})
 		self._applicationList = None
 
 		self.mVuplusBox = False
@@ -1057,10 +1057,45 @@ class HbbTVHelper(Screen, InfoBarNotifications):
 		except: pass
 
 	def getStartHbbTVUrl(self):
-		url, self._profile = None, 0
+		url, self._applicationList, self._profile = None, None, 0
+
+		setChannelInfo(None, None, None, None, None)
+
+		service = self._session.nav.getCurrentService()
+		info = service and service.info()
+		if info is not None:
+			sid  = info.getInfo(iServiceInformation.sSID)
+			onid = info.getInfo(iServiceInformation.sONID)
+			tsid = info.getInfo(iServiceInformation.sTSID)
+			name = info.getName()
+			if name is None:
+				name = ""
+
+			pmtid = info.getInfo(iServiceInformation.sPMTPID)
+			demux = info.getInfoString(iServiceInformation.sLiveStreamDemuxId)
+
+			if pmtid != -1:
+				try:
+					from aitreader import eAITSectionReader
+					reader = eAITSectionReader(demux, pmtid, sid)
+					if reader.doOpen():
+						reader.doParseApplications()
+						reader.doDump()
+					else:	print "no data!!"
+
+					self._applicationList = reader.getApplicationList()
+					if len(self._applicationList) > 0:
+						orgid = int(self._applicationList[0]["orgid"])
+						setChannelInfo(sid, onid, tsid, name, orgid)
+				except:	
+					return None
+			else:
+				return None
+
 		if self._applicationList is not None:
 			self._profile = self._applicationList[0]["profile"]
 			url = self._applicationList[0]["url"]
+
 		if url is None:
 			url = info.getInfoString(iServiceInformation.sHBBTVUrl)
 		return url
@@ -1071,7 +1106,8 @@ class HbbTVHelper(Screen, InfoBarNotifications):
 		if self.getStartHbbTVUrl():
 			for x in self._applicationList:
 				applications.append((x["name"], x))
-		else: applications.append((_("No detected HbbTV applications."), None))
+		else: 
+			applications.append((_("No detected HbbTV applications."), None))
 		self._session.openWithCallback(self._application_selected, ChoiceBox, title=_("Please choose an HbbTV application."), list=applications)
 
 	def _application_selected(self, selected):
