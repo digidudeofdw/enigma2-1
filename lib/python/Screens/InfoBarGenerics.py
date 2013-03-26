@@ -453,10 +453,10 @@ class InfoBarChannelSelection:
 			{
 				"switchChannelUp": (self.switchChannelUp, _("Open service list and select previous channel")),
 				"switchChannelDown": (self.switchChannelDown, _("Open service list and select next channel")),
-				"zapUp": (self.zapUp, _("Switch to previous channel")),
-				"zapDown": (self.zapDown, _("Switch next channel")),
-				"historyBack": (self.historyBack, _("Switch to previous channel in history")),
-				"historyNext": (self.historyNext, _("Switch to next channel in history")),
+				"zapUp": self.zapUp, 
+				"zapDown": self.zapDown,
+				"historyBack": self.historyBack,
+				"historyNext": self.historyNext, 
 				"openServiceList": (self.openServiceList, _("Open service list")),
 #[ iq
 				"ChannelPlusPressed": (self.ChannelPlusPressed, _("next channel")),
@@ -2136,8 +2136,8 @@ class InfoBarSubserviceSelection:
 
 		self["SubserviceQuickzapAction"] = HelpableActionMap(self, "InfobarSubserviceQuickzapActions",
 			{
-				"nextSubservice": (self.nextSubservice, _("Switch to next sub service")),
-				"prevSubservice": (self.prevSubservice, _("Switch to previous sub service"))
+				"nextSubservice": self.nextSubservice,
+				"prevSubservice": self.prevSubservice,
 			}, -1)
 		self["SubserviceQuickzapAction"].setEnabled(False)
 

@@ -108,7 +108,7 @@
 		<button name="8" pos="62,126" />
 		<button name="9" pos="113,122" />
 		<button name="ARROWLEFT" pos="50,258" />
-		<button name="0" pos="77,143" />
+		<button name="0" pos="62,145" />
 		<button name="ARROWRIGHT" pos="100,258" />
 		<button name="VOL+" pos="31,181" />
 		<button name="VOL-" pos="42,206" />
