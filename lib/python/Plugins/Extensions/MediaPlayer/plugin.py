@@ -181,9 +181,9 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 				"skipListend": (self.skip_listend, _("Jump to end of list")),
 				"prevBouquet": (self.switchToPlayList, _("Switch to playlist")),
 				"nextBouquet": (self.switchToFileList, _("Switch to filelist")),
-				"delete": (self.deletePlaylistEntry, _("Delete playlist entry")),
-				"shift_stop": (self.clear_playlist, _("Clear playlist")),
-				"shift_record": (self.playlist.PlayListShuffle, _("Shuffle playlist")),
+				"delete": self.deletePlaylistEntry,
+				"shift_stop": self.clear_playlist,
+				"shift_record": self.playlist.PlayListShuffle,
 				"subtitles": (self.subtitleSelection, _("Subtitle selection")),
 			}, -2)
 
