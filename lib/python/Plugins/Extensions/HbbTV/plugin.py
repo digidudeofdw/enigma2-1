@@ -708,6 +708,10 @@ class HandlerHbbTV(Handler):
 		if before_service is not None:
 			self._session.nav.playService(before_service)
 			self._vod_uri = None
+# iq - [
+			self._restore_before_service = True
+# ]
+
 		return (0, "OK")
 
 	def _cb_handleVODPlayerURI(self, opcode, data):
@@ -757,7 +761,10 @@ class HandlerHbbTV(Handler):
 
 	def _cb_handleVODPlayerStop(self, opcode, data):
 		self._handle_dump(self._cb_handleVODPlayerStop, opcode, data)
-		self.doStop()	
+# iq - [
+#		self.doStop()	
+		self.doStop(self._restore_before_service)
+# ]
 		return (0, "OK")
 
 	def _cb_handleVODPlayerPlayPause(self, opcode, data):
@@ -1115,6 +1122,11 @@ class HbbTVHelper(Screen, InfoBarNotifications):
 		try:
 			if selected[1] is None: return
 			self._cb_hbbtv_activated(selected[1]["name"], selected[1]["url"])
+
+# iq - [
+			self.hbbtv_handler_restore_before_service = False
+# ]
+
 		except Exception, ErrMsg: print ErrMsg
 
 	def showBrowserConfigBox(self):
