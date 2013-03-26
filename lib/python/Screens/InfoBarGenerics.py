@@ -2635,7 +2635,7 @@ class InfoBarSubtitleSupport(object):
 		object.__init__(self)
 		self["SubtitleSelectionAction"] = HelpableActionMap(self, "InfobarSubtitleSelectionActions",
 			{
-				"subtitleSelection": (self.subtitleSelection, _("Subtitle selection...")),
+				"subtitleSelection": self.subtitleSelection,
 			})
 
 		self.subtitle_window = self.session.instantiateDialog(SubtitleDisplay)
