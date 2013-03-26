@@ -1085,8 +1085,8 @@ class InfoBarSeek:
 
 		self["SeekActions"] = InfoBarSeekActionMap(self, actionmap,
 			{
-				"playpauseService": self.playpauseService,
-				"pauseService": (self.pauseService, _("Pause playback")),
+				"playpauseService": self.playpauseService, # iq : Wrongkey
+				"pauseService": self.pauseService, # iq : Wrongkey
 				"unPauseService": (self.unPauseService, _("Continue playback")),
 
 				"seekFwd": (self.seekFwd, _("Seek forward")),
