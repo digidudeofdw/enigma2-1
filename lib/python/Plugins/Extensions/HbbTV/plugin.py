@@ -1127,7 +1127,7 @@ class HbbTVHelper(Screen, InfoBarNotifications):
 			self._cb_hbbtv_activated(selected[1]["name"], selected[1]["url"])
 
 # iq - [
-			self.hbbtv_handler_restore_before_service = False
+			__gval__.hbbtv_handelr._restore_before_service = False
 # ]
 
 		except Exception, ErrMsg: print ErrMsg
