@@ -164,7 +164,11 @@ def main(session, **kwargs):
 def startMenu(menuid):
 	if menuid != "system":
 		return []
-	return [(_("Fan control"), main, "tempfancontrol", 80)]
+	from Tools.HardwareInfo import HardwareInfo
+	if HardwareInfo().get_device_name() in ( 'tmtwinoe', 'tm2toe', 'tmsingleoe', 'ios100hd', 'ios200hd' ):
+		return [(_("Fan control"), main, "tempfancontrol", 80)]
+	else:
+		return []
 
 def Plugins(**kwargs):
 	from Tools.HardwareInfo import HardwareInfo
