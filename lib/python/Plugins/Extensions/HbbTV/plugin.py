@@ -726,6 +726,9 @@ class HandlerHbbTV(Handler):
 
 	def doStop(self, restoreBeforeService=True, needStop=True):
 		if needStop == True:
+# iq - [
+			time.sleep(2)
+# ]
 			self._session.nav.stopService()
 		if self._vod_service is not None and restoreBeforeService:
 			before_service = getBeforeService()
@@ -1124,7 +1127,7 @@ class HbbTVHelper(Screen, InfoBarNotifications):
 			self._cb_hbbtv_activated(selected[1]["name"], selected[1]["url"])
 
 # iq - [
-			self.hbbtv_handler_restore_before_service = False
+			__gval__.hbbtv_handelr._restore_before_service = False
 # ]
 
 		except Exception, ErrMsg: print ErrMsg
