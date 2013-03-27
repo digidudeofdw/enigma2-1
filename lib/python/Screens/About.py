@@ -41,14 +41,16 @@ class About(Screen):
 # [iq
 		AboutText += _("Powered by 4D") + "\n"
 # iq]
-		fp_version = getFPVersion()
-		if fp_version is None:
-			fp_version = ""
-		else:
-			fp_version = _("Frontprocessor version: %d") % fp_version
-			AboutText += fp_version + "\n"
-
-		self["FPVersion"] = StaticText(fp_version)
+# [iq
+#		fp_version = getFPVersion()
+#		if fp_version is None:
+#			fp_version = ""
+#		else:
+#			fp_version = _("Frontprocessor version: %d") % fp_version
+#			AboutText += fp_version + "\n"
+#
+#		self["FPVersion"] = StaticText(fp_version)
+# iq]
 
 		self["TunerHeader"] = StaticText(_("Detected NIMs:"))
 		AboutText += "\n" + _("Detected NIMs:") + "\n"
