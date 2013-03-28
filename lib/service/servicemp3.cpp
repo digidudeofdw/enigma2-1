@@ -1453,8 +1453,11 @@ void eServiceMP3::gstBusCall(GstMessage *msg)
 					else if ( g_strrstr(sourceName, "audiosink") )
 						m_event((iPlayableService*)this, evUser+10);
 				}
+			}
+			else //if ( err->domain == GST_RESOURCE_ERROR )
+			{
 // iq - [
-				else if ( err->code == 5 )		// 5 is forbidden
+				if ( err->code == GST_RESOURCE_ERROR_OPEN_READ )		// 5 is forbidden
 					m_event((iPlayableService*)this, evUser+20);
 //
 			}
