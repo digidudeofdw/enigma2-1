@@ -1452,6 +1452,10 @@ void eServiceMP3::gstBusCall(GstMessage *msg)
 						m_event((iPlayableService*)this, evUser+11);
 					else if ( g_strrstr(sourceName, "audiosink") )
 						m_event((iPlayableService*)this, evUser+10);
+// iq - [
+					else if ( g_strrstr(sourceName, "text/html") )
+						m_event((iPlayableService*)this, evUser+20);
+//
 				}
 			}
 			g_error_free(err);
