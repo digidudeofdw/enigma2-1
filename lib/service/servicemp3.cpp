@@ -1455,7 +1455,7 @@ void eServiceMP3::gstBusCall(GstMessage *msg)
 				}
 // iq - [
 			}
-			else //if ( err->domain == GST_RESOURCE_ERROR )
+			else if ( err->domain == GST_RESOURCE_ERROR )
 			{
 				if ( err->code == GST_RESOURCE_ERROR_OPEN_READ )
 					m_event((iPlayableService*)this, evUser+20);
