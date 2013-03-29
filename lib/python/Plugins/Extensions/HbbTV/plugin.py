@@ -1097,7 +1097,9 @@ class HbbTVHelper(Screen, InfoBarNotifications):
 					if len(self._applicationList) > 0:
 						orgid = int(self._applicationList[0]["orgid"])
 						setChannelInfo(sid, onid, tsid, name, orgid)
-				except:	
+				except Exception, ErrMsg: 
+					print ErrMsg
+					os.system("echo 1 > /proc/sys/vm/drop_caches")
 					return None
 			else:
 				return None

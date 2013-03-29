@@ -41,7 +41,10 @@ class eAITSectionReader:
 		return self.mAppList
 
 	def doOpen(self):
-		document = os.popen(self.mCommand).read()
+#		document = os.popen(self.mCommand).read()
+		os.system(self.mCommand + " > /tmp/ait_doc")
+		document = open("/tmp/ait_doc", "r").read()
+		os.unlink("/tmp/ait_doc")
 		if len(document) == 0:
 			return False
 		self.mDocument = xml.dom.minidom.parseString(document)
