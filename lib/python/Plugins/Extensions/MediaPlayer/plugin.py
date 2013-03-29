@@ -528,7 +528,6 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 		if self.currList == "playlist":
 			if self.playlist.getCurrentIndex() == self.playlist.getSelectionIndex():
 				self.hide()
-#iq [
 #				if self.shown:
 #					self.hide()
 #				elif self.mediaPlayerInfoBar.shown:
@@ -536,7 +535,6 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 #					self.hideMediaPlayerInfoBar.stop()
 #				else:
 #					self.mediaPlayerInfoBar.show()
-#iq]
 			else:
 				self.changeEntry(self.playlist.getSelectionIndex())
 
@@ -549,6 +547,8 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 				menu.append((_("Add directory to playlist"), "copydir"))
 			else:
 				menu.append((_("Add files to playlist"), "copyfiles"))
+				self.copyFile() # iq##
+
 			menu.append((_("Switch to playlist"), "playlist"))
 			if config.usage.setup_level.index >= 1: # intermediate+
 				menu.append((_("Delete file"), "deletefile"))
