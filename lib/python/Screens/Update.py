@@ -132,10 +132,10 @@ class Update(Screen):
 		else:
 			lan = "Integrated Ethernet"
 		modelDir = open("/proc/stb/info/modelname").read().strip('\n')
-		self.imageInfo = { self.INTERNET_UPDATE : { "title" : "SW Update - "+lan, "imagedir" : "K3/"+modelDir+"_REL" },
-			self.INTERNET_SR_UPDATE : { "title" : "SR SW Update - "+lan, "imagedir" : "K3/"+modelDir+"SR_REL" },
-			self.INTERNET_UPDATE_BETA : { "title" : "SW Update (BETA) - "+lan, "imagedir" : "K3/"+modelDir },
-			self.INTERNET_SR_UPDATE_BETA : { "title" : "SR SW Update (BETA) - "+lan, "imagedir" : "K3/"+modelDir+"SR" }
+		self.imageInfo = { self.INTERNET_UPDATE : { "title" : "SW Update - "+lan, "imagedir" : "K3_OE3/"+modelDir+"_REL" },
+			self.INTERNET_SR_UPDATE : { "title" : "SR SW Update - "+lan, "imagedir" : "K3_OE3/"+modelDir+"SR_REL" },
+			self.INTERNET_UPDATE_BETA : { "title" : "SW Update (BETA) - "+lan, "imagedir" : "K3_OE3/"+modelDir },
+			self.INTERNET_SR_UPDATE_BETA : { "title" : "SR SW Update (BETA) - "+lan, "imagedir" : "K3_OE3/"+modelDir+"SR" }
 		}
 		self.setTitle(self.imageInfo[self.type]["title"])
 
