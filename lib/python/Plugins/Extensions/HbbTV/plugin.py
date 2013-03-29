@@ -1099,7 +1099,6 @@ class HbbTVHelper(Screen, InfoBarNotifications):
 						setChannelInfo(sid, onid, tsid, name, orgid)
 				except Exception, ErrMsg: 
 					print ErrMsg
-					os.system("echo 1 > /proc/sys/vm/drop_caches")
 					return None
 			else:
 				return None
