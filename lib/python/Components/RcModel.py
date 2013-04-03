@@ -38,9 +38,9 @@ class RcModel:
 				self.currentRcType = self.RCTYPE_IOS300
 			elif model == "tm2toe":
 				self.currentRcType = self.RCTYPE_TM2T
-			elif model == "tmsingleoe":
+			elif model == "tmsingle":
 				self.currentRcType = self.RCTYPE_TMSINGLE
-			elif model == "tmsingleoe":
+			elif model == "tmnano":
 				self.currentRcType = self.RCTYPE_TMNANO
 
 		elif os.path.exists('/proc/stb/info/boxtype'):
@@ -64,8 +64,8 @@ class RcModel:
 		elif self.currentRcType == self.RCTYPE_TM2T:
 			return '/usr/share/enigma2/rc_models/tm/tm2toe/'
 		elif self.currentRcType == self.RCTYPE_TMSINGLE:
-			return '/usr/share/enigma2/rc_models/tm/tmsingleoe/'
+			return '/usr/share/enigma2/rc_models/tm/tmsingle/'
 		elif self.currentRcType == self.RCTYPE_TMNANO:
-			return '/usr/share/enigma2/rc_models/tm/tmnanooe/'
+			return '/usr/share/enigma2/rc_models/tm/tmnano/'
 
 rc_model = RcModel()
