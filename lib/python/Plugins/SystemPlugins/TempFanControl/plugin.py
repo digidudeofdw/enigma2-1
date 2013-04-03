@@ -165,7 +165,7 @@ def startMenu(menuid):
 	if menuid != "system":
 		return []
 	from Tools.HardwareInfo import HardwareInfo
-	if HardwareInfo().get_device_name() in ( 'tmtwinoe', 'tm2toe', 'tmsingleoe', 'ios100hd', 'ios200hd' ):
+	if HardwareInfo().get_device_name() in ( 'tmtwinoe', 'tm2toe', 'tmsingle', 'ios100hd', 'ios200hd' ):
 		return [(_("Fan control"), main, "tempfancontrol", 80)]
 	else:
 		return []
