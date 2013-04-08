@@ -77,7 +77,7 @@ class HardwareInfo:
 			return True
 
 	def has_yuv(self):
-		DEVICES_WITHOUT_YUV = [ 'tmsingle', 'tmsinglemini', 'tm2toe', 'ios300hd', 'ios200hd' , 'tmnanooe' ]
+		DEVICES_WITHOUT_YUV = [ 'tmsingle', 'tmsinglemini', 'tm2toe', 'ios300hd', 'tmnanooe' ]
 		if HardwareInfo.device_name in DEVICES_WITHOUT_YUV:
 			return False
 		else:
@@ -91,7 +91,7 @@ class HardwareInfo:
 			return True
 
 	def has_scart(self):
-		DEVICES_WITHOUT_SCART = [ 'tmsinglemini', 'tmnanooe' ]
+		DEVICES_WITHOUT_SCART = [ 'tmsinglemini', 'tmnanooe', 'ios200hd' ]
 		if HardwareInfo.device_name in DEVICES_WITHOUT_SCART:
 			return False
 		else:
