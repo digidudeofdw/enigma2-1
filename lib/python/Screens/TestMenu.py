@@ -19,6 +19,7 @@ from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
 from enigma import eTimer, eServiceReference, eDVBDB, quitMainloop
 from enigma import eDVBResourceManager, iDVBFrontend
 from enigma import eDVBCI_UI, eDVBCIInterfaces
+from enigma import eDVBVolumecontrol
 import os, fcntl, array, socket, struct
 
 class TestMenu(Screen):
@@ -30,7 +31,7 @@ class TestMenu(Screen):
 
 			<widget name="label0"		position="80,55"	size="540,29"	foregroundColor="#0006c8f3" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
 
-			<widget name="menulist"		position="80,90"	size="540,210"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22"  zPosition="1" backgroundColorSelected="white" foregroundColorSelected="black" />
+			<widget name="menulist"		position="80,90"	size="540,240"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22"  zPosition="1" backgroundColorSelected="white" foregroundColorSelected="black" />
 
 			<widget name="lan_i"		position="80,350"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
 			<widget name="sc0_i"		position="80,380"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
@@ -54,16 +55,16 @@ class TestMenu(Screen):
 
 			<widget name="label1"		position="640,055"	size="540,29"	foregroundColor="#0006c8f3" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
 
-			<widget name="info0_i"		position="640,090"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
-			<widget name="info1_i"		position="640,120"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
-			<widget name="mac_i"		position="640,150"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="mac_i"		position="640,090"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="info0_i"		position="640,120"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="info1_i"		position="640,150"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
 			<widget name="micom_i"		position="640,180"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
 			<widget name="security0_i"	position="640,210"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
 			<widget name="security1_i"	position="640,240"	size="199,29"	foregroundColor="white" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
 
-			<widget name="info0_s"		position="840,090"	size="340,29"	foregroundColors="white,#00ff4500" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
-			<widget name="info1_s"		position="840,120"	size="340,29"	foregroundColors="white,#00ff4500" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
-			<widget name="mac_s"		position="840,150"	size="340,29"	foregroundColors="white,#00ff4500" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="mac_s"		position="840,090"	size="340,29"	foregroundColors="white,#00ff4500" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="info0_s"		position="840,120"	size="340,29"	foregroundColors="white,#00ff4500" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
+			<widget name="info1_s"		position="840,150"	size="340,29"	foregroundColors="white,#00ff4500" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
 			<widget name="micom_s"		position="840,180"	size="340,29"	foregroundColors="white,#00ff4500" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
 			<widget name="security0_s"	position="840,210"	size="340,29"	foregroundColors="white,#00ff4500" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
 			<widget name="security1_s"	position="840,240"	size="340,29"	foregroundColors="white,#00ff4500" backgroundColor="#40000000" font="Regular;22" zPosition="1" />
@@ -145,8 +146,7 @@ class TestMenu(Screen):
 		"tmnanooe":
 		{
 			"/devices/platform/ehci-brcm.1/usb2/2-1/2-1:1.0": 0,
-			"/devices/platform/ehci-brcm.0/usb1/1-1/1-1:1.0": 1,
-			"/devices/platform/ehci-brcm.0/usb1/1-2/1-2:1.0": 2,
+			"/devices/platform/ehci-brcm.0/usb1/1-2/1-2:1.0": 1,
 		},
 		"ios100hd":
 		{
@@ -213,16 +213,17 @@ class TestMenu(Screen):
 				}, -1)
 
 		self.MENU_LIST = []
-		self.MENU_LIST.append([ "[T0] H18,  720P, CVBS, 4:3,  22OFF (TRACE URB)",	"ch1",	self.func ])
-		self.MENU_LIST.append([ "[T0] V14,  576i, YC,   4:3,  22OFF (MASTV)",		"ch2",	self.func ])
+		self.MENU_LIST.append([ "[T1] H18,  720P, CVBS, 4:3,  22OFF (TRACE URB)",	"ch1",	self.func ])
+		self.MENU_LIST.append([ "[T1] V14,  576i, YC,   4:3,  22OFF (MASTV)",		"ch2",	self.func ])
 		if len(nimmanager.nimList()) == 2:
+			self.MENU_LIST.append([ "[T2] H18,  576i, RGB,  16:9, 22OFF (France 24)",	"ch3",	self.func ])
+			self.MENU_LIST.append([ "[T2] V14, 1080i, CVBS, 16:9, 22OFF (NewSky)",	"ch4",	self.func ])
+		else:
 			self.MENU_LIST.append([ "[T1] H18,  576i, RGB,  16:9, 22OFF (France 24)",	"ch3",	self.func ])
 			self.MENU_LIST.append([ "[T1] V14, 1080i, CVBS, 16:9, 22OFF (NewSky)",	"ch4",	self.func ])
-		else:
-			self.MENU_LIST.append([ "[T0] H18,  576i, RGB,  16:9, 22OFF (France 24)",	"ch3",	self.func ])
-			self.MENU_LIST.append([ "[T0] V14, 1080i, CVBS, 16:9, 22OFF (NewSky)",	"ch4",	self.func ])
 		self.MENU_LIST.append([ "22Khz	-  ON /[OFF]",							"tone",	self.func ])
-		self.MENU_LIST.append([ "FAN	- [ON]/ OFF",								"fan",	self.func ])
+		if HardwareInfo().get_device_name() not in ("ios300hd"):	# fan
+			self.MENU_LIST.append([ "FAN	- [ON]/ OFF",								"fan",	self.func ])
 		self.MENU_LIST.append([ "FRONT PANEL",										"fp",	self.func ])
 		self.MENU_LIST.append([ "DEEP STANDBY",										"ds",	self.func ])
 
@@ -256,7 +257,7 @@ class TestMenu(Screen):
 		self.setTestItemsLabel()
 	
 		# models using fan ic, available rpm, temp
-		if HardwareInfo().get_device_name() in ("tmtwinoe", "tm2toe", "ios100hd", "ios200hd"):
+		if HardwareInfo().get_device_name() in ("tmtwinoe", "tm2toe", "ios100hd"):
 			self.initFanSensors()
 
 		self.networkMonitor = eTimer()
@@ -281,8 +282,8 @@ class TestMenu(Screen):
 	def cancel(self):
 		if self.fpTestMode:
 			self.frontButtonExit()
-		else:
-			self.session.openWithCallback(self.quitConfirmed, MessageBox, _("Do you really want to quit?"), default = False)
+#		else:
+#			self.session.openWithCallback(self.quitConfirmed, MessageBox, _("Do you really want to quit?"), default = False)
 
 	def quitConfirmed(self, answer):
 		if answer:
@@ -294,19 +295,16 @@ class TestMenu(Screen):
 		self.ciMonitor.stop()
 		self.storageMonitor.stop()
 
-#		self.hide()
-#		if mode == 1:
-#			os.system("rm /etc/enigma2 -rf; /sbin/halt")
-#		elif mode == 3:
-#			os.system("rm /etc/enigma2 -rf; killall enigma2")
-
-		os.system("rm /etc/enigma2 -rf")
-		if mode == 3:
-			os.system("rm /etc/.run_factory_test -f")
 		self.hide()
-		self.quitScreen = self.session.instantiateDialog(QuitMainloopScreen,retvalue=mode)
-		self.quitScreen.show()
-		quitMainloop(mode)
+		if mode == 1:
+			os.system("rm /etc/enigma2 -rf")
+			self.hide()
+			self.quitScreen = self.session.instantiateDialog(QuitMainloopScreen,retvalue=mode)
+			self.quitScreen.show()
+			quitMainloop(mode)
+		elif mode == 3:
+			os.system("rm /etc/.run_factory_test -f")
+			os.system("rm /etc/enigma2 -rf; killall enigma2")
 
 	def up(self):
 		if self.fpTestMode:
@@ -318,7 +316,8 @@ class TestMenu(Screen):
 					if self["menulist"].l.getCurrentSelection()[0][0] != "--" or self["menulist"].l.getCurrentSelectionIndex() == 0:
 						break
 
-				os.system("echo \"%s\" > /proc/stb/lcd/show_txt" % self["menulist"].l.getCurrentSelection()[0][0])
+#				os.system("echo \"%s\" > /proc/stb/lcd/show_txt" % self["menulist"].l.getCurrentSelection()[0][0])
+				self.vfdTextWrite(self["menulist"].l.getCurrentSelection()[0][0])
 
 	def down(self):
 		if self.fpTestMode:
@@ -330,7 +329,8 @@ class TestMenu(Screen):
 					if self["menulist"].l.getCurrentSelection()[0][0] != "--" or self["menulist"].l.getCurrentSelectionIndex() == len(self["menulist"].list) - 1:
 						break
 
-				os.system("echo \"%s\" > /proc/stb/lcd/show_txt" % self["menulist"].l.getCurrentSelection()[0][0])
+#				os.system("echo \"%s\" > /proc/stb/lcd/show_txt" % self["menulist"].l.getCurrentSelection()[0][0])
+				self.vfdTextWrite(self["menulist"].l.getCurrentSelection()[0][0])
 
 	# runs a number shortcut
 	def keyNumberGlobal(self, number):
@@ -354,6 +354,7 @@ class TestMenu(Screen):
 	def goEntry(self, entry):
 # do self.func
 #		os.system("echo \"%s\" > /proc/stb/lcd/show_txt" % entry[0])
+#		self.vfdTextWrite(entry[0])
 
 		entry[2](entry)
 
@@ -386,7 +387,9 @@ class TestMenu(Screen):
 
 	def setMenuList(self, list):
 		self.list = []
-		self.__keys = [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "red", "green", "yellow", "blue" ] + (len(list) - 10) * [""]
+# 0 for exit
+#		self.__keys = [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "red", "green", "yellow", "blue" ] + (len(list) - 10) * [""]
+		self.__keys = [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "red", "green", "yellow", "blue" ] + (len(list) - 10) * [""]
 
 		pos = 0
 		self.keymap = {}
@@ -396,6 +399,11 @@ class TestMenu(Screen):
 			if self.__keys[pos] != "":
 				self.keymap[self.__keys[pos]] = list[pos]
 			pos += 1
+
+# 0 for exit, add to end of menu list
+		self.keymap["0"] = [ "EXIT",	"exit",	self.func ]
+		self.list.append(ChoiceEntryComponent(key = "0", text = self.keymap["0"]))
+		self.__keys[pos] = "0"
 
 		if not self.has_key("menulist"):
 			self["menulist"] = ChoiceList(self.list)
@@ -414,7 +422,9 @@ class TestMenu(Screen):
 		self["sata_i"] = Label(_(" iSATA"))
 		self["sata_s"] = MultiColorLabel(_(" N/A"))
 		# not support internal sata
-		if HardwareInfo().get_device_name() in ("tmsingle", "tmnanooe", "ios300hd"):
+		# mkseo
+		# if HardwareInfo().get_device_name() in ("tmsingle", "tmnanooe", "ios300hd"):
+		if HardwareInfo().get_device_name() in ("tmsingle", "ios300hd"):
 			self["sata_i"].hide()
 			self["sata_s"].hide()
 
@@ -431,24 +441,25 @@ class TestMenu(Screen):
 		self["micom_s"] = MultiColorLabel(_(" N/A"))
 
 		for i in (0, 1):
-			self["sc%d_i" % i] = Label(_(" SC Slot-%d" % i))
+			self["sc%d_i" % i] = Label(_(" SC Slot-%d" % (i+1)))
 			self["sc%d_s" % i] = MultiColorLabel(_(" N/A"))
 
-			self["ci%d_i" % i] = Label(_(" CI Slot-%d" % i))
+			self["ci%d_i" % i] = Label(_(" CI Slot-%d" % (i+1)))
 			self["ci%d_s" % i] = MultiColorLabel(_(" N/A"))
 
 			self["security%d_i" % i] = Label(_(" Security%d" % i))
 			self["security%d_s" % i] = MultiColorLabel(_(" N/A"))
 
-#		for i in (0, 1, 2):
-#			self["usb%d_i" % i] = Label(_(" USB-%d" % i))
-#			self["usb%d_s" % i] = MultiColorLabel(_(" N/A"))
 		self["usb0_i"] = Label(_(" Front USB"))
 		self["usb0_s"] = MultiColorLabel(_(" N/A"))
-		self["usb1_i"] = Label(_(" Rear USB-0"))
+		self["usb1_i"] = Label(_(" Rear USB-1"))
 		self["usb1_s"] = MultiColorLabel(_(" N/A"))
-		self["usb2_i"] = Label(_(" Rear USB-1"))
+		self["usb2_i"] = Label(_(" Rear USB-2"))
 		self["usb2_s"] = MultiColorLabel(_(" N/A"))
+		if "tmnano" in HardwareInfo().get_device_name():
+			self["usb1_i"].setText(_(" Rear USB"))
+			self["usb2_i"].hide()
+			self["usb2_s"].hide()
 
 		for button in self.BUTTON_TEST:
 			self[self.BUTTON_TEST[button]["button"]] = MultiColorLabel(_(self.BUTTON_TEST[button]["text"]))
@@ -471,6 +482,7 @@ class TestMenu(Screen):
 				self["security0_s"].setForegroundColorNum(1)
 			else:
 				self["security0_s"].setText(_(" SC41CR - OK"))
+			self["security1_i"].hide()
 			self["security1_s"].hide()
 		else:
 			if securityRes & 1:
@@ -485,6 +497,11 @@ class TestMenu(Screen):
 			else:
 				self["security1_s"].setText(_(" CO164 - OK"))
 
+		self.keyNumberGlobal(1)
+
+		from enigma import eDVBVolumecontrol
+		eDVBVolumecontrol.getInstance().setVolume(100, 100)
+
 # ---------------------------------------------------------------------
 #  menulist functions
 # ---------------------------------------------------------------------
@@ -494,25 +511,25 @@ class TestMenu(Screen):
 		if "ch1" in entry[1]:
 			video_hw.setMode("Scart", "720p", "50Hz")
 			config.av.colorformat.value = "cvbs"
-			config.av.aspectratio.value = "4_3_letterbox"
+			open("/proc/stb/video/aspect", "w").write("4:3")
 			self.setTone("off")
 			self.playService(entry[1])
 		elif "ch2" in entry[1]:
 			video_hw.setMode("YPbPr", "576i", "50Hz")
 			config.av.colorformat.value = "yuv"
-			config.av.aspectratio.value = "4_3_letterbox"
+			open("/proc/stb/video/aspect", "w").write("4:3")
 			self.setTone("off")
 			self.playService(entry[1])
 		elif "ch3" in entry[1]:
 			video_hw.setMode("Scart", "576i", "50Hz")
 			config.av.colorformat.value = "rgb"
-			config.av.aspectratio.value = "16_9"
+			open("/proc/stb/video/aspect", "w").write("16:9")
 			self.setTone("off")
 			self.playService(entry[1])
 		elif "ch4" in entry[1]:
 			video_hw.setMode("Scart", "1080i", "50Hz")
 			config.av.colorformat.value = "cvbs"
-			config.av.aspectratio.value = "16_9"
+			open("/proc/stb/video/aspect", "w").write("16:9")
 			self.setTone("off")
 			self.playService(entry[1])
 		elif entry[1] == "tone":
@@ -545,6 +562,8 @@ class TestMenu(Screen):
 			self.fpTest()
 		elif entry[1] == "ds":
 			self.deepStandby()
+		elif entry[1] == "exit":
+			self.session.openWithCallback(self.quitConfirmed, MessageBox, _("Do you really want to quit?"), default = False)
 		else:
 			print "what", entry
 		self["menulist"].show()
@@ -553,7 +572,8 @@ class TestMenu(Screen):
 		index = 0
 		for menu in self.MENU_LIST:
 			if menu[1] == entry[1]:
-				os.system("echo \"%s\" > /proc/stb/lcd/show_txt" % self.MENU_LIST[index][0])
+#				os.system("echo \"%s\" > /proc/stb/lcd/show_txt" % self.MENU_LIST[index][0])
+				self.vfdTextWrite(self.MENU_LIST[index][0])
 				break
 			index += 1
 
@@ -592,7 +612,13 @@ class TestMenu(Screen):
 
 	def setTone(self, tone):
 		config.Nims[0].advanced.sat[192].tonemode.value = tone
-		config.Nims[1].advanced.sat[201].tonemode.value = tone
+		if HardwareInfo().get_device_name() in ("tmnanooe", "ios300hd"):
+			config.Nims[0].advanced.sat[200].tonemode.value = tone
+		else:
+			config.Nims[1].advanced.sat[200].tonemode.value = tone
+
+#		mkseo
+#		config.Nims[1].advanced.sat[200].tonemode.value = tone
 		nimmanager.sec.update()
 
 		if tone == "on":
@@ -791,6 +817,11 @@ class TestMenu(Screen):
 		fp = open('/dev/dbox/lcd0', 'w')
 		fcntl.ioctl(fp.fileno(), 0x123321, on)
 
+	def vfdTextWrite(self, text):
+		if HardwareInfo().get_device_name() not in ("tmsingle", "tmnanooe", "ios200hd", "ios300hd"):
+			if os.path.exists('/proc/stb/lcd/show_txt'):
+				open('/proc/stb/lcd/show_txt', 'w').write(text)
+
 	def fpTest(self):
 		if self.fpTestMode:
 			return
@@ -944,7 +975,10 @@ class TestMenu(Screen):
 		for slot in (0, 1):
 			if os.path.exists("/dev/ci%d" % slot):
 				state = eDVBCI_UI.getInstance().getState(slot)
-				if state == 2:		#module ready
+				if state == 1:
+					self["ci%d_s" % slot].setText(_(" Getting..."))
+					self["ci%d_s" % slot].setForegroundColorNum(0)
+				elif state == 2:		#module ready
 					self["ci%d_s" % slot].setText(_(" %s" % eDVBCI_UI.getInstance().getAppName(slot)))
 					self["ci%d_s" % slot].setForegroundColorNum(1)
 					eDVBCI_UI.getInstance().stopMMI(slot)
