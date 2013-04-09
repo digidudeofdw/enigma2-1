@@ -56,7 +56,7 @@ AC_SUBST(BOXTYPE)
 AC_DEFINE_UNQUOTED(BOXTYPE,"$BOXTYPE",[box type])
 
 AM_CONDITIONAL(DREAMBOX, test `echo "$BOXTYPE" | cut -b 1-2` == "dm")
-AM_CONDITIONAL(HAVE_TEMPFANCONTROL, test "$BOXTYPE" == dm8000 -o "$BOXTYPE" == dm800se -o "$BOXTYPE" == dm500hd -o "$BOXTYPE" == tmtwinoe -o "$BOXTYPE" == ios100 -o "$BOXTYPE" == ios200 -o "$BOXTYPE" == tmsingle -o "$BOXTYPE" == tm2toe -o "$BOXTYPE" == ios300 -o "$BOXTYPE" == tmnanooe )
+AM_CONDITIONAL(HAVE_TEMPFANCONTROL, test "$BOXTYPE" == dm8000 -o "$BOXTYPE" == dm800se -o "$BOXTYPE" == dm500hd -o "$BOXTYPE" == tmtwinoe -o "$BOXTYPE" == ios100 -o "$BOXTYPE" == ios200 -o "$BOXTYPE" == tmsingle -o "$BOXTYPE" == tm2toe -o "$BOXTYPE" == ios300 -o "$BOXTYPE" == tmnanooe -o "$BOXTYPE" == mediabox )
 if test `echo "$BOXTYPE" | cut -b 1-2` == "dm"; then
 	AC_DEFINE(DREAMBOX, 1, [Dreambox hardware])
 	AC_DEFINE(KEY_PLAY_ACTUALLY_IS_KEY_PLAYPAUSE, 1,[define when rc sends a KEY_PLAY event for its KEY_PLAYPAUSE key])
@@ -172,6 +172,7 @@ data/rc_models/tm/ios100/Makefile
 data/rc_models/tm/ios200/Makefile
 data/rc_models/tm/ios300/Makefile
 data/rc_models/tm/tmnanooe/Makefile
+data/rc_models/tm/mediabox/Makefile
 data/rc_models/vu/Makefile
 data/rc_models/xp1000/Makefile
 data/skin_default/Makefile
