@@ -53,7 +53,7 @@ class HardwareInfo:
 			return True
 
 	def has_rfmod(self):
-		DEVICES_WITHOUT_RFMOD = [ 'tmsingle', 'tmsinglemini', 'ios300hd' , 'tmnanooe' ]
+		DEVICES_WITHOUT_RFMOD = [ 'tmsingle', 'tmsinglemini', 'ios300hd' , 'tmnanooe', 'mediabox' ]
 		if HardwareInfo.device_name in DEVICES_WITHOUT_RFMOD:
 			return False
 		else:
@@ -70,14 +70,14 @@ class HardwareInfo:
 			return True
 
 	def has_vcr(self):
-		DEVICES_WITHOUT_VCR = [ 'tmsingle', 'tmsinglemini', 'tm2toe', 'ios300hd', 'ios200hd' , 'tmnanooe' ]
+		DEVICES_WITHOUT_VCR = [ 'tmsingle', 'tmsinglemini', 'tm2toe', 'ios300hd', 'ios200hd' , 'tmnanooe', 'mediabox' ]
 		if HardwareInfo.device_name in DEVICES_WITHOUT_VCR:
 			return False
 		else:
 			return True
 
 	def has_yuv(self):
-		DEVICES_WITHOUT_YUV = [ 'tmsingle', 'tmsinglemini', 'tm2toe', 'ios300hd', 'tmnanooe' ]
+		DEVICES_WITHOUT_YUV = [ 'tmsingle', 'tmsinglemini', 'tm2toe', 'ios300hd', 'tmnanooe', 'mediabox' ]
 		if HardwareInfo.device_name in DEVICES_WITHOUT_YUV:
 			return False
 		else:
