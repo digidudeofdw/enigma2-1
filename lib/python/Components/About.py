@@ -40,7 +40,7 @@ def getHardwareTypeString():
 		if os.path.isfile("/proc/stb/info/boxtype"):
 			return open("/proc/stb/info/boxtype").read().strip().upper() + " (" + open("/proc/stb/info/board_revision").read().strip() + "-" + open("/proc/stb/info/version").read().strip() + ")"
 		if os.path.isfile("/proc/stb/info/hwmodel"):
-			return open("/proc/stb/info/hwmodel").read().strip().upper().replace('TM', 'TM-').replace('OE', '-OE')
+			return open("/proc/stb/info/hwmodel").read().strip().upper().replace('TM', 'TM-').replace('OE', '-OE').replace('MEDIABOX', 'Mediabox HD LX-1')
 #			return "VU+" + open("/proc/stb/info/vumodel").read().strip().upper() + "(" + open("/proc/stb/info/version").read().strip().upper() + ")" 
 #		if os.path.isfile("/proc/stb/info/model"):
 #			return open("/proc/stb/info/model").read().strip().upper()

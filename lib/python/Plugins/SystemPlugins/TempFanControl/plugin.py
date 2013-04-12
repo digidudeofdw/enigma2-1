@@ -172,11 +172,7 @@ def startMenu(menuid):
 
 def Plugins(**kwargs):
 	from Tools.HardwareInfo import HardwareInfo
-	if HardwareInfo().get_device_name() == "ios300hd":
-		return []
-	elif HardwareInfo().get_device_name() == "tmsinglemini":
-		return []
-	elif HardwareInfo().get_device_name() == "tmnanooe":
+	if HardwareInfo().get_device_name() in ('ios300hd', 'tmnanooe', 'mediabox'):
 		return []
 	return PluginDescriptor(name = "Fan control", description = _("Fan control"), where = PluginDescriptor.WHERE_MENU, needsRestart = False, fnc = startMenu)
 

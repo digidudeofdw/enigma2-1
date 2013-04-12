@@ -165,6 +165,12 @@ class TestMenu(Screen):
 			"/devices/platform/ehci-brcm.1/usb2/2-1/2-1:1.0": 0,
 			"/devices/platform/ehci-brcm.0/usb1/1-1/1-1:1.0": 1,
 			"/devices/platform/ehci-brcm.0/usb1/1-2/1-2:1.0": 2,
+		},
+		"mediabox":
+		{
+			"/devices/platform/ehci-brcm.1/usb2/2-1/2-1:1.0": 0,
+			"/devices/platform/ehci-brcm.0/usb1/1-1/1-1:1.0": 1,
+			"/devices/platform/ehci-brcm.0/usb1/1-2/1-2:1.0": 2,
 		}
 		}
 
@@ -212,6 +218,18 @@ class TestMenu(Screen):
 				"log": self.frontButtonInfo,
 				}, -1)
 
+		model = HardwareInfo().get_device_name()
+		self.has_fan = model not in ("ios300hd", "mediabox")
+		self.has_8_buttons_without_nav_keys = model in ("tmtwinoe", "ios100hd")
+		self.has_9_buttons = model in ("tm2toe", "tmsingle")
+		self.has_7_buttons = model in ("tmnanooe", "ios200hd", "ios300hd", "mediabox")
+		self.has_fan_sensor = model in ("tmtwinoe", "tm2toe", "ios100hd")
+		self.has_sata = model not in ("tmsingle", "ios300hd", "mediabox")
+		self.has_1_rear_usb = "tmnano" in model
+		self.has_sc41cr = "tmnano" in model
+		self.has_1_tuner = model in ("tmnanooe", "ios300hd", "mediabox")
+		self.has_vfd = model not in ("tmsingle", "tmnanooe", "ios200hd", "ios300hd", "mediabox")
+
 		self.MENU_LIST = []
 		self.MENU_LIST.append([ "[T1] H18,  720P, CVBS, 4:3,  22OFF (TRACE URB)",	"ch1",	self.func ])
 		self.MENU_LIST.append([ "[T1] V14,  576i, YC,   4:3,  22OFF (MASTV)",		"ch2",	self.func ])
@@ -222,7 +240,7 @@ class TestMenu(Screen):
 			self.MENU_LIST.append([ "[T1] H18,  576i, RGB,  16:9, 22OFF (France 24)",	"ch3",	self.func ])
 			self.MENU_LIST.append([ "[T1] V14, 1080i, CVBS, 16:9, 22OFF (NewSky)",	"ch4",	self.func ])
 		self.MENU_LIST.append([ "22Khz	-  ON /[OFF]",							"tone",	self.func ])
-		if HardwareInfo().get_device_name() not in ("ios300hd"):	# fan
+		self.has_fan:
 			self.MENU_LIST.append([ "FAN	- [ON]/ OFF",								"fan",	self.func ])
 		self.MENU_LIST.append([ "FRONT PANEL",										"fp",	self.func ])
 		self.MENU_LIST.append([ "DEEP STANDBY",										"ds",	self.func ])
@@ -236,7 +254,7 @@ class TestMenu(Screen):
 			"exit":		{ "button":"button_exit",	"func":self.frontButtonExit,	"pressed":False, "text":"EXIT" },
 			"menu":		{ "button":"button_menu",	"func":self.frontButtonMenu,	"pressed":False, "text":"MENU" },
 			"power":	{ "button":"button_power",	"func":self.frontButtonPower,	"pressed":False, "text":"POWER" }}
-		if HardwareInfo().get_device_name() in ("tmtwinoe", "ios100hd"):	# 8 buttons
+		if self.has_8_buttons_without_nav_keys:
 			self.BUTTON_TEST["up"]["text"] = "VOL+"
 			self.BUTTON_TEST["up"]["func"] = self.frontButtonVolUp
 			self.BUTTON_TEST["down"]["text"] = "VOL-"
@@ -245,9 +263,9 @@ class TestMenu(Screen):
 			self.BUTTON_TEST["left"]["func"] = self.frontButtonChMinus
 			self.BUTTON_TEST["right"]["text"] = "CH+"
 			self.BUTTON_TEST["right"]["func"] = self.frontButtonChPlus
-		if HardwareInfo().get_device_name() in ("tm2toe", "tmsingle"):		# 9 buttons
+		if self.has_9_buttons:
 			self.BUTTON_TEST["info"] = { "button":"button_info",	"func":self.frontButtonInfo,	"pressed":False, "text":"INFO" }
-		if HardwareInfo().get_device_name() in ("tmnanooe", "ios200hd", "ios300hd"):	# 7 buttons
+		if self.has_7_buttons:
 			self.BUTTON_TEST.pop("exit")
 
 		self.fpTestMode = False
@@ -257,7 +275,7 @@ class TestMenu(Screen):
 		self.setTestItemsLabel()
 	
 		# models using fan ic, available rpm, temp
-		if HardwareInfo().get_device_name() in ("tmtwinoe", "tm2toe", "ios100hd"):
+		if self.has_fan_sensor:
 			self.initFanSensors()
 
 		self.networkMonitor = eTimer()
@@ -422,9 +440,7 @@ class TestMenu(Screen):
 		self["sata_i"] = Label(_(" iSATA"))
 		self["sata_s"] = MultiColorLabel(_(" N/A"))
 		# not support internal sata
-		# mkseo
-		# if HardwareInfo().get_device_name() in ("tmsingle", "tmnanooe", "ios300hd"):
-		if HardwareInfo().get_device_name() in ("tmsingle", "ios300hd"):
+		if not self.has_sata:
 			self["sata_i"].hide()
 			self["sata_s"].hide()
 
@@ -456,7 +472,7 @@ class TestMenu(Screen):
 		self["usb1_s"] = MultiColorLabel(_(" N/A"))
 		self["usb2_i"] = Label(_(" Rear USB-2"))
 		self["usb2_s"] = MultiColorLabel(_(" N/A"))
-		if "tmnano" in HardwareInfo().get_device_name():
+		if self.has_1_rear_usb:
 			self["usb1_i"].setText(_(" Rear USB"))
 			self["usb2_i"].hide()
 			self["usb2_s"].hide()
@@ -476,7 +492,7 @@ class TestMenu(Screen):
 			for i in (0, 1):
 				self["security%d_i" % i].hide()
 				self["security%d_s" % i].hide()
-		elif "tmnano" in HardwareInfo().get_device_name():
+		elif self.has_sc41cr:
 			if securityRes:
 				self["security0_s"].setText(_(" SC41CR - NOK"))
 				self["security0_s"].setForegroundColorNum(1)
@@ -612,7 +628,7 @@ class TestMenu(Screen):
 
 	def setTone(self, tone):
 		config.Nims[0].advanced.sat[192].tonemode.value = tone
-		if HardwareInfo().get_device_name() in ("tmnanooe", "ios300hd"):
+		if self.has_1_tuner:
 			config.Nims[0].advanced.sat[200].tonemode.value = tone
 		else:
 			config.Nims[1].advanced.sat[200].tonemode.value = tone
@@ -818,7 +834,7 @@ class TestMenu(Screen):
 		fcntl.ioctl(fp.fileno(), 0x123321, on)
 
 	def vfdTextWrite(self, text):
-		if HardwareInfo().get_device_name() not in ("tmsingle", "tmnanooe", "ios200hd", "ios300hd"):
+		if self.has_vfd:
 			if os.path.exists('/proc/stb/lcd/show_txt'):
 				open('/proc/stb/lcd/show_txt', 'w').write(text)
 

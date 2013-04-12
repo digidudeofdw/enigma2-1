@@ -68,24 +68,14 @@ def InitUsageConfig():
 		("swapstop", _("Move PiP to main picture")), ("stop", _("Stop PiP")) ])
 
 # iq [
-	if HardwareInfo().get_device_name() == "ios300hd":
+	if HardwareInfo().get_device_name() in ('ios300hd', 'tmnanooe', 'mediabox'):
 		os.system("rm /hdd; ln -s /media/usb /hdd"); 
-	elif HardwareInfo().get_device_name() == "tmsinglemini":
-		os.system("rm /hdd; ln -s /media/usb /hdd");
-	elif HardwareInfo().get_device_name() == "tmnanooe":
-		os.system("rm /hdd; ln -s /media/usb /hdd");
 # ]
 	config.usage.default_path = ConfigText(default = resolveFilename(SCOPE_HDD))
 	config.usage.timer_path = ConfigText(default = "<default>")
 	config.usage.instantrec_path = ConfigText(default = "<default>")
 # if [
-	if HardwareInfo().get_device_name() == "ios300hd":
-		config.usage.timeshift_path = ConfigText(default = "/media/usb/")
-		config.usage.allowed_timeshift_paths = ConfigLocations(default = ["/media/usb/"])
-	elif HardwareInfo().get_device_name() == "tmsinglemini":
-		config.usage.timeshift_path = ConfigText(default = "/media/usb/")
-		config.usage.allowed_timeshift_paths = ConfigLocations(default = ["/media/usb/"])
-	elif HardwareInfo().get_device_name() == "tmnanooe":
+	if HardwareInfo().get_device_name() in ('ios300hd', 'tmnanooe', 'mediabox'):
 		config.usage.timeshift_path = ConfigText(default = "/media/usb/")
 		config.usage.allowed_timeshift_paths = ConfigLocations(default = ["/media/usb/"])
 	else:

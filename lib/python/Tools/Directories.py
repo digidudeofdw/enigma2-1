@@ -44,11 +44,7 @@ PATH_FALLBACK = 2
 # songingeun - [
 HDD_PATH="/hdd/movie/"
 from Tools.HardwareInfo import HardwareInfo
-if HardwareInfo().get_device_name() == 'ios300hd':
-	HDD_PATH="/media/usb/movie/"
-elif HardwareInfo().get_device_name() == 'tmsinglemini':
-	HDD_PATH="/media/usb/movie/"
-elif HardwareInfo().get_device_name() == 'tmnanooe':
+if HardwareInfo().get_device_name() in ('ios300hd', 'tmnanooe', 'mediabox'):
 	HDD_PATH="/media/usb/movie/"
 # ]
 

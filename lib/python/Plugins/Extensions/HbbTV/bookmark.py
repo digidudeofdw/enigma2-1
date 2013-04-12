@@ -128,7 +128,7 @@ class BookmarkManager(SimpleConfigParser):
 			model = f.read().strip()
 			f.close()
 #			manualmode = (model == "solo2" or model == "duo2")
-			manualmode = (model == "tmtwinoe" or model == "tm2toe" or model == "tmsingleoe" or model == "tmnanooe" or model == "ios100hd" or model == "ios200hd" or model == "ios300hd")
+			manualmode = model in ("tmtwinoe", "tm2toe", "tmsingleoe", "tmsingle", "tmnanooe", "ios100hd",, "ios200hd", "ios300hd", "mediabox")
 # [iq
 
 			os.system('echo "[__SYS__]" > %s'%(_dbFileName))
