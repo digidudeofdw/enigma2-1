@@ -9,6 +9,7 @@ class RcModel:
 	RCTYPE_TM2T = 5
 	RCTYPE_TMSINGLE = 6
 	RCTYPE_TMNANO = 7
+	RCTYPE_MEDIABOX = 8
 
 	def __init__(self):
 		self.currentRcType = self.RCTYPE_DMM
@@ -42,6 +43,8 @@ class RcModel:
 				self.currentRcType = self.RCTYPE_TMSINGLE
 			elif model == "tmnanooe":
 				self.currentRcType = self.RCTYPE_TMNANO
+			elif model == "mediabox":
+				self.currentRcType = self.RCTYPE_MEDIABOX
 
 		elif os.path.exists('/proc/stb/info/boxtype'):
 			model = self.readFile('/proc/stb/info/boxtype')
@@ -67,5 +70,7 @@ class RcModel:
 			return '/usr/share/enigma2/rc_models/tm/tmsingle/'
 		elif self.currentRcType == self.RCTYPE_TMNANO:
 			return '/usr/share/enigma2/rc_models/tm/tmnanooe/'
+		elif self.currentRcType == self.RCTYPE_MEDIABOX:
+			return '/usr/share/enigma2/rc_models/tm/mediabox/'
 
 rc_model = RcModel()
