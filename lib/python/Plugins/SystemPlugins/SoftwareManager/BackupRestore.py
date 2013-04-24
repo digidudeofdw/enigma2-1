@@ -95,14 +95,9 @@ class BackupScreen(Screen, ConfigListScreen):
 		try:
 			if (path.exists(self.backuppath) == False):
 				makedirs(self.backuppath)
-
 			self.backupdirs = ' '.join( config.plugins.configurationbackup.backupdirs.value )
 # iq [
 			self.addSkinToBackupDirs()
-#			from os import path as os_path
-#			for backupdir in config.plugins.configurationbackup.backupdirs.value:
-#				if os_path.exists(backupdir):
-#					self.backupdirs = self.backupdirs + " " + backupdir
 # ]
 			if path.exists(self.fullbackupfilename):
 				dt = str(date.fromtimestamp(stat(self.fullbackupfilename).st_ctime))
