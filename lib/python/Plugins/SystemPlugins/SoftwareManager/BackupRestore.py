@@ -19,7 +19,7 @@ from datetime import date
 
 config.plugins.configurationbackup = ConfigSubsection()
 config.plugins.configurationbackup.backuplocation = ConfigText(default = '/media/hdd/', visible_width = 50, fixed_size = False)
-config.plugins.configurationbackup.backupdirs = ConfigLocations(default=[eEnv.resolve('${sysconfdir}/enigma2/'), '/etc/network/interfaces', '/etc/wpa_supplicant.conf', '/etc/wpa_supplicant.ath0.conf', '/etc/wpa_supplicant.wlan0.conf', '/etc/resolv.conf', '/etc/default_gw', '/etc/hostname'])
+config.plugins.configurationbackup.backupdirs = ConfigLocations(default=[eEnv.resolve('${sysconfdir}/enigma2/'), '/etc/network/interfaces', '/etc/wpa_supplicant.conf', '/etc/wpa_supplicant.ath0.conf', '/etc/wpa_supplicant.wlan0.conf', '/etc/resolv.conf', '/etc/default_gw', '/etc/hostname', '/etc/CCcam.cfg', '/usr/keys/mg_cfg'])
 
 def getBackupPath():
 	backuppath = config.plugins.configurationbackup.backuplocation.value
@@ -64,12 +64,46 @@ class BackupScreen(Screen, ConfigListScreen):
 	def setWindowTitle(self):
 		self.setTitle(_("Backup is running..."))
 
+# iq [
+	def addSkinToBackupDirs(self):
+		from os import system as os_system, path as os_path
+
+		# if not default skin
+		if os_system("grep config.skin.primary_skin /etc/enigma2/settings 1>/dev/null") == 0 and config.skin.primary_skin.value != "skin.xml":
+			skinName = config.skin.primary_skin.value[:-9]
+			skinDir = "/usr/share/enigma2/%s" % skinName
+			skinFiles = skinDir + "/.skin_files"
+
+			if os_path.exists(skinFiles):
+				print "maybe skin from backup, not from opkg"
+			else:
+				if os_system("grep %s /usr/lib/opkg/info/*.list 1>/dev/null" % skinName) == 0:
+					os_system("opkg files `opkg search %s | awk '{print $1}'` > %s" % ("/usr/share/enigma2/"+config.skin.primary_skin.value, skinFiles))
+					self.backupdirs = self.backupdirs + " " + skinFiles
+				else:
+					print "skin is not from backup and not from opkg, can not know skin files"
+					return
+
+			self.backupdirs = self.backupdirs + " " + skinDir
+			for line in open(skinFiles).readlines():
+				if os_path.exists(line.split("\n")[0]) and not line.startswith(skinDir):
+					self.backupdirs = self.backupdirs + " " + line.split("\n")[0]
+# ]
+
 	def doBackup(self):
 		configfile.save()
 		try:
 			if (path.exists(self.backuppath) == False):
 				makedirs(self.backuppath)
+
 			self.backupdirs = ' '.join( config.plugins.configurationbackup.backupdirs.value )
+# iq [
+			self.addSkinToBackupDirs()
+#			from os import path as os_path
+#			for backupdir in config.plugins.configurationbackup.backupdirs.value:
+#				if os_path.exists(backupdir):
+#					self.backupdirs = self.backupdirs + " " + backupdir
+# ]
 			if path.exists(self.fullbackupfilename):
 				dt = str(date.fromtimestamp(stat(self.fullbackupfilename).st_ctime))
 				self.newfilename = self.backuppath + "/" + dt + '-' + self.backupfile
