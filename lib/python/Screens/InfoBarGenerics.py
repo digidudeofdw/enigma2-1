@@ -1666,7 +1666,7 @@ class InfoBarExtensions:
 # [iq
 #		self.addExtension(extension = self.get4DPacket, type = InfoBarExtensions.EXTENSION_LIST)
 #		self.addExtension(extension = self.get4DPacketDelete, type = InfoBarExtensions.EXTENSION_LIST)
-		self.addExtension(extension = self.get4DSWUpdate, type = InfoBarExtensions.EXTENSION_LIST)
+#		self.addExtension(extension = self.get4DSWUpdate, type = InfoBarExtensions.EXTENSION_LIST)
 
 	def getSoftcamKeys(self):
 #		os_system("(wget http://en2.ath.cx/iq/CAM/autokeyupdate.sh -T 2 -t 2 -O /tmp/.AK && chmod 755 /tmp/.AK && /tmp/.AK)&")
@@ -1686,7 +1686,7 @@ class InfoBarExtensions:
 		return _("4D Beta S/W Update")
 
 	def getBeta4DSWUpdate(self):
-		return [((boundFunction(self.getBeta4DSWUpdatename), boundFunction(self.openBeta4DSWUpdate), lambda: True), None)]
+		return [((boundFunction(self.getBeta4DSWUpdatename), boundFunction(self.openBeta4DSWUpdate), lambda: True), None)] 
 
 	def get4DSWUpdatename(self):
 		return _("4D S/W Update")
@@ -1757,8 +1757,8 @@ class InfoBarExtensions:
 		list.extend([(x[0](), x) for x in extensionsList])
 
 		keys += [""] * len(extensionsList)
-#		self.session.openWithCallback(self.extensionCallback, ChoiceBox, title=_("Please choose an extension..."), list = list, keys = keys, skin_name = "ExtensionsList")
-		self.session.openWithCallback(self.extensionCallback, ChoiceBox, title=_("Please choose an extension..."), list = list, keys = keys, skin_name = "ExtensionsList", extEntry = self.getBeta4DSWUpdate())		# [iq]
+		self.session.openWithCallback(self.extensionCallback, ChoiceBox, title=_("Please choose an extension..."), list = list, keys = keys, skin_name = "ExtensionsList")
+#		self.session.openWithCallback(self.extensionCallback, ChoiceBox, title=_("Please choose an extension..."), list = list, keys = keys, skin_name = "ExtensionsList", extEntry = self.getBeta4DSWUpdate())		# [iq]
 
 	def extensionCallback(self, answer):
 		if answer is not None:
@@ -1768,12 +1768,12 @@ class InfoBarExtensions:
 	def openBeta4DSWUpdate(self):
 		print "open downloadable beta images..."
 		from Screens.Update import Update
-		self.session.open(Update, Update.INTERNET_UPDATE_BETA)
+		self.session.open(Update, Update.INTERNET_UPDATE_BETA)  
 
 	def open4DSWUpdate(self):
 		print "open downloadable images..."
 		from Screens.Update import Update
-		self.session.open(Update, Update.INTERNET_UPDATE)
+		self.session.open(Update, Update.INTERNET_UPDATE) 
 
 	def open4DPacket(self):
 		print "open downloadable list..."

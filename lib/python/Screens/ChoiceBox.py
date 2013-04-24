@@ -108,7 +108,7 @@ class ChoiceBox(Screen):
 				self.extEntryExecuted = -1
 	def extEntryGo(self):
 		if self.extEntry is not None:
-			if self.extEntryExecuted == 2:
+			if self.extEntryExecuted == 2 and self.extEntry is not None:
 				self.close(("extEntry", self.extEntry[0][0]))
 			self.extEntryExecuted = 1
 # iq]
