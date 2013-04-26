@@ -181,7 +181,7 @@ class InfoBar(InfoBarBase, InfoBarShowHide,
 # [iq
 	def ZoomInOut(self):
 		zoomval=0
-		if self.zoomrate > 3:
+		if self.zoomrate > 1:
 			self.zoomin = 0
 		elif self.zoomrate < -9:
 			self.zoomin = 1
