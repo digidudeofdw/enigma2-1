@@ -165,14 +165,14 @@ def startMenu(menuid):
 	if menuid != "system":
 		return []
 	from Tools.HardwareInfo import HardwareInfo
-	if HardwareInfo().get_device_name() in ( 'tmtwinoe', 'tm2toe', 'tmsingle', 'ios100hd', 'ios200hd' , 'tmnanooe' ):
+	if HardwareInfo().has_fan():
 		return [(_("Fan control"), main, "tempfancontrol", 80)]
 	else:
 		return []
 
 def Plugins(**kwargs):
 	from Tools.HardwareInfo import HardwareInfo
-	if HardwareInfo().get_device_name() in ('ios300hd', 'mediabox'):
+	if not HardwareInfo().has_fan():
 		return []
 	return PluginDescriptor(name = "Fan control", description = _("Fan control"), where = PluginDescriptor.WHERE_MENU, needsRestart = False, fnc = startMenu)
 

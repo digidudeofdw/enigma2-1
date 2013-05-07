@@ -96,4 +96,11 @@ class HardwareInfo:
 			return False
 		else:
 			return True
+
+	def has_fan(self):
+		DEVICES_WITHOUT_FAN = [ 'ios300hd', 'mediabox' ]
+		if HardwareInfo.device_name in DEVICES_WITHOUT_FAN:
+			return False
+		else:
+			return True
 # ]
