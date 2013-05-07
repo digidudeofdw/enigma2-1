@@ -264,6 +264,12 @@ class Update(Screen):
 	def drawProgressBar(self):
 		config.progress.value = str(MiniFTP_Thread.getInstance().GetState())
 
+	def getKernelMtd(self):
+		for line in open("/proc/mtd", "r").readlines():
+			if "kernel" in line:
+				return "/dev/" + line.split(":")[0]
+		return None
+
 	def downloadBurn(self, val):
 		if not val:
 			config.progress.value = str(-1)
@@ -277,12 +283,11 @@ class Update(Screen):
 				cmds = []
 				cmds.append("tar xf /tmp/update_files.tar -C /tmp/")
 				from Tools.HardwareInfo import HardwareInfo
-				if 'mini' in HardwareInfo().get_device_name():
-					cmds.append("if [ -e /tmp/oe_kernel.bin ]; then flash_eraseall -j /dev/mtd1; nandwrite -p /dev/mtd1 /tmp/oe_kernel.bin; fi")
+				if about.getKernelVersionString().startswith("3"):
+					cmds.append("if [ -e /tmp/oe_kernel.bin ]; then flash_eraseall %s; nandwrite -p %s /tmp/oe_kernel.bin; fi" % (self.getKernelMtd(), self.getKernelMtd()))
 				else:
-					cmds.append("if [ -e /tmp/oe_kernel.bin ]; then flash_eraseall -j /dev/mtd6; nandwrite -p /dev/mtd6 /tmp/oe_kernel.bin; fi")
-				cmds.append("if [ -e /tmp/bcmlinuxdvb.ko ]; then mv /tmp/bcmlinuxdvb.ko %s; fi" % 
-						("/lib/modules/" + about.getKernelVersionString() + "/extra/bcmlinuxdvb.ko"))
+					cmds.append("if [ -e /tmp/oe_kernel.bin ]; then flash_eraseall -j %s; nandwrite -p %s /tmp/oe_kernel.bin; fi" % (self.getKernelMtd(), self.getKernelMtd()))
+				cmds.append("if [ -e /tmp/bcmlinuxdvb.ko ]; then mv /tmp/bcmlinuxdvb.ko %s; fi" % ("/lib/modules/" + about.getKernelVersionString() + "/extra/bcmlinuxdvb.ko"))
 				cmds.append("if [ \"`find /tmp/ -name enigma2*ipk`\" != \"\" ]; then opkg install `ls /tmp/enigma2*ipk`; fi")
 				cmds.append("sync")
 				self.session.openWithCallback(self.reboot, Console, title = _("Update is running..."), cmdlist = cmds, closeOnSuccess = True)
