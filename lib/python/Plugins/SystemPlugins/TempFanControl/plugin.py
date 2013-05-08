@@ -164,15 +164,10 @@ def main(session, **kwargs):
 def startMenu(menuid):
 	if menuid != "system":
 		return []
-	from Tools.HardwareInfo import HardwareInfo
-	if HardwareInfo().has_fan():
-		return [(_("Fan control"), main, "tempfancontrol", 80)]
-	else:
-		return []
+	return [(_("Fan control"), main, "tempfancontrol", 80)]
 
 def Plugins(**kwargs):
-	from Tools.HardwareInfo import HardwareInfo
-	if not HardwareInfo().has_fan():
+	if not fancontrol.getFanCount():
 		return []
 	return PluginDescriptor(name = "Fan control", description = _("Fan control"), where = PluginDescriptor.WHERE_MENU, needsRestart = False, fnc = startMenu)
 
