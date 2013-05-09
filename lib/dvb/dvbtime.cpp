@@ -203,7 +203,7 @@ void eDVBLocalTimeHandler::readTimeOffsetData( const char* filename )
 			continue;
 		int dvbnamespace,tsid,onid,offs;
 		if ( sscanf( line, "%08x,%04x,%04x:%d\n",&dvbnamespace,&tsid,&onid,&offs ) == 4 )
-			m_timeOffsetMap[eDVBChannelID(dvbnamespace,tsid,onid)]=offs;
+ 			m_timeOffsetMap[eDVBChannelID(dvbnamespace,tsid,onid)]=offs;
 	}
 	fclose(f);
 }
@@ -283,20 +283,24 @@ void eDVBLocalTimeHandler::updateTime( time_t tp_time, eDVBChannel *chan, int up
 			{
 				tm now;
 				localtime_r(&rtc_time, &now);
+				eDebug("-------------------------------------------------\n");
 				eDebug("[eDVBLocalTimerHandler] RTC time is %02d:%02d:%02d",
 					now.tm_hour,
 					now.tm_min,
 					now.tm_sec);
 				time_t linuxTime=time(0);
 				localtime_r(&linuxTime, &now);
+
 				eDebug("[eDVBLocalTimerHandler] Receiver time is %02d:%02d:%02d",
 					now.tm_hour,
 					now.tm_min,
 					now.tm_sec);
+				eDebug("-------------------------------------------------\n");
 				time_difference = rtc_time - linuxTime;
 				eDebug("[eDVBLocalTimerHandler] RTC to Receiver time difference is %ld seconds", linuxTime - rtc_time );
 				if ( time_difference )
 				{
+				  eDebug("-------------------------------------------------\n");
 					eDebug("[eDVBLocalTimerHandler] set Linux Time to RTC Time");
 					timeval tnow;
 					gettimeofday(&tnow,0);
@@ -304,13 +308,22 @@ void eDVBLocalTimeHandler::updateTime( time_t tp_time, eDVBChannel *chan, int up
 					settimeofday(&tnow,0);
 				}
 				else if ( !time_difference )
+				  {
+					eDebug("-------------------------------------------------\n");
 					eDebug("[eDVBLocalTimerHandler] no change needed");
+				  }
 				else
+				  {
+					eDebug("-------------------------------------------------\n");
 					eDebug("[eDVBLocalTimerHandler] set to RTC time");
-				/*emit*/ m_timeUpdated();
+					/*emit*/ m_timeUpdated();
+				  }
 			}
 			else
+			  {
+				eDebug("-------------------------------------------------\n");
 				eDebug("[eDVBLocalTimerHandler]    getRTC returned time=0. RTC problem?");
+			  }
 		}
 	}
 	else
@@ -322,6 +335,8 @@ void eDVBLocalTimeHandler::updateTime( time_t tp_time, eDVBChannel *chan, int up
 
 	// difference between current enigma time and transponder time
 		int enigma_diff = tp_time-linuxTime;
+		eDebug("-------------------------------------------------\n");
+		eDebug("enigma_diff : %02d\n", enigma_diff);
 
 		int new_diff=0;
 
@@ -334,12 +349,14 @@ void eDVBLocalTimeHandler::updateTime( time_t tp_time, eDVBChannel *chan, int up
 			eDebug("[eDVBLocalTimerHandler] diff is %d", enigma_diff);
 			if ( abs(enigma_diff) < 120 )
 			{
+				eDebug("-------------------------------------------------1\n");
 				eDebug("[eDVBLocalTimerHandler] diff < 120 .. use Transponder Time");
 				m_timeOffsetMap[chan->getChannelID()] = 0;
 				new_diff = enigma_diff;
 			}
 			else if ( it != m_timeOffsetMap.end() ) // correction saved?
 			{
+				eDebug("-------------------------------------------------2\n");
 				eDebug("[eDVBLocalTimerHandler] we have correction %d", it->second);
 				time_t CorrectedTpTime = tp_time+it->second;
 				int ddiff = CorrectedTpTime-linuxTime;
@@ -378,6 +395,7 @@ void eDVBLocalTimeHandler::updateTime( time_t tp_time, eDVBChannel *chan, int up
 		}
 		else  // no time setted yet
 		{
+			eDebug("-------------------------------------------------5\n");
 			if ( it != m_timeOffsetMap.end() )
 			{
 				enigma_diff += it->second;
@@ -401,10 +419,11 @@ void eDVBLocalTimeHandler::updateTime( time_t tp_time, eDVBChannel *chan, int up
 
 		if ( !update_count )
 		{
+			eDebug("-------------------------------------------------\n");
 			// set rtc to calced transponder time when the first tdt is received on this
 			// transponder
 			setRTC(t);
-			eDebug("[eDVBLocalTimerHandler] update RTC");
+			eDebug("[eDVBLocalTimerHandler] update RTC-------");
 		}
 		else if (getRTC())
 		{
