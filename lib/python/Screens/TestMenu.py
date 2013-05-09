@@ -240,7 +240,7 @@ class TestMenu(Screen):
 			self.MENU_LIST.append([ "[T1] H18,  576i, RGB,  16:9, 22OFF (France 24)",	"ch3",	self.func ])
 			self.MENU_LIST.append([ "[T1] V14, 1080i, CVBS, 16:9, 22OFF (NewSky)",	"ch4",	self.func ])
 		self.MENU_LIST.append([ "22Khz	-  ON /[OFF]",							"tone",	self.func ])
-		self.has_fan:
+		if self.has_fan:
 			self.MENU_LIST.append([ "FAN	- [ON]/ OFF",								"fan",	self.func ])
 		self.MENU_LIST.append([ "FRONT PANEL",										"fp",	self.func ])
 		self.MENU_LIST.append([ "DEEP STANDBY",										"ds",	self.func ])
