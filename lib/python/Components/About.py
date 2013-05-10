@@ -26,8 +26,7 @@ def getEnigmaVersionString():
 		enigma_version = enigma_version [:-12]
 #iq [
 		list = enigma_version.split("-")
-#	return list[1] + "-" + list[2] + "-" + list[0]
-	return lis listt 
+	return list[1] + "-" + list[2] + "-" + list[0]
 #iq ]
 
 def getKernelVersionString():
