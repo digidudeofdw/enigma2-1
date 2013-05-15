@@ -501,11 +501,15 @@ class TestMenu(Screen):
 			self["security1_i"].hide()
 			self["security1_s"].hide()
 		else:
-			if securityRes & 1:
-				self["security0_s"].setText(_(" ALPUMR - NOK"))
-				self["security0_s"].setForegroundColorNum(1)
+			if HardwareInfo().get_device_name() and self.getMicomVersion() < 117:
+				if securityRes & 1:
+					self["security0_s"].setText(_(" ALPUMR - NOK"))
+					self["security0_s"].setForegroundColorNum(1)
+				else:
+					self["security0_s"].setText(_(" ALPUMR - OK"))
 			else:
-				self["security0_s"].setText(_(" ALPUMR - OK"))
+				self["security1_i"].hide()
+				self["security1_s"].hide()
 
 			if securityRes>>1 & 1:
 				self["security1_s"].setText(_(" CO164 - NOK"))
@@ -633,8 +637,6 @@ class TestMenu(Screen):
 		else:
 			config.Nims[1].advanced.sat[200].tonemode.value = tone
 
-#		mkseo
-#		config.Nims[1].advanced.sat[200].tonemode.value = tone
 		nimmanager.sec.update()
 
 		if tone == "on":
@@ -866,7 +868,7 @@ class TestMenu(Screen):
 # deep standby 
 # ---------------------------------------------------------------------
 	def deepStandby(self):
-		self.session.openWithCallback(self.deepStandbyConfirmed, MessageBox, _("Do you really want to go to Deep Standby?"), default = False)
+		self.session.openWithCallback(self.deepStandbyConfirmed, MessageBox, _("Do you really want to go to Deep Standby?"), default = True)
 
 	def deepStandbyConfirmed(self, answer):
 		if answer:
