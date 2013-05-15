@@ -505,7 +505,7 @@ class TestMenu(Screen):
 				self["security0_s"].setText(_(" ALPUMR - NOK"))
 				self["security0_s"].setForegroundColorNum(1)
 			else:
-				if "tm2t" in HardwareInfo().get_device_name() and self.getMicomVersion() >= 117:
+				if "tm2t" in HardwareInfo().get_device_name() and self.getMicomVersion() != "N/A" and int(self.getMicomVersion()) >= 117:
 					self["security0_i"].hide()
 					self["security0_s"].hide()
 				else:
