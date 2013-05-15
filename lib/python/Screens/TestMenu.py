@@ -501,15 +501,15 @@ class TestMenu(Screen):
 			self["security1_i"].hide()
 			self["security1_s"].hide()
 		else:
-			if "tm2t" in HardwareInfo().get_device_name() and self.getMicomVersion() < 117:
-				if securityRes & 1:
-					self["security0_s"].setText(_(" ALPUMR - NOK"))
-					self["security0_s"].setForegroundColorNum(1)
+			if securityRes & 1:
+				self["security0_s"].setText(_(" ALPUMR - NOK"))
+				self["security0_s"].setForegroundColorNum(1)
+			else:
+				if "tm2t" in HardwareInfo().get_device_name() and self.getMicomVersion() < 117:
+					self["security0_i"].hide()
+					self["security0_s"].hide()
 				else:
 					self["security0_s"].setText(_(" ALPUMR - OK"))
-			else:
-				self["security0_i"].hide()
-				self["security0_s"].hide()
 
 			if securityRes>>1 & 1:
 				self["security1_s"].setText(_(" CO164 - NOK"))
