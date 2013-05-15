@@ -167,7 +167,12 @@ def startMenu(menuid):
 	return [(_("Fan control"), main, "tempfancontrol", 80)]
 
 def Plugins(**kwargs):
-	if not fancontrol.getFanCount():
+	from Tools.HardwareInfo import HardwareInfo
+	if HardwareInfo().get_device_name() == "ios300hd":
+		return []
+	elif HardwareInfo().get_device_name() == "tmsinglemini":
+		return []
+	elif HardwareInfo().get_device_name() == "tmnanooe":
 		return []
 	return PluginDescriptor(name = "Fan control", description = _("Fan control"), where = PluginDescriptor.WHERE_MENU, needsRestart = False, fnc = startMenu)
 
