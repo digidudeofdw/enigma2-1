@@ -170,7 +170,7 @@ def Plugins(**kwargs):
 	from Tools.HardwareInfo import HardwareInfo
 	if HardwareInfo().get_device_name() == "ios300hd":
 		return []
-	elif HardwareInfo().get_device_name() == "tmsinglemini":
+	elif HardwareInfo().get_device_name() == "mediabox":
 		return []
 	elif HardwareInfo().get_device_name() == "tmnanooe":
 		return []
