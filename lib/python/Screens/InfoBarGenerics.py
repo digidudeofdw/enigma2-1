@@ -33,6 +33,8 @@ from Screens.NetworkSetup import NetworkAdapterSelection
 
 from Tools import Notifications
 from Tools.Directories import fileExists
+from Tools.HardwareInfo import HardwareInfo
+
 
 from enigma import eTimer, eServiceCenter, eDVBServicePMTHandler, iServiceInformation, \
 	iPlayableService, eServiceReference, eEPGCache, eActionMap
@@ -1683,13 +1685,21 @@ class InfoBarExtensions:
 			self.session.open(MessageBox, _("Failed. Please check internet connection."), MessageBox.TYPE_ERROR, timeout=5)
 
 	def getBeta4DSWUpdatename(self):
-		return _("4D Beta S/W Update")
+		model = HardwareInfo().get_device_name()
+		if model == "mediabox":
+			return _("S/W Update")
+		else:
+			return _("4D Beta S/W Update")
 
 	def getBeta4DSWUpdate(self):
 		return [((boundFunction(self.getBeta4DSWUpdatename), boundFunction(self.openBeta4DSWUpdate), lambda: True), None)] 
 
 	def get4DSWUpdatename(self):
-		return _("4D S/W Update")
+		model = HardwareInfo().get_device_name()
+		if model == "mediabox":
+			return _("S/W Update")
+		else:
+			return _("4D S/W Update")
 
 	def get4DSWUpdate(self):
 		return [((boundFunction(self.get4DSWUpdatename), boundFunction(self.open4DSWUpdate), lambda: True), None)]

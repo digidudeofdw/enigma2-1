@@ -73,9 +73,14 @@ class PluginBrowser(Screen):
 		self.swapOn()
 # iq]
 
+		from Tools.HardwareInfo import HardwareInfo
+		model = HardwareInfo().get_device_name()
+
 		self["red"] = Label(_("Remove Plugins"))
-		self["green"] = Label(_("Download Plugins"))
-		self["yellow"] = Label(_("Download Myplugins"))
+		if model == "mediabox":
+			self["green"] = Label(_(" "))
+		else:
+			self["green"] = Label(_("Download Plugins"))
 		
 		self.list = []
 		self["list"] = PluginList(self.list)
