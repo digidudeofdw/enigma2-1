@@ -94,11 +94,17 @@ class PluginBrowser(Screen):
 			"ok": self.save,
 			"back": self.close,
 		})
-		self["PluginDownloadActions"] = ActionMap(["ColorActions"],
-		{
-			"red": self.delete,
-			"green": self.download
-		})
+		if model == "mediabox":
+			self["PluginDownloadActions"] = ActionMap(["ColorActions"],
+			{
+				"red": self.delete
+			})
+		else:
+			self["PluginDownloadActions"] = ActionMap(["ColorActions"],
+			{
+				"red": self.delete,
+				"green": self.download
+			})
 
 		self.onFirstExecBegin.append(self.checkWarnings)
 		self.onShown.append(self.updateList)
