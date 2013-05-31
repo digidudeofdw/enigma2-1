@@ -1,4 +1,4 @@
-installdir = $(pkgdatadir)/rc_models/tm/ios300
+installdir = $(pkgdatadir)/rc_models/tm/tmnanosuper
 
 dist_install_DATA = \
 	rc.png \
