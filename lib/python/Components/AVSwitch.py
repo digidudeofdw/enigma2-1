@@ -71,16 +71,23 @@ def InitAVSwitch():
 	colorformat_choices = {"cvbs": _("CVBS"), "rgb": _("RGB"), "svideo": _("S-Video")}
 
 # iq [
-	from Tools.HardwareInfo import HardwareInfo 
-	if not HardwareInfo().has_yuv():
+	default_color = "rgb"
+	colorformats = open("/proc/stb/avs/0/colorformat_choices", "r").read()
+	if "yuv" not in colorformats:
 		config.av.yuvenabled.value = False
+	if "rgb" not in colorformats:
+		colorformat_choices.pop("rgb")	
+		default_color = "cvbs"
 # ]
 
 	# when YUV is not enabled, don't let the user select it
 	if config.av.yuvenabled.value:
 		colorformat_choices["yuv"] = _("YPbPr")
 
-	config.av.colorformat = ConfigSelection(choices=colorformat_choices, default="rgb")
+# iq - [
+#	config.av.colorformat = ConfigSelection(choices=colorformat_choices, default="rgb")
+	config.av.colorformat = ConfigSelection(choices=colorformat_choices, default=default_color)
+# ]
 	config.av.aspectratio = ConfigSelection(choices={
 			"4_3_letterbox": _("4:3 Letterbox"),
 			"4_3_panscan": _("4:3 PanScan"), 

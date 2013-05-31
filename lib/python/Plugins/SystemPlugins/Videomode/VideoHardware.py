@@ -119,6 +119,13 @@ class VideoHardware:
 			print "remove DVI-PC because of not existing modes"
 			del self.modes["DVI-PC"]
 
+# iq - [
+		if "1080p50" in self.modes_available:
+			self.rates["1080p"]["50Hz"] = { 50 : "1080p50" }
+		if "1080p60" in self.modes_available:
+			self.rates["1080p"]["60Hz"] = { 60 : "1080p60" }
+# ]
+
 		self.createConfig()
 #		self.on_hotplug.append(self.createConfig)
 

@@ -88,7 +88,7 @@ class HardwareInfo:
 			return True
 
 	def has_scart(self):
-		DEVICES_WITHOUT_SCART = [ 'tmnanooe', 'ios200hd' ]
+		DEVICES_WITHOUT_SCART = [ 'tmnanooe', 'ios200hd', 'force1', 'tmnanooesuper' ]
 		if HardwareInfo.device_name in DEVICES_WITHOUT_SCART:
 			return False
 		else:
