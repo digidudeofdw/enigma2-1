@@ -7,6 +7,7 @@ from Components.About import about
 from Components.ScrollLabel import ScrollLabel
 
 from Tools.StbHardware import getFPVersion
+from Tools.HardwareInfo import HardwareInfo
 
 class About(Screen):
 	def __init__(self, session):
@@ -119,12 +120,17 @@ class About(Screen):
 			self.key_status = 1
 
 	def info_action(self):
-		if self.key_status == 1:
-			self.key_status = 2
-			print "info_action two"
+		model = HardwareInfo().get_device_name() 
+		
+		if model == "mediabox": 
+			return
 		else:
-			self.key_status = 1
-			print "info_action one"
+			if self.key_status == 1:
+				self.key_status = 2
+				print "info_action two"
+			else:
+				self.key_status = 1
+				print "info_action one"
 
 	def first_action(self):
 		if self.key_status == 2:
