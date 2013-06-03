@@ -84,7 +84,7 @@ class RcModel:
 		elif self.currentRcType == self.RCTYPE_FORCE1:
 			return '/usr/share/enigma2/rc_models/tm/force1/'
 		elif self.currentRcType == self.RCTYPE_TMNANOSUPER:
-			return '/usr/share/enigma2/rc_models/tm/tmnanoosuper/'
+			return '/usr/share/enigma2/rc_models/tm/tmnanosuper/'
 		elif self.currentRcType == self.RcTYPE_TM2TSUPER:
 			return '/usr/share/enigma2/rc_models/tm/tm2tsuper'
 
