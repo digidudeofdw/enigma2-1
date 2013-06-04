@@ -27,12 +27,13 @@ from Components.PackageInfo import PackageInfoHandler
 from Components.Language import language
 from Components.AVSwitch import AVSwitch
 from Components.Task import job_manager
+from Tools.HardwareInfo import HardwareInfo
 from Tools.Directories import pathExists, fileExists, resolveFilename, SCOPE_PLUGINS, SCOPE_CURRENT_PLUGIN, SCOPE_CURRENT_SKIN, SCOPE_METADIR
 from Tools.LoadPixmap import LoadPixmap
 from Tools.NumericalTextInput import NumericalTextInput
 from enigma import eTimer, RT_HALIGN_LEFT, RT_VALIGN_CENTER, eListboxPythonMultiContent, eListbox, gFont, getDesktop, ePicLoad, eRCInput, getPrevAsciiCode, eEnv, iRecordableService
 from cPickle import dump, load
-from os import path as os_path, system as os_system, unlink, stat, mkdir, popen, makedirs, listdir, access, rename, remove, W_OK, R_OK, F_OK
+from os import path as os_path, system as os_system, unlink, stat, mkdir, popen, makedirs, listdir, access, rename, remove, W_OK, R_OK, F_OK, statvfs, walk, chmod
 from time import time, gmtime, strftime, localtime
 from stat import ST_MTIME
 from datetime import date
@@ -46,7 +47,7 @@ from SoftwareTools import iSoftwareTools
 config.plugins.configurationbackup = ConfigSubsection()
 config.plugins.configurationbackup.backuplocation = ConfigText(default = '/media/hdd/', visible_width = 50, fixed_size = False)
 config.plugins.configurationbackup.backupdirs = ConfigLocations(default=[eEnv.resolve('${sysconfdir}/enigma2/'), '/etc/network/interfaces', '/etc/wpa_supplicant.conf', '/etc/wpa_supplicant.ath0.conf', '/etc/wpa_supplicant.wlan0.conf', '/etc/resolv.conf', '/etc/default_gw', '/etc/hostname', '/etc/CCcam.cfg', '/usr/keys/mg_cfg'])
-
+config.plugins.configurationbackup.folderprefix = ConfigText(default=HardwareInfo().get_device_name(), fixed_size=False)
 config.plugins.softwaremanager = ConfigSubsection()
 config.plugins.softwaremanager.overwriteConfigFiles = ConfigSelection(
 				[
@@ -133,7 +134,11 @@ class UpdatePluginMenu(Screen):
 		if self.menu == 0:
 			print "building menu entries"
 			self.list.append(("install-extensions", _("Manage extensions"), _("\nManage extensions or plugins for your receiver" ) + self.oktext, None))
+# iq - [
 #			self.list.append(("software-update", _("Software update"), _("\nOnline update of your receiver software." ) + self.oktext, None))
+			self.list.append(("image-backup", _("Image backup"), _("\nBackup your receiver image.." ) + self.oktext, None))
+			self.list.append(("image-restore", _("Image restore"), _("\nRestore your receiver image.." ) + self.oktext, None))
+# ]
 			self.list.append(("software-restore", _("Software restore"), _("\nRestore your receiver with a new firmware." ) + self.oktext, None))
 			self.list.append(("system-backup", _("Backup system settings"), _("\nBackup your receiver settings." ) + self.oktext + "\n\n" + self.infotext, None))
 			self.list.append(("system-restore",_("Restore system settings"), _("\nRestore your receiver settings." ) + self.oktext, None))
@@ -262,12 +267,18 @@ class UpdatePluginMenu(Screen):
 			if self.menu == 0:
 				if (currentEntry == "software-update"):
 					self.session.open(UpdatePlugin, self.skin_path)
+# iq - [
+				elif (currentEntry == "image-backup"):
+					self.session.openWithCallback(self.startImageBackup, MessageBox, _("Are you sure you want to backup image?"))
+				elif (currentEntry == "image-restore"):
+					self.session.open(ImageRestore)
+# ]
 				elif (currentEntry == "software-restore"):
 					self.session.open(ImageWizard)
 				elif (currentEntry == "install-extensions"):
 					self.session.open(PluginManager, self.skin_path)
 				elif (currentEntry == "system-backup"):
-					self.session.openWithCallback(self.backupDone,BackupScreen, runBackup = True)
+					self.session.openWithCallback(self.backupDone, BackupScreen, runBackup = True)
 				elif (currentEntry == "system-restore"):
 					if os_path.exists(self.fullbackupfilename):
 						self.session.openWithCallback(self.startRestore, MessageBox, _("Are you sure you want to restore the backup?\nYour receiver will restart after the backup has been restored!"))
@@ -340,6 +351,26 @@ class UpdatePluginMenu(Screen):
 		if (ret == True):
 			self.exe = True
 			self.session.open(RestoreScreen, runRestore = True)
+
+# iq - [
+	def startImageBackup(self, ret = False):
+		if ret:
+			self.ImageBackup = ImageBackup(self.session)
+			job_manager.AddJob(self.ImageBackup.createBackupJob())
+
+			for job in job_manager.getPendingJobs():
+				if job.name.startswith(_("Image Backup")):
+					backup = job
+			self.showJobView(backup)
+
+	def JobViewCB(self, in_background):
+		job_manager.in_background = in_background
+
+	def showJobView(self, job):
+		from Screens.TaskView import JobView
+		job_manager.in_background = False
+		self.session.openWithCallback(self.JobViewCB, JobView, job, cancelable = False, backgroundable = False, afterEventChangeable = False)
+# ]
 
 class SoftwareManagerSetup(Screen, ConfigListScreen):
 
@@ -1889,6 +1920,421 @@ class IpkgInstaller(Screen):
 			cmdList.append((IpkgComponent.CMD_INSTALL, { "package": item[1] }))
 		self.session.open(Ipkg, cmdList = cmdList)
 
+# iq - [
+from Tools import Notifications
+import Components.Task
+from shutil import rmtree, move, copy
+class ImageBackup(Screen):
+	def __init__(self, session, updatebackup=False):
+		Screen.__init__(self, session)
+		self.updatebackup = updatebackup
+		self.swapdevice = ""
+		self.RamChecked = False
+		self.SwapCreated = False
+		self.Stage1Completed = False
+		self.Stage2Completed = False
+		self.Stage3Completed = False
+
+	def createBackupJob(self):
+		job = Components.Task.Job(_("Image Backup"))
+
+		task = Components.Task.PythonTask(job, _("Setting Up..."))
+		task.work = self.JobStart
+		task.weighting = 5
+
+		task = Components.Task.ConditionTask(job, _("Checking Free RAM.."), timeoutCount=10)
+		task.check = lambda: self.RamChecked
+		task.weighting = 5
+
+		task = Components.Task.ConditionTask(job, _("Creating Swap.."), timeoutCount=120)
+		task.check = lambda: self.SwapCreated
+		task.weighting = 5
+
+		task = Components.Task.PythonTask(job, _("Creating Backup Files..."))
+		task.work = self.doBackup1
+		task.weighting = 5
+
+		task = Components.Task.ConditionTask(job, _("Creating Backup Files..."), timeoutCount=900)
+		task.check = lambda: self.Stage1Completed
+		task.weighting = 35
+
+		task = Components.Task.PythonTask(job, _("Creating Backup Files..."))
+		task.work = self.doBackup2
+		task.weighting = 5
+
+		task = Components.Task.ConditionTask(job, _("Creating Backup Files..."), timeoutCount=900)
+		task.check = lambda: self.Stage2Completed
+		task.weighting = 15
+
+		task = Components.Task.PythonTask(job, _("Removing temp mounts..."))
+		task.work = self.doBackup3
+		task.weighting = 5
+
+		task = Components.Task.ConditionTask(job, _("Removing temp mounts..."), timeoutCount=900)
+		task.check = lambda: self.Stage3Completed
+		task.weighting = 5
+
+		task = Components.Task.PythonTask(job, _("Moving to Backup Location..."))
+		task.work = self.doBackup4
+		task.weighting = 5
+
+		task = Components.Task.ConditionTask(job, _("Moving to Backup Location..."), timeoutCount=900)
+		task.check = lambda: self.Stage4Completed
+		task.weighting = 5
+
+		task = Components.Task.PythonTask(job, _("Backup Complete..."))
+		task.work = self.BackupComplete
+		task.weighting = 5
+
+		return job
+
+	def JobStart(self):
+		self.BackupDevice = config.plugins.configurationbackup.backuplocation.value
+		print "[ImageManager] Device: " + self.BackupDevice
+		self.BackupDirectory = config.plugins.configurationbackup.backuplocation.value + '/imagebackups/'
+		print "[ImageManager] Directory: " + self.BackupDirectory
+
+		try:
+			if not os_path.exists(self.BackupDirectory):
+				mkdir(self.BackupDirectory, 0755)
+			if os_path.exists(self.BackupDirectory + config.plugins.configurationbackup.folderprefix.value + "-swapfile_backup"):
+				system('swapoff ' + self.BackupDirectory + config.plugins.configurationbackup.folderprefix.value + "-swapfile_backup")
+				remove(self.BackupDirectory + config.plugins.configurationbackup.folderprefix.value + "-swapfile_backup")
+		except Exception,e:
+			print str(e)
+			print "Device: " + config.plugins.configurationbackup.backuplocation.value + ", i don't seem to have write access to this device."
+
+		s = statvfs(self.BackupDevice)
+		free = (s.f_bsize * s.f_bavail)/(1024*1024)
+		if int(free) < 200:
+			Notifications.AddNotificationWithCallback(self.BackupComplete,
+				_("The backup location does not have enough freespace." + "\n" + self.BackupDevice + "only has " + str(free) + "MB free."),
+				MessageBox.TYPE_INFO,
+				10,
+				'RamCheckFailedNotification'
+			)
+		else:
+			self.MemCheck()
+
+	def MemCheck(self):
+		f = open('/proc/meminfo', 'r')
+		for line in f.readlines():
+			if line.find('MemFree') != -1:
+				parts = line.strip().split()
+				memfree = int(parts[1])
+			elif line.find('SwapFree') != -1:
+				parts = line.strip().split()
+				swapfree = int(parts[1])
+		f.close()
+		TotalFree = memfree + swapfree
+		print '[ImageManager] Stage1: Free Mem',TotalFree
+		if int(TotalFree) < 3000:
+			self.MemCheckConsole = Console()
+			supported_filesystems = frozenset(('ext4', 'ext3', 'ext2'))
+			candidates = []
+			mounts = getProcMounts()
+			for partition in harddiskmanager.getMountedPartitions(False, mounts):
+				if partition.filesystem(mounts) in supported_filesystems:
+					candidates.append((partition.description, partition.mountpoint))
+			for swapdevice in candidates:
+				self.swapdevice = swapdevice[1]
+			if self.swapdevice:
+				print '[ImageManager] Stage1: Creating Swapfile.'
+				self.RamChecked = True
+				self.MemCheck2()
+			else:
+				print '[ImageManager] Sorry, not enough free ram found, and no physical devices that supports SWAP attached'
+				Notifications.AddNotificationWithCallback(self.BackupComplete,
+					_("Sorry, not enough free ram found, and no physical devices that supports SWAP attached. Can't create Swapfile on network or fat32 filesystems, unable to make backup"),
+						MessageBox.TYPE_INFO,
+					10,
+					'RamCheckFailedNotification'
+				)
+		else:
+			print '[ImageManager] Stage1: Found Enough Ram'
+			self.RamChecked = True
+			self.SwapCreated = True
+
+	def MemCheck2(self):
+		self.MemCheckConsole.ePopen("dd if=/dev/zero of=" + self.swapdevice + config.plugins.configurationbackup.folderprefix.value + "-swapfile_backup bs=1024 count=61440", self.MemCheck3)
+
+	def MemCheck3(self, result, retval, extra_args = None):
+		if retval == 0:
+			self.MemCheckConsole = Console()
+			self.MemCheckConsole.ePopen("mkswap " + self.swapdevice + config.plugins.configurationbackup.folderprefix.value + "-swapfile_backup", self.MemCheck4)
+
+	def MemCheck4(self, result, retval, extra_args = None):
+		if retval == 0:
+			self.MemCheckConsole = Console()
+			self.MemCheckConsole.ePopen("swapon " + self.swapdevice + config.plugins.configurationbackup.folderprefix.value + "-swapfile_backup", self.MemCheck5)
+
+	def MemCheck5(self, result, retval, extra_args = None):
+		self.SwapCreated = True
+
+	def doBackup1(self):
+		f = open('/proc/mounts')
+		filesystem = f.read()
+		f.close()
+		if filesystem.find('ubifs') != -1:
+			self.ROOTFSTYPE = 'ubifs'
+		else:
+			self.ROOTFSTYPE= 'jffs2'
+		self.BackupConsole = Console()
+		print '[ImageManager] Stage1: Creating tmp folders.',self.BackupDirectory
+#		self.BackupDate = getImageVersionString() + '.' + getBuildVersionString() + '-' + strftime('%Y%m%d_%H%M%S', localtime())
+		self.BackupDate = strftime('%Y%m%d_%H%M%S', localtime())
+		self.WORKDIR=self.BackupDirectory + config.plugins.configurationbackup.folderprefix.value + '-temp'
+		self.TMPDIR=self.BackupDirectory + config.plugins.configurationbackup.folderprefix.value + '-mount'
+		if self.updatebackup:
+			self.MAINDESTROOT=self.BackupDirectory + config.plugins.configurationbackup.folderprefix.value + '-SoftwareUpdate-' + self.BackupDate
+		else:
+			self.MAINDESTROOT=self.BackupDirectory + config.plugins.configurationbackup.folderprefix.value + '-' + self.BackupDate
+		MKFS='mkfs.' + self.ROOTFSTYPE
+		JFFS2OPTIONS=" --disable-compressor=lzo --eraseblock=0x20000 -n -l"
+		UBINIZE='ubinize'
+		UBINIZE_ARGS="-m 2048 -p 128KiB"
+		print '[ImageManager] Stage1: Creating backup Folders.'
+		if os_path.exists(self.WORKDIR):
+			rmtree(self.WORKDIR)
+		mkdir(self.WORKDIR, 0644)
+		if os_path.exists(self.TMPDIR + '/root'):
+			system('umount ' + self.TMPDIR + '/root')
+		if os_path.exists(self.TMPDIR):
+			rmtree(self.TMPDIR)
+		makedirs(self.TMPDIR + '/root', 0644)
+		makedirs(self.MAINDESTROOT, 0644)
+		self.commands = []
+		print '[ImageManager] Stage1: Making Root Image.'
+		hw_type = HardwareInfo().get_device_name()
+		if 'tmtwin' in hw_type:
+			self.MAINDEST = self.MAINDESTROOT + '/update/tmtwinoe/cfe'
+		elif 'tm2t' in hw_type:
+			self.MAINDEST = self.MAINDESTROOT + '/update/tm2toe/cfe'
+		elif 'tmsingle' in hw_type:
+			self.MAINDEST = self.MAINDESTROOT + '/update/tmsingle/cfe'
+		elif 'ios100' in hw_type:
+			self.MAINDEST = self.MAINDESTROOT + '/update/ios100/cfe'
+		elif 'ios200' in hw_type:
+			self.MAINDEST = self.MAINDESTROOT + '/update/ios200/cfe'
+		elif 'ios300' in hw_type:
+			self.MAINDEST = self.MAINDESTROOT + '/update/ios300/cfe'
+		else:
+			self.MAINDEST = self.MAINDESTROOT + '/' + hw_type
+		makedirs(self.MAINDEST, 0644)
+		if self.ROOTFSTYPE == 'jffs2':
+			print '[ImageManager] Stage1: JFFS2 Detected.'
+			self.commands.append('mount --bind / ' + self.TMPDIR + '/root')
+			self.commands.append(MKFS + ' --root=' + self.TMPDIR + '/root --faketime --output=' + self.WORKDIR + '/root.jffs2' + JFFS2OPTIONS)
+		elif self.ROOTFSTYPE == 'ubifs':
+			print '[ImageManager] Stage1: UBIFS Detected.'
+			MKUBIFS_ARGS="-m 2048 -e 126976 -c 4096 -F"
+			output = open(self.WORKDIR + '/ubinize.cfg','w')
+			output.write('[ubifs]\n')
+			output.write('mode=ubi\n')
+			output.write('image=' + self.WORKDIR + '/root.ubi\n')
+			output.write('vol_id=0\n')
+			output.write('vol_type=dynamic\n')
+			output.write('vol_name=rootfs\n')
+			output.write('vol_flags=autoresize\n')
+			output.close()
+			self.commands.append('mount --bind / ' + self.TMPDIR + '/root')
+			self.commands.append('touch ' + self.WORKDIR + '/root.ubi')
+			self.commands.append(MKFS + ' -r ' + self.TMPDIR + '/root -o ' + self.WORKDIR + '/root.ubi ' + MKUBIFS_ARGS)
+			self.commands.append('ubinize -o ' + self.WORKDIR + '/root.ubifs ' + UBINIZE_ARGS + ' ' + self.WORKDIR + '/ubinize.cfg')
+		self.BackupConsole.eBatch(self.commands, self.Stage1Complete, debug=True)
+
+	def Stage1Complete(self, extra_args = None):
+		if len(self.BackupConsole.appContainers) == 0:
+			self.Stage1Completed = True
+			print '[ImageManager] Stage1: Complete.'
+
+	def doBackup2(self):
+		print '[ImageManager] Stage2: Making Kernel Image.'
+		self.command = 'cat /dev/mtd6 > ' + self.WORKDIR + '/vmlinux.gz'
+		self.BackupConsole.ePopen(self.command, self.Stage2Complete)
+
+	def Stage2Complete(self, result, retval, extra_args = None):
+		if retval == 0:
+			self.Stage2Completed = True
+			print '[ImageManager] Stage2: Complete.'
+
+	def doBackup3(self):
+		print '[ImageManager] Stage3: Unmounting and removing tmp system'
+		if os_path.exists(self.TMPDIR + '/root'):
+			self.command = 'umount ' + self.TMPDIR + '/root && rm -rf ' + self.TMPDIR
+			self.BackupConsole.ePopen(self.command, self.Stage3Complete)
+
+	def Stage3Complete(self, result, retval, extra_args = None):
+		if retval == 0:
+			self.Stage3Completed = True
+			print '[ImageManager] Stage3: Complete.'
+
+	def doBackup4(self):
+		imagecreated = False
+		print '[ImageManager] Stage4: Moving from work to backup folders'
+		move(self.WORKDIR + '/root.' + self.ROOTFSTYPE, self.MAINDEST + '/oe_rootfs.bin')
+		move(self.WORKDIR + '/vmlinux.gz', self.MAINDEST + '/oe_kernel.bin')
+		imagecreated = True
+		print '[ImageManager] Stage4: Removing Swap.'
+		if os_path.exists(self.swapdevice + config.plugins.configurationbackup.folderprefix.value + "-swapfile_backup"):
+			system('swapoff ' + self.swapdevice + config.plugins.configurationbackup.folderprefix.value + "-swapfile_backup")
+			remove(self.swapdevice + config.plugins.configurationbackup.folderprefix.value + "-swapfile_backup")
+		if os_path.exists(self.WORKDIR):
+			rmtree(self.WORKDIR)
+		if imagecreated:
+			for root, dirs, files in walk(self.MAINDEST):
+				for momo in dirs:
+					chmod(os_path.join(root, momo), 0644)
+				for momo in files:
+					chmod(os_path.join(root, momo), 0644)
+			print '[ImageManager] Stage4: Image created in ' + self.MAINDESTROOT
+			self.Stage4Complete()
+		else:
+			print "[ImageManager] Stage4: Image creation failed - e. g. wrong backup destination or no space left on backup device"
+			self.Stage3Complete()
+
+	def Stage4Complete(self):
+		self.Stage4Completed = True
+		print '[ImageManager] Stage4: Complete.'
+
+	def BackupComplete(self, anwser=None):
+		print "[ImageManager] Backup Completed."
+
+class ImageRestore(Screen):
+	skin = """
+		<screen name="ImageRestore" position="center,center" size="560,400" title="Restore backups" >
+			<ePixmap pixmap="skin_default/buttons/red.png" position="0,0" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/green.png" position="140,0" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/yellow.png" position="280,0" size="140,40" alphatest="on" />
+			<widget source="key_red" render="Label" position="0,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
+			<widget source="key_green" render="Label" position="140,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+			<widget source="key_yellow" render="Label" position="280,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#a08500" transparent="1" />
+			<widget name="filelist" position="5,50" size="550,230" scrollbarMode="showOnDemand" />
+		</screen>"""
+
+	def __init__(self, session):
+		Screen.__init__(self, session)
+		self.skinName = "RestoreMenu"
+		
+		self["key_red"] = StaticText(_("Cancel"))
+		self["key_green"] = StaticText(_("Restore"))
+		self["key_yellow"] = StaticText(_("Delete"))
+
+		self.sel = []
+		self.val = []
+		self.entry = False
+		self.exe = False
+		
+		self.path = ""
+
+		self["actions"] = NumberActionMap(["SetupActions"],
+		{
+			"ok": self.KeyOk,
+			"cancel": self.keyCancel
+		}, -1)
+
+		self["shortcuts"] = ActionMap(["ShortcutActions"],
+		{
+			"red": self.keyCancel,
+			"green": self.KeyOk,
+			"yellow": self.deleteFile,
+		})
+		self.flist = []
+		self["filelist"] = MenuList(self.flist)
+		self.fill_list()
+		self.onLayoutFinish.append(self.layoutFinished)
+
+	def layoutFinished(self):
+		self.setWindowTitle()
+
+	def setWindowTitle(self):
+		self.setTitle(_("Restore image backups"))
+
+	def fill_list(self):
+		self.flist = []
+		self.path = config.plugins.configurationbackup.backuplocation.value + '/imagebackups/'
+		if (os_path.exists(self.path) == False):
+			makedirs(self.path)
+		for file in listdir(self.path):
+			if (file.startswith(config.plugins.configurationbackup.folderprefix.value)):
+				self.flist.append((file))
+				self.entry = True
+		self.flist.sort(reverse=True)
+		self["filelist"].l.setList(self.flist)
+
+	def KeyOk(self):
+		if (self.exe == False) and (self.entry == True):
+			self.sel = self["filelist"].getCurrent()
+			if self.sel:
+				self.MAINDESTROOT = self.path + self.sel
+				hw_type = HardwareInfo().get_device_name()
+				if 'tmtwin' in hw_type:
+					self.MAINDEST = self.MAINDESTROOT + '/update/tmtwinoe/cfe/'
+				elif 'tm2t' in hw_type:
+					self.MAINDEST = self.MAINDESTROOT + '/update/tm2toe/cfe/'
+				elif 'tmsingle' in hw_type:
+					self.MAINDEST = self.MAINDESTROOT + '/update/tmsingle/cfe/'
+				elif 'ios100' in hw_type:
+					self.MAINDEST = self.MAINDESTROOT + '/update/ios100/cfe/'
+				elif 'ios200' in hw_type:
+					self.MAINDEST = self.MAINDESTROOT + '/update/ios200/cfe/'
+				elif 'ios300' in hw_type:
+					self.MAINDEST = self.MAINDESTROOT + '/update/ios300/cfe/'
+				else:
+					self.MAINDEST = self.MAINDESTROOT + '/' + hw_type + '/'
+				if os_path.exists(self.MAINDEST):
+					message = _("Are you sure you want to restore this image:\n ") + self.sel
+					ybox = self.session.openWithCallback(self.doRestore, MessageBox, message, MessageBox.TYPE_YESNO)
+					ybox.setTitle(_("Restore Confirmation"))
+				else:
+					self.session.open(MessageBox, _("Sorry the image " + self.sel + " is not compatible with this STB_BOX."), MessageBox.TYPE_INFO, timeout = 10)
+			else:
+				self.session.open(MessageBox, _("You have no image to restore."), MessageBox.TYPE_INFO, timeout = 10)
+
+	def doRestore(self,answer):
+		if answer:
+			if not os_path.exists('/tmp/sync'):
+				copy('/bin/sync','/tmp')
+			if not os_path.exists('/tmp/nandwrite'):
+				copy('/usr/sbin/nandwrite','/tmp')
+			if not os_path.exists('/tmp/flash_erase'):
+				copy('/usr/sbin/flash_erase','/tmp')
+			if not os_path.exists('/tmp/reboot'):
+				copy('/sbin/reboot', '/tmp')
+			if not os_path.exists('/tmp/tee'):
+				copy('/usr/bin/tee','/tmp')
+
+			kernelMTD = "mtd6"
+			kernelFILE = "oe_kernel.bin"
+			rootMTD = "mtd4"
+			rootFILE = "oe_rootfs.bin"
+
+			output = open('/tmp/image_restore.sh','w')
+			output.write('#!/bin/sh\n\n/tmp/sync > ' + config.plugins.configurationbackup.backuplocation.value + '/restore.log 2>&1 && mount -no remount,ro / >> ' + config.plugins.configurationbackup.backuplocation.value +'/restore.log 2>&1 && /tmp/flash_erase /dev/' + kernelMTD + ' 0 0 >> ' + config.plugins.configurationbackup.backuplocation.value + '/restore.log 2>&1 && /tmp/nandwrite -p /dev/' + kernelMTD + ' ' + self.MAINDEST + kernelFILE + ' >> ' + config.plugins.configurationbackup.backuplocation.value + '/restore.log 2>&1 && /tmp/flash_erase /dev/' + rootMTD + ' 0 0 >> ' + config.plugins.configurationbackup.backuplocation.value + '/restore.log 2>&1 && /tmp/nandwrite -p /dev/' + rootMTD + ' ' + self.MAINDEST + rootFILE + ' >> ' + config.plugins.configurationbackup.backuplocation.value + '/restore.log 2>&1 && /tmp/reboot -fn')
+			output.close()
+			chmod('/tmp/image_restore.sh', 0755)
+			self.session.open(TryQuitMainloop, retvalue=43)
+			self.close()
+
+	def keyCancel(self):
+		self.close()
+
+	def deleteFile(self):
+		if (self.exe == False) and (self.entry == True):
+			self.sel = self["filelist"].getCurrent()
+			if self.sel:
+				self.val = self.path + "/" + self.sel
+				self.session.openWithCallback(self.startDelete, MessageBox, _("Are you sure you want to delete\nthe following backup:\n") + self.sel)
+
+	def startDelete(self, ret = False):
+		if (ret == True):
+			self.exe = True
+			print "removing:",self.val
+			if (os_path.exists(self.val) == True):
+				os_system("rm -rf " + self.val)
+			self.exe = False
+			self.fill_list()
+# ]
 
 def filescan_open(list, session, **kwargs):
 	filelist = [x.path for x in list]

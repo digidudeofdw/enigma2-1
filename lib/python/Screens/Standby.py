@@ -121,6 +121,7 @@ class QuitMainloopScreen(Screen):
 # iq - [
 #			42: _("Unattended upgrade in progress\nPlease wait until your receiver reboots\nThis may take a few minutes") }.get(retvalue)
 			42: _("Unattended upgrade in progress\nPlease wait until your receiver reboots\nThis may take a few minutes"),
+			43: _("Image Restore in progress\nPlease wait until your receiver reboots\nThis may take a few minutes"),
 			64: _("Full factory reset in progress\nPlease wait until your receiver reboots\nThis may take a few minutes"),
 			65: _("Factory reset in progress\nPlease wait until your receiver reboots\nThis may take a few minutes"),
 			90: _("S/W update in progress\nPlease wait until your receiver reboots\nThis may take a few minutes"),
