@@ -2150,7 +2150,10 @@ class ImageBackup(Screen):
 
 	def doBackup2(self):
 		print '[ImageManager] Stage2: Making Kernel Image.'
-		self.command = 'cat /dev/mtd6 > ' + self.WORKDIR + '/vmlinux.gz'
+		if HardwareInfo().get_device_name().startswith("tmnano"):
+			self.command = 'cat /dev/mtd1 > ' + self.WORKDIR + '/vmlinux.gz'
+		else:
+			self.command = 'cat /dev/mtd6 > ' + self.WORKDIR + '/vmlinux.gz'
 		self.BackupConsole.ePopen(self.command, self.Stage2Complete)
 
 	def Stage2Complete(self, result, retval, extra_args = None):
@@ -2304,10 +2307,16 @@ class ImageRestore(Screen):
 			if not os_path.exists('/tmp/tee'):
 				copy('/usr/bin/tee','/tmp')
 
-			kernelMTD = "mtd6"
-			kernelFILE = "oe_kernel.bin"
-			rootMTD = "mtd4"
-			rootFILE = "oe_rootfs.bin"
+			if HardwareInfo().get_device_name().startswith("tmnano"):
+				kernelMTD = "mtd1"
+				kernelFILE = "oe_kernel.bin"
+				rootMTD = "mtd0"
+				rootFILE = "oe_rootfs.bin"
+			else:
+				kernelMTD = "mtd6"
+				kernelFILE = "oe_kernel.bin"
+				rootMTD = "mtd4"
+				rootFILE = "oe_rootfs.bin"
 
 			output = open('/tmp/image_restore.sh','w')
 			output.write('#!/bin/sh\n\n/tmp/sync > ' + config.plugins.configurationbackup.backuplocation.value + '/restore.log 2>&1 && mount -no remount,ro / >> ' + config.plugins.configurationbackup.backuplocation.value +'/restore.log 2>&1 && /tmp/flash_erase /dev/' + kernelMTD + ' 0 0 >> ' + config.plugins.configurationbackup.backuplocation.value + '/restore.log 2>&1 && /tmp/nandwrite -p /dev/' + kernelMTD + ' ' + self.MAINDEST + kernelFILE + ' >> ' + config.plugins.configurationbackup.backuplocation.value + '/restore.log 2>&1 && /tmp/flash_erase /dev/' + rootMTD + ' 0 0 >> ' + config.plugins.configurationbackup.backuplocation.value + '/restore.log 2>&1 && /tmp/nandwrite -p /dev/' + rootMTD + ' ' + self.MAINDEST + rootFILE + ' >> ' + config.plugins.configurationbackup.backuplocation.value + '/restore.log 2>&1 && /tmp/reboot -fn')
