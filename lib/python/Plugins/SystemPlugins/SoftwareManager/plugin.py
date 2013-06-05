@@ -265,10 +265,10 @@ class UpdatePluginMenu(Screen):
 		if current:
 			currentEntry = current[0]
 			if self.menu == 0:
-				if (currentEntry == "software-update"):
-					self.session.open(UpdatePlugin, self.skin_path)
 # iq - [
-				elif (currentEntry == "image-backup"):
+#				if (currentEntry == "software-update"):
+#					self.session.open(UpdatePlugin, self.skin_path)
+				if (currentEntry == "image-backup"):
 					self.session.openWithCallback(self.startImageBackup, MessageBox, _("Are you sure you want to backup image?"))
 				elif (currentEntry == "image-restore"):
 					self.session.open(ImageRestore)
