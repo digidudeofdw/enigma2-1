@@ -53,12 +53,3 @@ class Timezones:
 		return self.timezones[0][0]
 
 timezones = Timezones()
-
-class SummerTime:
-	def __init__(self):
-		print "summertime"
-
-	def setSummertime(self):
-		print "setSummertime"
-
-summertime = SummerTime()
