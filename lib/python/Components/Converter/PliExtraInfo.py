@@ -214,7 +214,10 @@ class PliExtraInfo(Poll, Converter, object):
 
 		if self.type == "CryptoInfo":
 			self.getCryptoInfo(info)
-			if config.usage.show_cryptoinfo.value:
+# iq - [
+#			if config.usage.show_cryptoinfo.value:
+			if config.usage.show_cryptoinfo.value != "off":
+# ]
 				return addspace(self.createCryptoBar(info)) + self.createCryptoSpecial(info)
 			else:
 				return addspace(self.createCryptoBar(info)) + addspace(self.current_source) + self.createCryptoSpecial(info)
@@ -248,7 +251,10 @@ class PliExtraInfo(Poll, Converter, object):
 
 		if self.type == "All":
 			self.getCryptoInfo(info)
-			if config.usage.show_cryptoinfo.value:
+# iq - [
+#			if config.usage.show_cryptoinfo.value:
+			if config.usage.show_cryptoinfo.value != "off":
+# ]
 				return addspace(self.createProviderName(info)) + self.createTransponderInfo(fedata,feraw) + "\n" \
 				+ addspace(self.createCryptoBar(info)) + addspace(self.createCryptoSpecial(info)) + "\n" \
 				+ addspace(self.createPIDInfo(info)) + addspace(self.createVideoCodec(info)) + self.createResolution(info)

@@ -12,7 +12,10 @@ class CryptoInfo(Poll, Converter, object):
 
 		self.type = type
 		self.active = False
-		self.visible = config.usage.show_cryptoinfo.value
+# iq - [
+#		self.visible = config.usage.show_cryptoinfo.value
+		self.visible = config.usage.show_cryptoinfo.value != "off"
+# ]
 		self.textvalue = ""
 		self.poll_interval = 1000
 		self.poll_enabled = True
@@ -20,7 +23,10 @@ class CryptoInfo(Poll, Converter, object):
 		
 	@cached
 	def getText(self):
-		if not config.usage.show_cryptoinfo.value:
+# iq - [
+#		if not config.usage.show_cryptoinfo.value:
+		if config.usage.show_cryptoinfo.value == "off":
+# ]
 			self.visible = False
 			data = ''
 		else:

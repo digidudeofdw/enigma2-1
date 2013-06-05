@@ -1,5 +1,6 @@
 import os
 import time
+from Components.config import config	# iq
 
 ECM_INFO = '/tmp/ecm.info'
 EMPTY_ECM_INFO = '','0','0','0'
@@ -70,8 +71,13 @@ class GetEcmInfo:
 						hops = ' @' + hops
 					else:
 						hops = ''
+# iq - [
 #					self.textvalue = info.get('address', '?') + hops + " (%ss)" % info.get('ecm time', '?')
-					self.textvalue = "NET (%ss)" % info.get('ecm time', '?')	# [iq 
+				if config.usage.show_cryptoinfo.value == "full" and not info.get('address', '?').startswith("ilove.hobby-site.com"):
+					self.textvalue = info.get('address', '?') + hops + " (%ss)" % info.get('ecm time', '?')
+				else:
+					self.textvalue = "NET (%ss)" % info.get('ecm time', '?')
+# ]
 			else:
 				decode = info.get('decode', None)
 				if decode:
