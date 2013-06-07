@@ -1478,8 +1478,8 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 			else:
 				self.setCurrentSelection(ref)
 		else:
-			#if Screens.InfoBar.InfoBar.instance.checkTimeshiftRunning(boundFunction(self.timeshiftCheckReply, enable_pipzap, preview_zap)):
-	#				return
+			if Screens.InfoBar.InfoBar.instance.checkTimeshiftRunning(boundFunction(self.timeshiftCheckReply, enable_pipzap, preview_zap)):
+					return
 			ref = self.session.nav.getCurrentlyPlayingServiceOrGroup()
 			if ref is None or ref != nref:
 				self.new_service_played = True

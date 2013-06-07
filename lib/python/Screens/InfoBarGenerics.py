@@ -1633,6 +1633,9 @@ class InfoBarTimeshift:
 		self.__seekableStatusChanged()
 
 	def checkTimeshiftRunning(self, returnFunction, answer = None):
+		if config.plugins.pts.enabled.value:
+			return
+
 		self.returnFunction = returnFunction
 		if answer is None:
 			if self.timeshift_enabled and self.check_timeshift and config.usage.check_timeshift.value:
