@@ -15,7 +15,7 @@ from Components.Pixmap import Pixmap
 from Components.MenuList import MenuList
 from Components.Sources.List import List
 from Components.Slider import Slider
-from Components.Harddisk import harddiskmanager
+from Components.Harddisk import harddiskmanager, findMountPoint
 from Components.config import config,getConfigListEntry, ConfigSubsection, ConfigText, ConfigLocations, ConfigYesNo, ConfigSelection
 from Components.ConfigList import ConfigListScreen
 from Components.Console import Console
@@ -269,9 +269,19 @@ class UpdatePluginMenu(Screen):
 					self.session.open(UpdatePlugin, self.skin_path)
 # iq - [
 				if (currentEntry == "image-backup"):
-					self.session.openWithCallback(self.startImageBackup, MessageBox, _("Are you sure you want to backup image?"))
+					dirname = os_path.realpath(config.plugins.configurationbackup.backuplocation.value)
+					mountpoint = findMountPoint(dirname)
+					if mountpoint in ('/', '/media'):
+						self.session.open(MessageBox, _("Sorry, check backup location please!"), MessageBox.TYPE_INFO, timeout = 10)
+					else:
+						self.session.openWithCallback(self.startImageBackup, MessageBox, _("Are you sure you want to backup image?"))
 				elif (currentEntry == "image-restore"):
-					self.session.open(ImageRestore)
+					dirname = os_path.realpath(config.plugins.configurationbackup.backuplocation.value)
+					mountpoint = findMountPoint(dirname)
+					if mountpoint in ('/', '/media'):
+						self.session.open(MessageBox, _("Sorry, check backup location please!"), MessageBox.TYPE_INFO, timeout = 10)
+					else:
+						self.session.open(ImageRestore)
 #				elif (currentEntry == "software-restore"):
 #					self.session.open(ImageWizard)
 # ]
