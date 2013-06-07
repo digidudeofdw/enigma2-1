@@ -2321,7 +2321,10 @@ class ImageRestore(Screen):
 				rootFILE = "oe_rootfs.bin"
 
 			output = open('/tmp/image_restore.sh','w')
-			output.write('#!/bin/sh\n\n/tmp/sync > ' + config.plugins.configurationbackup.backuplocation.value + '/restore.log 2>&1 && mount -no remount,ro / >> ' + config.plugins.configurationbackup.backuplocation.value +'/restore.log 2>&1 && /tmp/flash_erase /dev/' + kernelMTD + ' 0 0 >> ' + config.plugins.configurationbackup.backuplocation.value + '/restore.log 2>&1 && /tmp/nandwrite -p /dev/' + kernelMTD + ' ' + self.MAINDEST + kernelFILE + ' >> ' + config.plugins.configurationbackup.backuplocation.value + '/restore.log 2>&1 && /tmp/flash_erase /dev/' + rootMTD + ' 0 0 >> ' + config.plugins.configurationbackup.backuplocation.value + '/restore.log 2>&1 && /tmp/nandwrite -p /dev/' + rootMTD + ' ' + self.MAINDEST + rootFILE + ' >> ' + config.plugins.configurationbackup.backuplocation.value + '/restore.log 2>&1 && /tmp/ld.so.1 --library-path /tmp /tmp/reboot -fn')
+			output.write('#!/bin/sh\n\n/tmp/sync > ' + config.plugins.configurationbackup.backuplocation.value + '/restore.log 2>&1 && mount -no remount,ro / >> ' + config.plugins.configurationbackup.backuplocation.value +'/restore.log 2>&1')
+			output.write('\n/tmp/flash_erase /dev/' + kernelMTD + ' 0 0 >> ' + config.plugins.configurationbackup.backuplocation.value + '/restore.log 2>&1 && /tmp/nandwrite -p /dev/' + kernelMTD + ' ' + self.MAINDEST + kernelFILE + ' >> ' + config.plugins.configurationbackup.backuplocation.value + '/restore.log 2>&1')
+			output.write('\n/tmp/flash_erase /dev/' + rootMTD + ' 0 0 >> ' + config.plugins.configurationbackup.backuplocation.value + '/restore.log 2>&1 && /tmp/nandwrite -p /dev/' + rootMTD + ' ' + self.MAINDEST + rootFILE + ' >> ' + config.plugins.configurationbackup.backuplocation.value + '/restore.log 2>&1')
+			output.write('\n/tmp/ld.so.1 --library-path /tmp /tmp/reboot -fn')
 			output.close()
 			chmod('/tmp/image_restore.sh', 0755)
 			self.session.open(TryQuitMainloop, retvalue=43)
