@@ -40,7 +40,12 @@ class About(Screen):
 		AboutText += ImageVersion + "\n"
 
 # [iq
-		AboutText += _("Powered by 4D") + "\n"
+		model = HardwareInfo().get_device_name()
+
+		if model == "mediabox":
+			AboutText += _("Powered by Jepssen") + "\n"
+		else:
+			AboutText += _("Powered by 4D") + "\n"
 # iq]
 # [iq
 #		fp_version = getFPVersion()
