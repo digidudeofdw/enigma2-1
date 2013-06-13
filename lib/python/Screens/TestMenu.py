@@ -24,7 +24,8 @@ import os, fcntl, array, socket, struct
 
 class TestMenu(Screen):
 # 1.0.0	- 
-	TEST_PROG_VERSION = "1.0.0"
+# 1.0.1 - alpumr check removed
+	TEST_PROG_VERSION = "1.0.1"
 	skin = """
         <screen name="TestMenu" position="fill" title="Test Menu" flags="wfNoBorder">
 			<eLabel position="fill" backgroundColor="transpBlack" zPosition="-50"/>
@@ -501,21 +502,13 @@ class TestMenu(Screen):
 			self["security1_i"].hide()
 			self["security1_s"].hide()
 		else:
-			if securityRes & 1:
-				self["security0_s"].setText(_(" ALPUMR - NOK"))
+			if securityRes>>1 & 1:
+				self["security0_s"].setText(_(" CO164 - NOK"))
 				self["security0_s"].setForegroundColorNum(1)
 			else:
-				if "tm2t" in HardwareInfo().get_device_name() and self.getMicomVersion() != "N/A" and int(self.getMicomVersion()) >= 117:
-					self["security0_i"].hide()
-					self["security0_s"].hide()
-				else:
-					self["security0_s"].setText(_(" ALPUMR - OK"))
-
-			if securityRes>>1 & 1:
-				self["security1_s"].setText(_(" CO164 - NOK"))
-				self["security1_s"].setForegroundColorNum(1)
-			else:
-				self["security1_s"].setText(_(" CO164 - OK"))
+				self["security0_s"].setText(_(" CO164 - OK"))
+			self["security1_i"].hide()
+			self["security1_s"].hide()
 
 		self.keyNumberGlobal(1)
 
