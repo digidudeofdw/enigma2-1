@@ -492,10 +492,14 @@ class InfoBarChannelSelection:
 		self.servicelist.historyNext()
 
 	def switchChannelUp(self):
+		if not config.servicelist.startupservice.value and not config.tv.lastservice.value:
+				self.servicelist.showAllServices()
 		self.servicelist.moveUp()
 		self.session.execDialog(self.servicelist)
 
 	def switchChannelDown(self):
+		if not config.servicelist.startupservice.value and not config.tv.lastservice.value:
+			self.servicelist.showAllServices()
 		self.servicelist.moveDown()
 		self.session.execDialog(self.servicelist)
 
@@ -515,6 +519,9 @@ class InfoBarChannelSelection:
 # [iq
 	def ChannelMinusPressed(self):
 # iq]
+		if not config.servicelist.startupservice.value and not config.tv.lastservice.value:
+			self.servicelist.showAllServices()
+
 		if self.servicelist.inBouquet():
 			prev = self.servicelist.getCurrentSelection()
 			if prev:
@@ -533,6 +540,9 @@ class InfoBarChannelSelection:
 # [iq
 	def ChannelPlusPressed(self):
 # iq]
+		if not config.servicelist.startupservice.value and not config.tv.lastservice.value:
+			self.servicelist.showAllServices()
+
 		if self.servicelist.inBouquet():
 			prev = self.servicelist.getCurrentSelection()
 			if prev:
