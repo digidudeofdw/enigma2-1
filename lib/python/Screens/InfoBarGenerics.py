@@ -492,14 +492,18 @@ class InfoBarChannelSelection:
 		self.servicelist.historyNext()
 
 	def switchChannelUp(self):
-		if not config.servicelist.startupservice.value and not config.tv.lastservice.value:
-				self.servicelist.showAllServices()
+		model = HardwareInfo().get_device_name()
+		if model == "mediabox":
+			if not config.servicelist.startupservice.value and not config.tv.lastservice.value:
+					self.servicelist.showAllServices()
 		self.servicelist.moveUp()
 		self.session.execDialog(self.servicelist)
 
 	def switchChannelDown(self):
-		if not config.servicelist.startupservice.value and not config.tv.lastservice.value:
-			self.servicelist.showAllServices()
+		model = HardwareInfo().get_device_name()
+		if model == "mediabox":
+			if not config.servicelist.startupservice.value and not config.tv.lastservice.value:
+				self.servicelist.showAllServices()
 		self.servicelist.moveDown()
 		self.session.execDialog(self.servicelist)
 
@@ -519,8 +523,10 @@ class InfoBarChannelSelection:
 # [iq
 	def ChannelMinusPressed(self):
 # iq]
-		if not config.servicelist.startupservice.value and not config.tv.lastservice.value:
-			self.servicelist.showAllServices()
+		model = HardwareInfo().get_device_name()
+		if model == "mediabox":
+			if not config.servicelist.startupservice.value and not config.tv.lastservice.value:
+				self.servicelist.showAllServices()
 
 		if self.servicelist.inBouquet():
 			prev = self.servicelist.getCurrentSelection()
@@ -540,8 +546,10 @@ class InfoBarChannelSelection:
 # [iq
 	def ChannelPlusPressed(self):
 # iq]
-		if not config.servicelist.startupservice.value and not config.tv.lastservice.value:
-			self.servicelist.showAllServices()
+		model = HardwareInfo().get_device_name()
+		if model == "mediabox":
+			if not config.servicelist.startupservice.value and not config.tv.lastservice.value:
+				self.servicelist.showAllServices()
 
 		if self.servicelist.inBouquet():
 			prev = self.servicelist.getCurrentSelection()
@@ -1698,7 +1706,6 @@ class InfoBarExtensions:
 			self.session.open(MessageBox, _("Failed. Please check internet connection."), MessageBox.TYPE_ERROR, timeout=5)
 
 	def getBeta4DSWUpdatename(self):
-		model = HardwareInfo().get_device_name()
 		if model == "mediabox":
 			return _("S/W Update")
 		else:
@@ -1708,7 +1715,6 @@ class InfoBarExtensions:
 		return [((boundFunction(self.getBeta4DSWUpdatename), boundFunction(self.openBeta4DSWUpdate), lambda: True), None)] 
 
 	def get4DSWUpdatename(self):
-		model = HardwareInfo().get_device_name()
 		if model == "mediabox":
 			return _("S/W Update")
 		else:
