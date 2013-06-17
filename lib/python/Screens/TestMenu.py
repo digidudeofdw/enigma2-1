@@ -179,8 +179,11 @@ class TestMenu(Screen):
 		Screen.__init__(self, session)
 		self.session = session
 
+		if HardwareInfo().get_device_name() == "mediabox":
+			os.system("opkg remove enigma2-plugin-channel.non.motorized-techsat-17-29-57")
 		os.system("rm /etc/enigma2 -rf; touch /etc/.run_factory_test; tar xf /etc/.e2settings.tar -C /")
 		configfile.load()
+		nimmanager.readTransponders()
 		InitNimManager(nimmanager)
 		eDVBDB.getInstance().reloadBouquets()
 		eDVBDB.getInstance().reloadServicelist()
@@ -221,14 +224,16 @@ class TestMenu(Screen):
 
 		model = HardwareInfo().get_device_name()
 		self.has_fan = model not in ("ios300hd", "mediabox")
-		self.has_8_buttons_without_nav_keys = model in ("tmtwinoe", "ios100hd")
+		self.has_nav_keys = model not in ("tmtwinoe", "ios100hd", "mediabox")
+		self.has_8_buttons = model in ("tmtwinoe", "ios100hd")
 		self.has_9_buttons = model in ("tm2toe", "tmsingle")
-		self.has_7_buttons = model in ("tmnanooe", "ios200hd", "ios300hd", "mediabox")
+		self.has_7_buttons = model in ("tmnanooe", "ios200hd", "ios300hd")
+		self.has_5_buttons = "mediabox" in model
 		self.has_fan_sensor = model in ("tmtwinoe", "tm2toe", "ios100hd")
-		self.has_sata = model not in ("tmsingle", "ios300hd", "mediabox")
+		self.has_sata = model not in ("ios300hd", "mediabox")
 		self.has_1_rear_usb = "tmnano" in model
 		self.has_sc41cr = "tmnano" in model
-		self.has_1_tuner = model in ("tmnanooe", "ios300hd", "mediabox")
+		self.has_1_tuner = model in ("tmnanooe", "ios300hd", "mediabox", "tmsingle")
 		self.has_vfd = model not in ("tmsingle", "tmnanooe", "ios200hd", "ios300hd", "mediabox")
 
 		self.MENU_LIST = []
@@ -255,7 +260,7 @@ class TestMenu(Screen):
 			"exit":		{ "button":"button_exit",	"func":self.frontButtonExit,	"pressed":False, "text":"EXIT" },
 			"menu":		{ "button":"button_menu",	"func":self.frontButtonMenu,	"pressed":False, "text":"MENU" },
 			"power":	{ "button":"button_power",	"func":self.frontButtonPower,	"pressed":False, "text":"POWER" }}
-		if self.has_8_buttons_without_nav_keys:
+		if not self.has_nav_keys:
 			self.BUTTON_TEST["up"]["text"] = "VOL+"
 			self.BUTTON_TEST["up"]["func"] = self.frontButtonVolUp
 			self.BUTTON_TEST["down"]["text"] = "VOL-"
@@ -268,6 +273,10 @@ class TestMenu(Screen):
 			self.BUTTON_TEST["info"] = { "button":"button_info",	"func":self.frontButtonInfo,	"pressed":False, "text":"INFO" }
 		if self.has_7_buttons:
 			self.BUTTON_TEST.pop("exit")
+		if self.has_5_buttons:
+			self.BUTTON_TEST.pop("exit")
+			self.BUTTON_TEST.pop("menu")
+			self.BUTTON_TEST.pop("ok")
 
 		self.fpTestMode = False
 		self.service = "ch1"
@@ -322,8 +331,10 @@ class TestMenu(Screen):
 			self.quitScreen.show()
 			quitMainloop(mode)
 		elif mode == 3:
-			os.system("rm /etc/.run_factory_test -f")
-			os.system("rm /etc/enigma2 -rf; killall enigma2")
+			os.system("rm /etc/.run_factory_test -f; rm /etc/enigma2 -rf")
+			if HardwareInfo().get_device_name() == "mediabox":
+				os.system("tar xvf /etc/var.tar -C /; opkg install /tmp/enigma2-plugin-channel.non.motorized-techsat-17-29-57_20130610_all.ipk")
+			os.system("killall enigma2")
 
 	def up(self):
 		if self.fpTestMode:
