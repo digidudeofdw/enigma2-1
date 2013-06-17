@@ -587,7 +587,7 @@ class TestMenu(Screen):
 		elif entry[1] == "ds":
 			self.deepStandby()
 		elif entry[1] == "exit":
-			self.session.openWithCallback(self.quitConfirmed, MessageBox, _("Do you really want to quit?"), default = False)
+			self.session.openWithCallback(self.quitConfirmed, MessageBox, _("Do you really want to quit?"), default = True)
 		else:
 			print "what", entry
 		self["menulist"].show()
@@ -878,6 +878,8 @@ class TestMenu(Screen):
 					self[self.BUTTON_TEST[button]["button"]].setForegroundColorNum(1)
 				self.changeMenuName("fp", "FRONT PANEL - OK")
 				self.fpTestMode = False
+
+				os.system("echo '^0^' > /proc/stb/lcd/show_txt")
 
 	def vfdOn(self, on):
 		fp = open('/dev/dbox/lcd0', 'w')

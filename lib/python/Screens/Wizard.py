@@ -305,13 +305,12 @@ class Wizard(Screen):
 		if self.testMenuKeyCount == 0:
 			self.testMenuKeyCount = 1
 			print "checkTestMenuKey0", self.testMenuKeyCount
-			self.goTestMenu()
-#		elif self.testMenuKeyCount == 2:
-#			self.testMenuKeyCount = 3
-#			print "checkTestMenuKey0", self.testMenuKeyCount
-#		else:
-#			self.testMenuKeyCount = 0
-#			print "checkTestMenuKey0", self.testMenuKeyCount
+		elif self.testMenuKeyCount == 2:
+			self.testMenuKeyCount = 3
+			print "checkTestMenuKey0", self.testMenuKeyCount
+		else:
+			self.testMenuKeyCount = 0
+			print "checkTestMenuKey0", self.testMenuKeyCount
 
 
 	def checkTestMenuKey1(self):
