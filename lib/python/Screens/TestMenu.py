@@ -658,6 +658,9 @@ class TestMenu(Screen):
 		if not self.fpTestMode:
 			return
 
+		if not self.BUTTON_TEST.has_key("ok"):
+			return
+
 		if pressed:
 			self["button_ok"].show()
 		else:
@@ -671,7 +674,10 @@ class TestMenu(Screen):
 		if not self.fpTestMode:
 			return
 
-		if HardwareInfo().get_device_name() == "tmtwinoe":
+		if not self.BUTTON_TEST.has_key("up"):
+			return
+
+		if not self.has_nav_keys:
 			return
 
 		if pressed:
@@ -685,8 +691,14 @@ class TestMenu(Screen):
 		if not self.fpTestMode:
 			return
 
-		if HardwareInfo().get_device_name() == "tmtwinoe":
+		if not self.BUTTON_TEST.has_key("down"):
 			return
+
+		if not self.has_nav_keys:
+			return
+
+		if not self.BUTTON_TEST.has_key("menu"):
+			os.system("echo VFD START > /proc/stb/lcd/show_txt")
 
 		if pressed:
 			self["button_down"].show()
@@ -699,7 +711,10 @@ class TestMenu(Screen):
 		if not self.fpTestMode:
 			return
 
-		if HardwareInfo().get_device_name() == "tmtwinoe":
+		if not self.BUTTON_TEST.has_key("left"):
+			return
+
+		if not self.has_nav_keys:
 			return
 
 		if pressed:
@@ -713,7 +728,10 @@ class TestMenu(Screen):
 		if not self.fpTestMode:
 			return
 
-		if HardwareInfo().get_device_name() == "tmtwinoe":
+		if not self.BUTTON_TEST.has_key("right"):
+			return
+
+		if not self.has_nav_keys:
 			return
 
 		if pressed:
@@ -727,6 +745,9 @@ class TestMenu(Screen):
 		if not self.fpTestMode:
 			return
 
+		if not self.BUTTON_TEST.has_key("ok"):
+			return
+
 		if pressed:
 			self["button_menu"].show()
 		else:
@@ -734,11 +755,13 @@ class TestMenu(Screen):
 		self.BUTTON_TEST["menu"]["pressed"] = pressed
 		self.checkFpTestIsOk()
 
+		os.system("echo VFD START > /proc/stb/lcd/show_txt")
+
 	def frontButtonExit(self, pressed=True):
 		if not self.fpTestMode:
 			return
 
-		if not self.has_key("button_exit"):
+		if not self.BUTTON_TEST.has_key("exit"):
 			return
 
 		if pressed:
@@ -752,6 +775,9 @@ class TestMenu(Screen):
 		if not self.fpTestMode:
 			return
 
+		if not self.BUTTON_TEST.has_key("power"):
+			return
+
 		if pressed:
 			self["button_power"].show()
 		else:
@@ -761,6 +787,9 @@ class TestMenu(Screen):
 
 	def frontButtonChPlus(self, pressed=True):
 		if not self.fpTestMode:
+			return
+
+		if not self.BUTTON_TEST.has_key("right"):
 			return
 
 		if pressed:
@@ -774,6 +803,12 @@ class TestMenu(Screen):
 		if not self.fpTestMode:
 			return
 
+		if not self.BUTTON_TEST.has_key("left"):
+			return
+
+		if not self.BUTTON_TEST.has_key("menu"):
+			os.system("echo VFD START > /proc/stb/lcd/show_txt")
+
 		if pressed:
 			self["button_left"].show()
 		else:
@@ -783,6 +818,9 @@ class TestMenu(Screen):
 
 	def frontButtonVolUp(self, pressed=True):
 		if not self.fpTestMode:
+			return
+
+		if not self.BUTTON_TEST.has_key("up"):
 			return
 
 		if pressed:
@@ -796,6 +834,9 @@ class TestMenu(Screen):
 		if not self.fpTestMode:
 			return
 
+		if not self.BUTTON_TEST.has_key("down"):
+			return
+
 		if pressed:
 			self["button_down"].show()
 		else:
@@ -805,6 +846,9 @@ class TestMenu(Screen):
 
 	def frontButtonInfo(self, pressed=True):
 		if not self.fpTestMode:
+			return
+
+		if not self.BUTTON_TEST.has_key("info"):
 			return
 
 		if not self.has_key("button_info"):
