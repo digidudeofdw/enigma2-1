@@ -1706,6 +1706,7 @@ class InfoBarExtensions:
 			self.session.open(MessageBox, _("Failed. Please check internet connection."), MessageBox.TYPE_ERROR, timeout=5)
 
 	def getBeta4DSWUpdatename(self):
+		model = HardwareInfo().get_device_name()
 		if model == "mediabox":
 			return _("S/W Update")
 		else:
@@ -1715,6 +1716,7 @@ class InfoBarExtensions:
 		return [((boundFunction(self.getBeta4DSWUpdatename), boundFunction(self.openBeta4DSWUpdate), lambda: True), None)] 
 
 	def get4DSWUpdatename(self):
+		model = HardwareInfo().get_device_name()
 		if model == "mediabox":
 			return _("S/W Update")
 		else:
