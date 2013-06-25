@@ -364,6 +364,11 @@ class UpdatePluginMenu(Screen):
 
 # iq - [
 	def startImageBackup(self, ret = False):
+		from Components.ParentalControl import parentalControl
+
+		parentalControl.save()
+		config.saveToFile("/etc/enigma2/settings")	# iq
+
 		if ret:
 			self.ImageBackup = ImageBackup(self.session)
 			job_manager.AddJob(self.ImageBackup.createBackupJob())
