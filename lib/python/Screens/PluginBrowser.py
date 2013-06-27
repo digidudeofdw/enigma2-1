@@ -77,10 +77,7 @@ class PluginBrowser(Screen):
 		model = HardwareInfo().get_device_name()
 
 		self["red"] = Label(_("Remove Plugins"))
-		if model == "mediabox":
-			self["green"] = Label(_(" "))
-		else:
-			self["green"] = Label(_("Download Plugins"))
+		self["green"] = Label(_("Download Plugins"))
 		
 		self.list = []
 		self["list"] = PluginList(self.list)
@@ -94,17 +91,11 @@ class PluginBrowser(Screen):
 			"ok": self.save,
 			"back": self.close,
 		})
-		if model == "mediabox":
-			self["PluginDownloadActions"] = ActionMap(["ColorActions"],
-			{
-				"red": self.delete
-			})
-		else:
-			self["PluginDownloadActions"] = ActionMap(["ColorActions"],
-			{
-				"red": self.delete,
-				"green": self.download
-			})
+		self["PluginDownloadActions"] = ActionMap(["ColorActions"],
+		{
+			"red": self.delete,
+			"green": self.download
+		})
 
 		self.onFirstExecBegin.append(self.checkWarnings)
 		self.onShown.append(self.updateList)
