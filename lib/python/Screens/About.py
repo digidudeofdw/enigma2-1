@@ -127,15 +127,12 @@ class About(Screen):
 	def info_action(self):
 		model = HardwareInfo().get_device_name() 
 		
-		if model == "mediabox": 
-			return
+		if self.key_status == 1:
+			self.key_status = 2
+			print "info_action two"
 		else:
-			if self.key_status == 1:
-				self.key_status = 2
-				print "info_action two"
-			else:
-				self.key_status = 1
-				print "info_action one"
+			self.key_status = 1
+			print "info_action one"
 
 	def first_action(self):
 		if self.key_status == 2:
