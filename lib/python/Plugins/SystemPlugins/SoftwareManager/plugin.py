@@ -2167,6 +2167,8 @@ class ImageBackup(Screen):
 		print '[ImageManager] Stage2: Making Kernel Image.'
 		if HardwareInfo().get_device_name().startswith("tmnano"):
 			self.command = 'cat /dev/mtd1 > ' + self.WORKDIR + '/vmlinux.gz'
+		elif HardwareInfo().get_device_name() in ("force1", "tm2tsuper", "tmnanosuper"):
+			self.command = 'cat /dev/mtd2 > ' + self.WORKDIR + '/vmlinux.gz'
 		else:
 			self.command = 'cat /dev/mtd6 > ' + self.WORKDIR + '/vmlinux.gz'
 		self.BackupConsole.ePopen(self.command, self.Stage2Complete)
@@ -2326,6 +2328,11 @@ class ImageRestore(Screen):
 
 			if HardwareInfo().get_device_name().startswith("tmnano"):
 				kernelMTD = "mtd1"
+				kernelFILE = "oe_kernel.bin"
+				rootMTD = "mtd0"
+				rootFILE = "oe_rootfs.bin"
+			elif HardwareInfo().get_device_name() in ("force1", "tm2tsuper", "tmnanosuper"):
+				kernelMTD = "mtd2"
 				kernelFILE = "oe_kernel.bin"
 				rootMTD = "mtd0"
 				rootFILE = "oe_rootfs.bin"
