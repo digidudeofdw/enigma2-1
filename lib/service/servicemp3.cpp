@@ -511,7 +511,7 @@ eServiceMP3::~eServiceMP3()
 		gst_object_unref (GST_OBJECT (m_gst_playbin));
 		eDebug("eServiceMP3::destruct!");
 	}
-#ifdef IQ_PATCH
+#if IQ_PATCH
     system("echo 1 > /proc/sys/vm/drop_caches");
 #endif
 }
@@ -578,7 +578,7 @@ RESULT eServiceMP3::setSlowMotion(int ratio)
 	if (!ratio)
 		return 0;
 	eDebug("eServiceMP3::setSlowMotion ratio=%f",1.0/(gdouble)ratio);
-#ifdef IQ_PATCH
+#if IQ_PATCH
     int ret=0;
     char seek_cmd[255];
     sprintf(seek_cmd,"echo 4 > /proc/stb/lcd/video_seek_mode;echo %d > /proc/stb/lcd/video_seek_speed",ratio);
@@ -594,7 +594,7 @@ RESULT eServiceMP3::setSlowMotion(int ratio)
 RESULT eServiceMP3::setFastForward(int ratio)
 {
 	eDebug("eServiceMP3::setFastForward ratio=%i",ratio);
-#ifdef IQ_PATCH
+#if IQ_PATCH
     int ret=0;
     char seek_cmd[255];
     if(ratio<0)
@@ -614,7 +614,7 @@ RESULT eServiceMP3::pause()
 {
 	if (!m_gst_playbin || m_state != stRunning)
 		return -1;
-#ifdef IQ_PATCH
+#if IQ_PATCH
     system("echo 0 > /proc/stb/lcd/video_seek_mode;echo 0 > /proc/stb/lcd/video_seek_speed");
 #endif
 	trickSeek(0.0);
@@ -626,7 +626,7 @@ RESULT eServiceMP3::unpause()
 {
 	if (!m_gst_playbin || m_state != stRunning)
 		return -1;
-#ifdef IQ_PATCH
+#if IQ_PATCH
     system("echo 1 > /proc/stb/lcd/video_seek_mode;echo 1 > /proc/stb/lcd/video_seek_speed");
 #endif
 	trickSeek(1.0);

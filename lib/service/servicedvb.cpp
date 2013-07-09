@@ -32,7 +32,7 @@
 #error no byte order defined!
 #endif
 
-#define  IQ_PATCH
+#define  IQ_PATCH	0		/* enigma2 compatibillity for other team */
 
 class eStaticServiceDVBInformation: public iStaticServiceInformation
 {
@@ -1532,7 +1532,7 @@ RESULT eDVBServicePlay::unpause()
 RESULT eDVBServicePlay::seekTo(pts_t to)
 {
 	eDebug("eDVBServicePlay::seekTo: jump %lld", to);
-#ifdef  IQ_PATCH
+#if  IQ_PATCH
    if(m_is_paused)
       m_decoder->play();
 #endif
@@ -1551,7 +1551,7 @@ RESULT eDVBServicePlay::seekTo(pts_t to)
 	m_cue->seekTo(0, to);
 	m_dvb_subtitle_pages.clear();
 	m_subtitle_pages.clear();
-#ifdef  IQ_PATCH
+#if  IQ_PATCH
    if(m_is_paused)
 		m_decoder->pause();
 #endif
@@ -1565,7 +1565,7 @@ RESULT eDVBServicePlay::seekRelative(int direction, pts_t to)
 
 	if (!m_decode_demux)
 		return -1;
-#ifdef  IQ_PATCH
+#if  IQ_PATCH
    if(m_is_paused)
       m_decoder->play();
 #endif
@@ -1589,7 +1589,7 @@ RESULT eDVBServicePlay::seekRelative(int direction, pts_t to)
 	m_cue->seekTo(mode, to);
 	m_dvb_subtitle_pages.clear();
 	m_subtitle_pages.clear();
-#ifdef  IQ_PATCH
+#if  IQ_PATCH
    if(m_is_paused)
 		m_decoder->pause();
 #endif
@@ -2549,7 +2549,7 @@ void eDVBServicePlay::switchToLive()
 {
 	if (!m_timeshift_active)
 		return;
-#ifdef  IQ_PATCH
+#if  IQ_PATCH
     if(m_is_paused)
         m_decoder->play();
 #endif
