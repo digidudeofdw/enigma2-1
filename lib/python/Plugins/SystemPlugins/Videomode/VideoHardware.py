@@ -39,9 +39,12 @@ class VideoHardware:
 								"multi":	{ 50: "1080i50", 60: "1080i" } }
 # [iq
 	if HardwareInfo().support_1080p():
-
-		rates["1080p"] =		{ "24Hz":		{ 24: "1080p24" },
-								"30Hz":		{ 30: "1080p30" } }
+		if HardwareInfo().support_1080p_50_60():
+			rates["1080p"] =		{ "50Hz":		{ 50: "1080p50" },
+									"60Hz":		{ 60: "1080p60" } }
+		else:
+			rates["1080p"] =		{ "24Hz":		{ 24: "1080p24" },
+									"30Hz":		{ 30: "1080p30" } }
 # iq]
 
 	rates["PC"] = { 
