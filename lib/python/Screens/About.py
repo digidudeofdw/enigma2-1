@@ -44,6 +44,8 @@ class About(Screen):
 
 		if model == "mediabox":
 			AboutText += _("Powered by Jepssen") + "\n"
+		elif model == "optimussos1" or model == "optimussos2":
+			AboutText += _("Powered by Edision") + "\n"
 		else:
 			AboutText += _("Powered by 4D") + "\n"
 # iq]
