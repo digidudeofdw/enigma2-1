@@ -249,6 +249,10 @@ class NetworkWizard(WizardLanguage, Rc):
 	def AdapterSetupEndFinished(self,data):
 		if data <= 2:
 			self.InterfaceState = True
+# iq - to get ip after wizard setup [
+#			iNetwork.restartNetwork()
+			iNetwork.getInterfaces()
+# ]
 		else:
 			self.InterfaceState = False
 		self.AdapterRef.close(True)
@@ -292,6 +296,10 @@ class NetworkWizard(WizardLanguage, Rc):
 	def checkNetworkStateCB(self,data):
 		if data <= 2:
 			self.InterfaceState = True
+# iq - to get ip after wizard setup [
+#			iNetwork.restartNetwork()
+			iNetwork.getInterfaces()
+# ]
 		else:
 			self.InterfaceState = False
 		self.checkRef.close(True)

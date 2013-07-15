@@ -87,6 +87,13 @@ class HardwareInfo:
 		else:
 			return True
 
+	def support_1080p_50_60(self):
+		DEVICES_WITH_1080P_50_60 = [ 'force1', 'tmnanosuper', 'tm2tsuper' ]
+		if HardwareInfo.device_name in DEVICES_WITH_1080P_50_60:
+			return True
+		else:
+			return False
+
 	def has_scart(self):
 		DEVICES_WITHOUT_SCART = [ 'tmnanooe', 'ios200hd', 'force1', 'tmnanosuper' ]
 		if HardwareInfo.device_name in DEVICES_WITHOUT_SCART:
