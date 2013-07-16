@@ -246,7 +246,7 @@ class TestMenu(Screen):
 		self.has_fan_sensor = model in ("tmtwinoe", "tm2toe", "ios100hd")
 		self.has_sata = model not in ("ios300hd", "mediabox" , "optimussos1")
 		self.has_1_rear_usb = "tmnano" in model
-		self.has_sc41cr = "tmnano" in model
+		self.has_sc41cr = model in ("ios200hd", "tmnanooe")
 		self.has_1_tuner = model in ("tmnanooe", "ios300hd", "mediabox", "tmsingle", "optimussos1")
 		self.has_vfd = model not in ("tmsingle", "tmnanooe", "ios200hd", "ios300hd", "mediabox", "optimussos1")
 
