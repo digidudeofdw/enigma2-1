@@ -20,7 +20,7 @@ from Tools.LoadPixmap import LoadPixmap
 from Tools import Notifications 
 
 from time import time
-import os
+from os import path as os_path, system as os_system, unlink
 
 def languageChanged():
 	plugins.clearPluginList()
@@ -77,7 +77,10 @@ class PluginBrowser(Screen):
 		model = HardwareInfo().get_device_name()
 
 		self["red"] = Label(_("Remove Plugins"))
-		self["green"] = Label(_("Download Plugins"))
+		if os_path.exists("/etc/factory"):
+			self["green"] = Label(_(" "))
+		else:
+			self["green"] = Label(_("Download Plugins"))
 		
 		self.list = []
 		self["list"] = PluginList(self.list)
@@ -91,11 +94,17 @@ class PluginBrowser(Screen):
 			"ok": self.save,
 			"back": self.close,
 		})
-		self["PluginDownloadActions"] = ActionMap(["ColorActions"],
-		{
-			"red": self.delete,
-			"green": self.download
-		})
+		if os_path.exists("/etc/factory"):
+			self["PluginDownloadActions"] = ActionMap(["ColorActions"],
+			{
+				"red": self.delete
+			})
+		else:
+			self["PluginDownloadActions"] = ActionMap(["ColorActions"],
+			{
+				"red": self.delete,
+				"green": self.download
+			})
 
 		self.onFirstExecBegin.append(self.checkWarnings)
 		self.onShown.append(self.updateList)
