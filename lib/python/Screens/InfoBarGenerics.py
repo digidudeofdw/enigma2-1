@@ -40,7 +40,7 @@ from enigma import eTimer, eServiceCenter, eDVBServicePMTHandler, iServiceInform
 	iPlayableService, eServiceReference, eEPGCache, eActionMap
 
 from time import time, localtime, strftime
-from os import stat as os_stat, system as os_system, chmod as os_chmod
+from os import stat as os_stat, system as os_system, chmod as os_chmod, os_path, system as os_system
 from bisect import insort
 
 from RecordTimer import RecordTimerEntry, RecordTimer, findSafeRecordPath
@@ -1706,8 +1706,7 @@ class InfoBarExtensions:
 			self.session.open(MessageBox, _("Failed. Please check internet connection."), MessageBox.TYPE_ERROR, timeout=5)
 
 	def getBeta4DSWUpdatename(self):
-		model = HardwareInfo().get_device_name()
-		if model == "mediabox":
+                if os_path.exists("/etc/factory"):
 			return _("S/W Update")
 		else:
 			return _("4D Beta S/W Update")
@@ -1716,8 +1715,7 @@ class InfoBarExtensions:
 		return [((boundFunction(self.getBeta4DSWUpdatename), boundFunction(self.openBeta4DSWUpdate), lambda: True), None)] 
 
 	def get4DSWUpdatename(self):
-		model = HardwareInfo().get_device_name()
-		if model == "mediabox":
+                if os_path.exists("/etc/factory"):
 			return _("S/W Update")
 		else:
 			return _("4D S/W Update")
