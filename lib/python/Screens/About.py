@@ -8,6 +8,7 @@ from Components.ScrollLabel import ScrollLabel
 
 from Tools.StbHardware import getFPVersion
 from Tools.HardwareInfo import HardwareInfo
+from os import path as os_path
 
 class About(Screen):
 	def __init__(self, session):
@@ -153,9 +154,12 @@ class About(Screen):
 	def third_action(self):
 		if self.key_status == 4:
 			print "third_action"
-			from Screens.ModeSetup import Mode4DSSetup 
-			self.session.open(Mode4DSSetup)
-			self.close()
+                        if os_path.exists("/etc/factory"):
+                                return
+                        else:
+                                from Screens.ModeSetup import Mode4DSSetup 
+                                self.session.open(Mode4DSSetup)
+                                self.close()
 		else:
 			self.key_status == -1
 
