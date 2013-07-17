@@ -20,6 +20,7 @@ from Tools.LoadPixmap import LoadPixmap
 from Tools import Notifications 
 
 from time import time
+import os
 from os import path as os_path, system as os_system, unlink
 
 def languageChanged():
