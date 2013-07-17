@@ -1,4 +1,4 @@
-Gfrom Components.ActionMap import ActionMap
+from Components.ActionMap import ActionMap
 from Components.Sensors import sensors
 from Components.Sources.Sensor import SensorSource
 from Components.Sources.StaticText import StaticText
