@@ -176,6 +176,8 @@ data/rc_models/tm/mediabox/Makefile
 data/rc_models/tm/tm2tsuper/Makefile
 data/rc_models/tm/tmnanosuper/Makefile
 data/rc_models/tm/force1/Makefile
+data/rc_models/tm/optimussos1/Makefile
+data/rc_models/tm/optimussos2/Makefile
 data/rc_models/vu/Makefile
 data/rc_models/xp1000/Makefile
 data/skin_default/Makefile
