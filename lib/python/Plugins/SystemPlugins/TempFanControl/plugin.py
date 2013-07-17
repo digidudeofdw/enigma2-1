@@ -1,4 +1,4 @@
-from Components.ActionMap import ActionMap
+Gfrom Components.ActionMap import ActionMap
 from Components.Sensors import sensors
 from Components.Sources.Sensor import SensorSource
 from Components.Sources.StaticText import StaticText
@@ -168,7 +168,7 @@ def startMenu(menuid):
 
 def Plugins(**kwargs):
 	from Tools.HardwareInfo import HardwareInfo
-	HAVE_NOT_FAN = {"ios300hd", "mediabox", "tmnanooe",  "optimussos1" }
+	HAVE_NOT_FAN = {"ios300hd", "mediabox", "optimussos1" }
 
 	if HardwareInfo().get_device_name() in HAVE_NOT_FAN:
 		return []
