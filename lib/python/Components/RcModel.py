@@ -13,8 +13,8 @@ class RcModel:
 	RCTYPE_FORCE1 = 9
 	RCTYPE_TMNANOSUPER = 10
 	RCTYPE_TM2TSUPER = 11
-        RCTYPE_OPTIMUSSOS1 = 12
-        RCTYPE_OPTIMUSSOS2 = 13
+	RCTYPE_OPTIMUSSOS1 = 12
+	RCTYPE_OPTIMUSSOS2 = 13
 
 	def __init__(self):
 		self.currentRcType = self.RCTYPE_DMM
@@ -56,10 +56,10 @@ class RcModel:
 				self.currentRcType = self.RCTYPE_TMNANOSUPER
 			elif model == "tm2tsuper":
 				self.currentRcType = self.RCTYPE_TM2TSUPER
-                        elif model == "optimuss os1":
-                                self.currentRcType = self.RCTYPE_OPTIMUSSOS1
-                        elif model == "optimuss os2":
-                                self.currentRcType = self.RCTYPE_OPTIMUSSOS2
+			elif model == "optimussos1":
+				self.currentRcType = self.RCTYPE_OPTIMUSSOS1
+			elif model == "optimussos2":
+				self.currentRcType = self.RCTYPE_OPTIMUSSOS2
 
 		elif os.path.exists('/proc/stb/info/boxtype'):
 			model = self.readFile('/proc/stb/info/boxtype')
@@ -91,11 +91,11 @@ class RcModel:
 			return '/usr/share/enigma2/rc_models/tm/force1/'
 		elif self.currentRcType == self.RCTYPE_TMNANOSUPER:
 			return '/usr/share/enigma2/rc_models/tm/tmnanosuper/'
-		elif self.currentRcType == self.RcTYPE_TM2TSUPER:
+		elif self.currentRcType == self.RCTYPE_TM2TSUPER:
 			return '/usr/share/enigma2/rc_models/tm/tm2tsuper'
-                elif self.currentRcType == self.Rctype_Optimussos1:
-                        return '/usr/share/enigma2/rc_models/tm/optimussos1/'
-                elif self.currentRcType == self.Rctype_Optimussos2:
-                        return '/usr/share/enigma2/rc_models/tm/optimussos2/'
+		elif self.currentRcType == self.RCTYPE_OPTIMUSSOS1:
+			return '/usr/share/enigma2/rc_models/tm/optimussos1/'
+		elif self.currentRcType == self.RCTYPE_OPTIMUSSOS2:
+			return '/usr/share/enigma2/rc_models/tm/optimussos2/'
 
 rc_model = RcModel()

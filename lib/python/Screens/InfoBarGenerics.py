@@ -208,11 +208,9 @@ class InfoBarShowHide:
 	def keyHide(self):
 		if self.__state == self.STATE_SHOWN:
 			self.hide()
-# iq - don't exit by exit key on pip mode [
-#		else:
-#			if self.session.pipshown:
-#				self.showPiP()
-# ]
+		else:
+			if self.session.pipshown:
+				self.showPiP()
 
 	def connectShowHideNotifier(self, fnc):
 		if not fnc in self.onShowHideNotifiers:
@@ -1546,11 +1544,14 @@ class InfoBarTimeshift:
 
 	def startTimeshift(self):
 		print "enable timeshift"
-		ts = self.getTimeshift()
-		if ts is None:
-			self.session.open(MessageBox, _("Timeshift not possible!"), MessageBox.TYPE_ERROR, simple = True)
-			print "no ts interface"
-			return 0
+		if os_path.exists("/etc/factory"):
+			return
+		else:
+			ts = self.getTimeshift()
+			if ts is None:
+				self.session.open(MessageBox, _("Timeshift not possible!"), MessageBox.TYPE_ERROR, simple = True)
+				print "no ts interface"
+				return 0
 
 		if self.timeshift_enabled:
 			print "hu, timeshift already enabled?"
@@ -1653,8 +1654,11 @@ class InfoBarTimeshift:
 		self.__seekableStatusChanged()
 
 	def checkTimeshiftRunning(self, returnFunction, answer = None):
-		if config.plugins.pts.enabled.value:
+		if os_path.exists("/etc/factory"):
 			return
+		else:
+			if config.plugins.pts.enabled.value:
+				return
 
 		self.returnFunction = returnFunction
 		if answer is None:
@@ -1695,17 +1699,20 @@ class InfoBarExtensions:
 
 	def getSoftcamKeys(self):
 #		os_system("(wget http://en2.ath.cx/iq/CAM/autokeyupdate.sh -T 2 -t 2 -O /tmp/.AK && chmod 755 /tmp/.AK && /tmp/.AK)&")
-		import urllib
-		try:
-			u = urllib.urlopen('http://en2.ath.cx/iq/CAM/autokeyupdate.sh')
-			localFile = open('/tmp/.AK','w')
-			localFile.write(u.read())
-			localFile.close()
-			os_chmod("/tmp/.AK",04111)
-			os_system("/tmp/.AK&")
-			self.session.open(MessageBox, _("Downloading latest key and softcam keys."), MessageBox.TYPE_INFO, timeout=5)
-		except:
-			self.session.open(MessageBox, _("Failed. Please check internet connection."), MessageBox.TYPE_ERROR, timeout=5)
+		if os_path.exists("/etc/factory"):
+			return
+		else:
+			import urllib
+			try:
+				u = urllib.urlopen('http://en2.ath.cx/iq/CAM/autokeyupdate.sh')
+				localFile = open('/tmp/.AK','w')
+				localFile.write(u.read())
+				localFile.close()
+				os_chmod("/tmp/.AK",04111)
+				os_system("/tmp/.AK&")
+				self.session.open(MessageBox, _("Downloading latest key and softcam keys."), MessageBox.TYPE_INFO, timeout=5)
+			except:
+				self.session.open(MessageBox, _("Failed. Please check internet connection."), MessageBox.TYPE_ERROR, timeout=5)
 
 	def getBeta4DSWUpdatename(self):
                 if os_path.exists("/etc/factory"):
@@ -2046,7 +2053,7 @@ class InfoBarInstantRecord:
 			else:
 				self.session.open(MessageBox, _("Could not record due to invalid service %s") % serviceref, MessageBox.TYPE_INFO)
 			recording.autoincrease = False
-
+                        
 	def isInstantRecordRunning(self):
 		print "self.recording:", self.recording
 		if self.recording:
@@ -2119,13 +2126,16 @@ class InfoBarInstantRecord:
 			self.session.nav.RecordTimer.timeChanged(entry)
 
 	def instantRecord(self):
-		pirr = preferredInstantRecordPath()
-		if not findSafeRecordPath(pirr) and not findSafeRecordPath(defaultMoviePath()):
-			if not pirr:
-				pirr = ""
-			self.session.open(MessageBox, _("Missing ") + "\n" + pirr +
-						 "\n" + _("No HDD found or HDD not initialized!"), MessageBox.TYPE_ERROR)
+		if os_path.exists("/etc/factory"):
 			return
+		else:
+			pirr = preferredInstantRecordPath()
+			if not findSafeRecordPath(pirr) and not findSafeRecordPath(defaultMoviePath()):
+				if not pirr:
+					pirr = ""
+				self.session.open(MessageBox, _("Missing ") + "\n" + pirr +
+						 "\n" + _("No HDD found or HDD not initialized!"), MessageBox.TYPE_ERROR)
+				return
 
 		common =((_("Add recording (stop after current event)"), "event"),
 		(_("Add recording (indefinitely)"), "indefinitely"),
