@@ -14,8 +14,14 @@ class About(Screen):
 	def __init__(self, session):
 		Screen.__init__(self, session)
 
-
-		AboutText = _("Hardware: ") + about.getHardwareTypeString() + "\n"
+		from Tools.HardwareInfo import HardwareInfo
+		model = HardwareInfo().get_device_name()
+		if model == "optimussos2":
+			AboutText = _("Hardware: ") + "OPTIMUSS OS2" + "\n"
+		elif model == "optimussos1":
+			AboutText = _("Hardware: ") + "OPTIMUSS OS1" + "\n"
+		else:
+			AboutText = _("Hardware: ") + about.getHardwareTypeString() + "\n"
 
 		import fcntl, socket, struct
 		def getHwAddr(ifname):
@@ -26,7 +32,6 @@ class About(Screen):
 		self["MacAddress"] = StaticText(_("Mac Address:") + " " + macaddress)
 		AboutText += _("Mac Address:") + " " + macaddress + "\n"
 
-		from Tools.HardwareInfo import HardwareInfo
 		if HardwareInfo().has_micom():
 			AboutText += _("Micom Version: ") + about.getMicomVersionString() + "\n"
 		AboutText += _("Image: ") + about.getImageTypeString() + "\n"
@@ -41,8 +46,6 @@ class About(Screen):
 		AboutText += ImageVersion + "\n"
 
 # [iq
-		model = HardwareInfo().get_device_name()
-
 		if model == "mediabox":
 			AboutText += _("Powered by Jepssen") + "\n"
 		elif model == "optimussos1" or model == "optimussos2":
