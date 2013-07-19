@@ -208,9 +208,11 @@ class InfoBarShowHide:
 	def keyHide(self):
 		if self.__state == self.STATE_SHOWN:
 			self.hide()
-		else:
-			if self.session.pipshown:
-				self.showPiP()
+# iq - don't exit by exit key on pip mode [
+#		else:
+#			if self.session.pipshown:
+#				self.showPiP()
+# ]
 
 	def connectShowHideNotifier(self, fnc):
 		if not fnc in self.onShowHideNotifiers:
