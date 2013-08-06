@@ -6,6 +6,7 @@ import Screens.MovieSelection
 
 from Screen import Screen
 from Screens.MessageBox import MessageBox
+from os import path as os_path
 
 profile("LOAD:enigma")
 import enigma
@@ -167,8 +168,11 @@ class InfoBar(InfoBarBase, InfoBarShowHide,
 		self.rds_display.show()  # in InfoBarRdsDecoder
 
 	def showMovies(self, defaultRef=None):
-		self.lastservice = self.session.nav.getCurrentlyPlayingServiceOrGroup()
-		self.session.openWithCallback(self.movieSelected, Screens.MovieSelection.MovieSelection, defaultRef, timeshiftEnabled = self.timeshift_enabled)
+		if os_path.exists("/etc/factory"):
+			return
+		else:
+			self.lastservice = self.session.nav.getCurrentlyPlayingServiceOrGroup()
+			self.session.openWithCallback(self.movieSelected, Screens.MovieSelection.MovieSelection, defaultRef, timeshiftEnabled = self.timeshift_enabled)
 
 	def movieSelected(self, service):
 		ref = self.lastservice

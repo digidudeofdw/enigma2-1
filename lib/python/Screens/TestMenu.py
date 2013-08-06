@@ -238,15 +238,15 @@ class TestMenu(Screen):
 
 		model = HardwareInfo().get_device_name()
 		self.has_fan = model not in ("ios300hd", "mediabox" , "optimussos1" )
-		self.has_nav_keys = model not in ("tmtwinoe", "ios100hd", "mediabox", "ios200hd")
+		self.has_nav_keys = model not in ("tmtwinoe", "ios100hd", "mediabox", "ios200hd", "optimussos2")
 		self.has_8_buttons = model in ("tmtwinoe", "ios100hd")
 		self.has_9_buttons = model in ("tm2toe", "tmsingle")
-		self.has_7_buttons = model in ("tmnanooe", "ios300hd", "optimussos2")
-		self.has_5_buttons = model in ("mediabox","ios200hd")
+		self.has_7_buttons = model in ("tmnanooe", "ios300hd")
+		self.has_5_buttons = model in ("mediabox","ios200hd", "optimussos2")
 		self.has_fan_sensor = model in ("tmtwinoe", "tm2toe", "ios100hd")
 		self.has_sata = model not in ("ios300hd", "mediabox" , "optimussos1")
 		self.has_1_rear_usb = "tmnano" in model
-		self.has_sc41cr = model in ("ios200hd", "tmnanooe")
+		self.has_sc41cr = model in ("ios200hd", "tmnanooe","optimussos2")
 		self.has_1_tuner = model in ("tmnanooe", "ios300hd", "mediabox", "tmsingle", "optimussos1")
 		self.has_vfd = model not in ("tmsingle", "tmnanooe", "ios200hd", "ios300hd", "mediabox", "optimussos1")
 
@@ -508,7 +508,13 @@ class TestMenu(Screen):
 			self[self.BUTTON_TEST[button]["button"]].hide()
 
 	def layoutFinished(self):
-		self["info0_s"].setText(_(" %s" % (about.getHardwareTypeString())))
+		model = HardwareInfo().get_device_name() 
+		if model == "optimussos1":
+			self["info0_s"].setText(_("OPTIMUSS OS1"))
+		elif model == "optimussos2":
+			self["info0_s"].setText(_("OPTIMUSS OS2"))
+		else:
+			self["info0_s"].setText(_(" %s" % (about.getHardwareTypeString())))
 		self["info1_s"].setText(_(" %s" % (self.TEST_PROG_VERSION)))
 		self["mac_s"].setText(_(" %s" % self.getMacaddress()))
 		self["micom_s"].setText(_(" %s" % self.getMicomVersion()))
@@ -611,7 +617,7 @@ class TestMenu(Screen):
 		for menu in self.MENU_LIST:
 			if menu[1] == entry[1]:
 #				os.system("echo \"%s\" > /proc/stb/lcd/show_txt" % self.MENU_LIST[index][0])
-				self.vfdTextWrite(self.MENU_LIST[index][0])
+#				self.vfdTextWrite(self.MENU_LIST[index][0])
 				break
 			index += 1
 
@@ -900,6 +906,7 @@ class TestMenu(Screen):
 		fcntl.ioctl(fp.fileno(), 0x123321, on)
 
 	def vfdTextWrite(self, text):
+		return
 		if self.has_vfd:
 			if os.path.exists('/proc/stb/lcd/show_txt'):
 				open('/proc/stb/lcd/show_txt', 'w').write(text)
@@ -911,7 +918,7 @@ class TestMenu(Screen):
 		self.fpTestMode = True
 		self.changeMenuName("fp", " \"PRESS FRONT BUTTONS(RED TO QUIT)\"")
 
-		os.system("echo VFD START > /proc/stb/lcd/show_txt")
+#		os.system("echo VFD START > /proc/stb/lcd/show_txt")
 
 		for button in self.BUTTON_TEST:
 			self.BUTTON_TEST[button]["func"](False)
