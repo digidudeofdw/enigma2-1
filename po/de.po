@@ -100,12 +100,18 @@ msgstr ""
 "Wählen Sie Ihr Sicherungs-Laufwerk.\n"
 "Aktuelles Laufwerk: "
 
+msgid "No, scan later manually"
+msgstr "Nein, eine manuelle Suche später durchführen"
+
 msgid ""
 "\n"
 "View, install and remove available or installed packages."
 msgstr ""
 "\n"
 "Anzeigen, Installieren und Entfernen verfügbarer oder installierter Pakete."
+
+msgid "Do you want to enable the parental control feature on your Settop Box?"
+msgstr "Möchten Sie die Kindersicherungen auf Ihre Set-Top-Box aktivieren?"
 
 msgid " (PiP)"
 msgstr " (PiP)"
@@ -5695,6 +5701,15 @@ msgstr "Mit den hoch/runter-Tasten können Sie eine Option auswählen. Danach bi
 
 msgid "Use the wizard to set up basic features"
 msgstr "Grundeinstellungen jetzt vornehmen"
+
+msgid ""
+"Use the left and right buttons to change an option.\n"
+"\n"
+"Please set up tuner A"
+msgstr ""
+"Verwenden Sie die linken und rechten Tasten, um eine Option zu ändern.\n"
+"\n"
+"Einstellungen für tuner A"
 
 msgid "Use these input device settings?"
 msgstr "Diese Eingabegeräte Einstellungen benutzten?"

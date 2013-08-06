@@ -1,0 +1,772 @@
+./python.h:16:	int m_line, m_from, m_to;
+./python.h:20:	inline ePyObject();
+./python.h:21:	inline ePyObject(const ePyObject &ob);
+./python.h:22:	inline ePyObject(PyObject *ob);
+./python.h:24:	inline ePyObject(PyObject *ob, const char *file, int line);
+./python.h:26:	inline ePyObject(PyVarObject *ob);
+./python.h:27:	inline ePyObject(PyDictObject *ob);
+./python.h:28:	inline ePyObject(PyTupleObject *ob);
+./python.h:29:	inline ePyObject(PyListObject *ob);
+./python.h:30:	inline ePyObject(PyStringObject *ob);
+./python.h:48:	void incref(const char *file, int line);
+./python.h:49:	void decref(const char *file, int line);
+./python.h:56:inline ePyObject::ePyObject()
+./python.h:59:	,m_file(0), m_line(0), m_from(0), m_to(0), m_erased(false)
+./python.h:64:inline ePyObject::ePyObject(const ePyObject &ob)
+./python.h:67:	,m_file(ob.m_file), m_line(ob.m_line)
+./python.h:73:inline ePyObject::ePyObject(PyObject *ob)
+./python.h:76:	,m_file(0), m_line(0), m_from(0), m_to(0), m_erased(false)
+./python.h:82:inline ePyObject::ePyObject(PyObject *ob, const char* file, int line)
+./python.h:84:	,m_file(file), m_line(line), m_from(ob->ob_refcnt), m_to(ob->ob_refcnt), m_erased(false)
+./python.h:89:inline ePyObject::ePyObject(PyVarObject *ob)
+./python.h:92:	,m_file(0), m_line(0), m_from(0), m_to(0), m_erased(false)
+./python.h:97:inline ePyObject::ePyObject(PyDictObject *ob)
+./python.h:100:	,m_file(0), m_line(0), m_from(0), m_to(0), m_erased(false)
+./python.h:105:inline ePyObject::ePyObject(PyTupleObject *ob)
+./python.h:108:	,m_file(0), m_line(0), m_from(0), m_to(0), m_erased(false)
+./python.h:113:inline ePyObject::ePyObject(PyListObject *ob)
+./python.h:116:	,m_file(0), m_line(0), m_from(0), m_to(0), m_erased(false)
+./python.h:121:inline ePyObject::ePyObject(PyStringObject *ob)
+./python.h:124:	,m_file(0), m_line(0), m_from(0), m_to(0), m_erased(false)
+./python.h:130:inline ePyObject &ePyObject::operator=(PyObject *ob)
+./python.h:136:inline ePyObject &ePyObject::operator=(const ePyObject &ob)
+./python.h:142:inline ePyObject::operator PyObject*()
+./python.h:147:inline void ePyObject::incref()
+./python.h:152:inline void ePyObject::decref()
+./python.h:199:inline void Impl_Py_DECREF(const char* file, int line, const ePyObject &obj)
+./python.h:201:	((ePyObject*)(&obj))->decref(file, line);
+./python.h:204:inline void Impl_Py_INCREF(const char* file, int line, const ePyObject &obj)
+./python.h:206:	((ePyObject*)(&obj))->incref(file, line);
+./python.h:209:inline void Impl_Py_XDECREF(const char* file, int line, const ePyObject &obj)
+./python.h:212:		((ePyObject*)(&obj))->decref(file, line);
+./python.h:215:inline void Impl_Py_XINCREF(const char* file, int line, const ePyObject &obj)
+./python.h:218:		((ePyObject*)(&obj))->incref(file, line);
+./python.h:221:inline ePyObject Impl_PyTuple_New(const char* file, int line, int elements=0)
+./python.h:223:	return ePyObject(PyTuple_New(elements), file, line);
+./python.h:226:inline ePyObject Impl_PyList_New(const char* file, int line, int elements=0)
+./python.h:228:	return ePyObject(PyList_New(elements), file, line);
+./python.h:231:inline ePyObject Impl_PyDict_New(const char* file, int line)
+./python.h:233:	return ePyObject(PyDict_New(), file, line);
+./python.h:236:inline ePyObject Impl_PyString_FromString(const char* file, int line, const char *str)
+./python.h:238:	return ePyObject(PyString_FromString(str), file, line);
+./python.h:241:inline ePyObject Impl_PyString_FromFormat(const char* file, int line, const char *fmt, ...)
+./python.h:247:	return ePyObject(ob, file, line);
+./python.h:250:inline ePyObject Impl_PyInt_FromLong(const char* file, int line, long val)
+./python.h:252:	return ePyObject(PyInt_FromLong(val), file, line);
+./python.h:255:inline ePyObject Impl_PyLong_FromLong(const char* file, int line, long val)
+./python.h:257:	return ePyObject(PyLong_FromLong(val), file, line);
+./python.h:260:inline ePyObject Impl_PyLong_FromUnsignedLong(const char* file, int line, unsigned long val)
+./python.h:262:	return ePyObject(PyLong_FromUnsignedLong(val), file, line);
+./python.h:265:inline ePyObject Impl_PyLong_FromLongLong(const char* file, int line, long long val)
+./python.h:267:	return ePyObject(PyLong_FromLongLong(val), file, line);
+./python.h:270:inline ePyObject Impl_PyList_GET_ITEM(const char *file, int line, ePyObject list, unsigned int pos)
+./python.h:272:	return ePyObject(PyList_GET_ITEM(list, pos), file, line);
+./python.h:275:inline ePyObject Impl_PyTuple_GET_ITEM(const char *file, int line, ePyObject list, unsigned int pos)
+./python.h:277:	return ePyObject(PyTuple_GET_ITEM(list, pos), file, line);
+./python.h:280:inline void Impl_Py_DECREF(const ePyObject &obj)
+./python.h:285:inline void Impl_Py_INCREF(const ePyObject &obj)
+./python.h:290:inline void Impl_Py_XDECREF(const ePyObject &obj)
+./python.h:296:inline void Impl_Py_XINCREF(const ePyObject &obj)
+./python.h:302:inline ePyObject Impl_PyTuple_New(int elements=0)
+./python.h:307:inline ePyObject Impl_PyList_New(int elements=0)
+./python.h:312:inline ePyObject Impl_PyDict_New()
+./python.h:317:inline ePyObject Impl_PyString_FromString(const char *str)
+./python.h:322:inline ePyObject Impl_PyString_FromFormat(const char *fmt, ...)
+./python.h:331:inline ePyObject Impl_PyInt_FromLong(long val)
+./python.h:336:inline ePyObject Impl_PyLong_FromLong(long val)
+./python.h:341:inline ePyObject Impl_PyLong_FromUnsignedLong(unsigned long val)
+./python.h:346:inline ePyObject Impl_PyLong_FromLongLong(long long val)
+./python.h:351:inline ePyObject Impl_PyList_GET_ITEM(ePyObject list, unsigned int pos)
+./python.h:356:inline ePyObject Impl_PyTuple_GET_ITEM(ePyObject list, unsigned int pos)
+./python.h:362:inline void Impl_INCREF(PyObject *ob)
+./python.h:367:inline void Impl_DECREF(PyObject *ob)
+./python.h:380:#define Py_DECREF(obj) Impl_Py_DECREF(__FILE__, __LINE__, obj)
+./python.h:381:#define Py_XDECREF(obj) Impl_Py_XDECREF(__FILE__, __LINE__, obj)
+./python.h:382:#define Py_INCREF(obj) Impl_Py_INCREF(__FILE__, __LINE__, obj)
+./python.h:383:#define Py_XINCREF(obj) Impl_Py_XINCREF(__FILE__, __LINE__, obj)
+./python.h:384:#define PyList_New(args...) Impl_PyList_New(__FILE__, __LINE__, args)
+./python.h:385:#define PyTuple_New(args...) Impl_PyTuple_New(__FILE__, __LINE__, args)
+./python.h:386:#define PyDict_New(...) Impl_PyDict_New(__FILE__, __LINE__)
+./python.h:387:#define PyString_FromString(str) Impl_PyString_FromString(__FILE__, __LINE__, str)
+./python.h:388:#define PyString_FromFormat(str, args...) Impl_PyString_FromFormat(__FILE__, __LINE__, str, args)
+./python.h:389:#define PyInt_FromLong(val) Impl_PyInt_FromLong(__FILE__, __LINE__, val)
+./python.h:390:#define PyLong_FromLong(val) Impl_PyLong_FromLong(__FILE__, __LINE__, val)
+./python.h:391:#define PyLong_FromUnsignedLong(val) Impl_PyLong_FromUnsignedLong(__FILE__, __LINE__, val)
+./python.h:392:#define PyLong_FromLongLong(val) Impl_PyLong_FromLongLong(__FILE__, __LINE__, val)
+./python.h:393:#define PyList_GET_ITEM(list, pos) Impl_PyList_GET_ITEM(__FILE__, __LINE__, list, pos)
+./python.h:394:#define PyTuple_GET_ITEM(list, pos) Impl_PyTuple_GET_ITEM(__FILE__, __LINE__, list, pos)
+./Tools/GetEcmInfo.py:33:				ecm = open(ECM_INFO, 'rb').readlines()
+./Tools/GetEcmInfo.py:36:			for line in ecm:
+./Tools/GetEcmInfo.py:37:				d = line.split(':', 1)
+./Tools/GetEcmInfo.py:82:							share = open('/tmp/share.info', 'rb').readlines()
+./Tools/GetEcmInfo.py:83:							for line in share:
+./Tools/GetEcmInfo.py:84:								if cardid in line:
+./Tools/GetEcmInfo.py:85:									self.textvalue = line.strip()
+./Tools/GetEcmInfo.py:108:						for line in ecm:
+./Tools/GetEcmInfo.py:109:							if line.find('msec') != -1:
+./Tools/GetEcmInfo.py:110:								line = line.split(' ')
+./Tools/GetEcmInfo.py:111:								if line[0]:
+./Tools/GetEcmInfo.py:112:									time = " (%ss)" % (float(line[0])/1000)
+./Tools/Profile.py:15:	profile_old = open(resolveFilename(SCOPE_CONFIG, "profile"), "r").readlines()
+./Tools/Profile.py:18:	for line in profile_old:
+./Tools/Profile.py:19:		(t, id) = line[:-1].split('\t')
+./Tools/ISO639.py:38:LanguageCodes["ban"] = ("Balinese", "")
+./Tools/HardwareInfo.py:14:			HardwareInfo.device_name = file.readline().strip()
+./Tools/HardwareInfo.py:18:				HardwareInfo.device_version = file.readline().strip()
+./connections.h:22:inline PyObject *PyFrom(int v)
+./connections.h:27:inline PyObject *PyFrom(const char *c)
+./enigma_py_patcher.py:11:for line, str in enumerate(source):
+./enigma_py_patcher.py:25:		print "!!! Patch enigma.py line %d\n%s\n%s" %(line, oldstr[:len(oldstr)-1], str)
+./Components/config.py:1794:	def unpickle(self, lines, base_file=True):
+./Components/config.py:1797:		for l in lines:
+./Components/config.py:1844:		self.unpickle(f.readlines(), base_file)
+./Components/Ipkg.py:127:					self.parseLine(mydata)
+./Components/Ipkg.py:129:	def parseLine(self, data):
+./Components/Ipkg.py:153:				# Note: the config file update question doesn't end with a newline, so
+./Components/Ipkg.py:155:				# don't necessarily start at the beginning of a line
+./Components/Renderer/Canvas.py:37:				self.instance.drawLine(l[1], l[2], l[3], l[4], gRGB(l[5]))
+./Components/RecordingConfig.py:16:	config.recording.offline_decode_delay = ConfigNumber(default = 1000)
+./Components/Converter/Streaming.py:6:# lines starting with '-' are fatal errors (no recovery possible),
+./Components/Converter/Streaming.py:7:# lines starting with '=' are progress notices,
+./Components/Converter/Streaming.py:8:# lines starting with '+' are PIDs to record:
+./Components/Task.py:130:		self.cmdline = None
+./Components/Task.py:132:		self.output_line = ""
+./Components/Task.py:136:	def setCommandline(self, cmd, args):
+./Components/Task.py:146:	def setCmdline(self, cmdline):
+./Components/Task.py:147:		self.cmdline = cmdline
+./Components/Task.py:161:		if (self.cmd is None) and (self.cmdline is None):
+./Components/Task.py:171:		if not self.cmd and self.cmdline:
+./Components/Task.py:172:			print "execute:", self.container.execute(self.cmdline), self.cmdline
+./Components/Task.py:208:		self.output_line += data
+./Components/Task.py:210:			i = self.output_line.find('\n')
+./Components/Task.py:213:			self.processOutputLine(self.output_line[:i+1])
+./Components/Task.py:214:			self.output_line = self.output_line[i+1:]
+./Components/Task.py:216:	def processOutputLine(self, line):
+./Components/Task.py:217:		print "[Task %s]" % self.name, line[:-1]
+./Components/NimManager.py:730:		for line in nimfile:
+./Components/NimManager.py:731:			if not line:
+./Components/NimManager.py:733:			line = line.strip()
+./Components/NimManager.py:734:			if line.startswith("NIM Socket"):
+./Components/NimManager.py:735:				parts = line.split(" ")
+./Components/NimManager.py:738:			elif line.startswith("Type:"):
+./Components/NimManager.py:739:				entries[current_slot]["type"] = str(line[6:])
+./Components/NimManager.py:741:			elif line.startswith("Name:"):
+./Components/NimManager.py:742:				entries[current_slot]["name"] = str(line[6:])
+./Components/NimManager.py:744:			elif line.startswith("Has_Outputs:"):
+./Components/NimManager.py:745:				input = str(line[len("Has_Outputs:") + 1:])
+./Components/NimManager.py:747:			elif line.startswith("Internally_Connectable:"):
+./Components/NimManager.py:748:				input = int(line[len("Internally_Connectable:") + 1:])
+./Components/NimManager.py:750:			elif line.startswith("Frontend_Device:"):
+./Components/NimManager.py:751:				input = int(line[len("Frontend_Device:") + 1:])
+./Components/NimManager.py:753:			elif  line.startswith("Mode"):
+./Components/NimManager.py:755:				split = line.split(": ")
+./Components/NimManager.py:762:			elif line.startswith("I2C_Device:"):
+./Components/NimManager.py:763:				input = int(line[len("I2C_Device:") + 1:])
+./Components/NimManager.py:765:			elif line.startswith("empty"):
+./Components/NimManager.py:1542:					oldvalue = open("/sys/module/dvb_core/parameters/dvb_shutdown_timeout", "r").readline()
+./Components/Sensors.py:45:			value = int(f.readline().strip())
+./Components/Sensors.py:60:					name = f.readline().strip()
+./Components/Sensors.py:64:					unit = f.readline().strip()
+./Components/opkg.py:18:			for line in open('/var/lib/opkg/%s' % feed, 'r'):
+./Components/opkg.py:19:				if line.startswith('Package:'):
+./Components/opkg.py:20:					package = line[8:].strip()
+./Components/opkg.py:28:				if line.startswith('Version:'):
+./Components/opkg.py:29:					version = line[8:].strip()
+./Components/opkg.py:30:				elif line.startswith('Description:'):
+./Components/opkg.py:31:					description = line[14:-1]
+./Components/opkg.py:32:				elif description and line.startswith(' '):
+./Components/opkg.py:33:					description += line[:-1]
+./Components/opkg.py:34:				elif len(line) <= 1:
+./Components/DreamInfoHandler.py:391:		lines = fd.readlines()
+./Components/DreamInfoHandler.py:393:		return lines
+./Components/PackageInfo.py:359:		lines = fd.readlines()
+./Components/PackageInfo.py:361:		return lines
+./Components/FanControl.py:87:		value = int(f.readline().strip()[:-4])
+./Components/FanControl.py:93:		value = int(f.readline().strip(), 16)
+./Components/FanControl.py:106:		value = int(f.readline().strip(), 16)
+./Components/Network.py:80:		ipLinePattern = re_compile('inet ' + ipRegexp + '/')
+./Components/Network.py:82:		netmaskLinePattern = re_compile('/' + netRegexp)
+./Components/Network.py:84:		bcastLinePattern = re_compile(' brd ' + ipRegexp)
+./Components/Network.py:87:		macLinePattern = re_compile('link/ether ' + macRegexp)
+./Components/Network.py:89:		for line in result.splitlines():
+./Components/Network.py:90:			split = line.strip().split(' ',2)
+./Components/Network.py:93:				mac = self.regExpMatch(macPattern, self.regExpMatch(macLinePattern, split[2]))
+./Components/Network.py:102:					ip = self.regExpMatch(ipPattern, self.regExpMatch(ipLinePattern, split[2]))
+./Components/Network.py:103:					netmask = self.calc_netmask(self.regExpMatch(netmaskPattern, self.regExpMatch(netmaskLinePattern, split[2])))
+./Components/Network.py:104:					bcast = self.regExpMatch(ipPattern, self.regExpMatch(bcastLinePattern, split[2]))
+./Components/Network.py:125:		ipLinePattern = re_compile(ipRegexp)
+./Components/Network.py:127:		for line in result.splitlines():
+./Components/Network.py:128:			print line[0:7]
+./Components/Network.py:129:			if line[0:7] == "0.0.0.0":
+./Components/Network.py:130:				gateway = self.regExpMatch(ipPattern, line[16:31])
+./Components/Network.py:179:			interfaces = fp.readlines()
+./Components/Network.py:242:			resolv = fp.readlines()
+./Components/Network.py:248:		for line in resolv:
+./Components/Network.py:249:			if self.regExpMatch(nameserverPattern, line) is not None:
+./Components/Network.py:250:				ip = self.regExpMatch(ipPattern, line)
+./Components/Network.py:619:		for line in fp:
+./Components/Network.py:621:				ifnames.append(device.search(line).group()[:-1])
+./Components/Keyboard.py:17:				for line in f:
+./Components/Keyboard.py:18:					m = re_compile('^\s*(\w+)\s*=\s*(.*)\s*$').match(line)
+./Components/Harddisk.py:22:	return [line.strip().split(' ') for line in mounts]
+./Components/Harddisk.py:144:		line = readFile(self.sysfsPath('size'))
+./Components/Harddisk.py:146:			cap = int(line)
+./Components/Harddisk.py:297:#			lines = fstab.readlines()
+./Components/Harddisk.py:301:#		for line in lines:
+./Components/Harddisk.py:302:#			parts = line.strip().split(" ")
+./Components/Harddisk.py:307:#				cmd = "mkdir -p " + line.split()[1] + "; mount " + fspath + " " + line.split()[1]		# [iq]
+./Components/Harddisk.py:1010:#			self.setCmdline('umount -f ' + dev)
+./Components/Harddisk.py:1011:			self.setCmdline('umount -f ' + dev + '; rm -rf ' + dev)		# [iq]
+./Components/Harddisk.py:1042:		lines = fstab.readlines()
+./Components/Harddisk.py:1044:		for line in lines:
+./Components/Harddisk.py:1045:			parts = line.strip().split(" ")
+./Components/Harddisk.py:1048:#				self.setCmdline("mount -t ext3 " + fspath)
+./Components/Harddisk.py:1049:				self.setCmdline("mkdir -p " + line.split()[1] + "; mount " + fspath)		# [iq]
+./Components/Harddisk.py:1056:			self.setCmdline('sleep 2; sfdisk -R ' + self.hdd.disk_path)
+./Components/Playlist.py:52:			entry = file.readline().strip()
+./Components/Playlist.py:80:			entry = file.readline().strip()
+./Components/Playlist.py:110:		entry = file.readline().strip()
+./Components/Playlist.py:113:				entry = file.readline().strip()
+./Components/ScrollLabel.py:32:		lineheight=fontRenderClass.getInstance().getLineHeight( self.long_text.getFont() )
+./Components/ScrollLabel.py:33:		if not lineheight:
+./Components/ScrollLabel.py:34:			lineheight = 30 # assume a random lineheight if nothing is visible
+./Components/ScrollLabel.py:35:		lines = (int)(s.height() / lineheight)
+./Components/ScrollLabel.py:36:		self.pageHeight = (int)(lines * lineheight)
+./Components/ScrollLabel.py:37:		self.instance.resize(eSize(s.width(), self.pageHeight+(int)(lineheight/6)))
+./Components/ScrollLabel.py:39:		self.scrollbar.resize(eSize(20,self.pageHeight+(int)(lineheight/6)))
+./Components/AVSwitch.py:113:	if os.path.exists("/proc/stb/video/policy2_choices") and "auto" in open("/proc/stb/video/policy2_choices").readline():
+./Components/AVSwitch.py:123:	"nonlinear": _("Nonlinear"),
+./Components/AVSwitch.py:126:	if os.path.exists("/proc/stb/video/policy_choices") and "auto" in open("/proc/stb/video/policy_choices").readline():
+./Components/About.py:53:		return open("/etc/issue").readlines()[-2].capitalize().strip()[:-6]
+./Plugins/Extensions/Modem/plugin.py:4:		for line in f.readlines():
+./Plugins/Extensions/Modem/plugin.py:5:			tokens = line.split('\t')
+./Plugins/Extensions/Modem/plugin.py:13:		for line in f.readlines():
+./Plugins/Extensions/Modem/plugin.py:14:			if line.find('connect') == 0:
+./Plugins/Extensions/Modem/plugin.py:15:				line = line[line.find(' ')+1:]
+./Plugins/Extensions/Modem/plugin.py:16:				line = line[line.find(' ')+1:]
+./Plugins/Extensions/Modem/plugin.py:17:				line = line[:line.find('"')]
+./Plugins/Extensions/Modem/plugin.py:18:				return line
+./Plugins/Extensions/Modem/plugin.py:24:		lines = f.readlines()
+./Plugins/Extensions/Modem/plugin.py:26:		for line in lines:
+./Plugins/Extensions/Modem/plugin.py:27:			if line.find('connect') == 0:
+./Plugins/Extensions/Modem/plugin.py:28:				p = line.find(' ')
+./Plugins/Extensions/Modem/plugin.py:29:				p = line.find(' ', p+1)
+./Plugins/Extensions/Modem/plugin.py:30:				line = line[:p+1]
+./Plugins/Extensions/Modem/plugin.py:31:				f.write(line+tel+'"\n')
+./Plugins/Extensions/Modem/plugin.py:32:			elif line.find('user') == 0:
+./Plugins/Extensions/Modem/plugin.py:35:				f.write(line)
+./Plugins/Extensions/Modem/plugin.py:40:		for line in f.readlines():
+./Plugins/Extensions/Modem/plugin.py:41:			if line[0] == '#' or line.find('*') == -1:
+./Plugins/Extensions/Modem/plugin.py:44:				line = line.replace(ch, '')
+./Plugins/Extensions/Modem/plugin.py:45:			return line
+./Plugins/Extensions/Modem/plugin.py:51:		lines = f.readlines()
+./Plugins/Extensions/Modem/plugin.py:53:		for line in lines:
+./Plugins/Extensions/Modem/plugin.py:54:			if line[0] == '#' or line.find('*') == -1:
+./Plugins/Extensions/Modem/plugin.py:55:				f.write(line)
+./Plugins/Extensions/MediaPlayer/plugin.py:759:		offline = serviceHandler.offlineOperations(self.service)
+./Plugins/Extensions/MediaPlayer/plugin.py:763:		if offline is not None:
+./Plugins/Extensions/MediaPlayer/plugin.py:765:			if not offline.deleteFromDisk(1):
+./Plugins/Extensions/MediaPlayer/plugin.py:768:			self.session.openWithCallback(self.deleteConfirmed_offline, MessageBox, _("Do you really want to delete %s?") % (name))
+./Plugins/Extensions/MediaPlayer/plugin.py:772:	def deleteConfirmed_offline(self, confirmed):
+./Plugins/Extensions/MediaPlayer/plugin.py:775:			offline = serviceHandler.offlineOperations(self.service)
+./Plugins/Extensions/MediaPlayer/plugin.py:777:			if offline is not None:
+./Plugins/Extensions/MediaPlayer/plugin.py:779:				if not offline.deleteFromDisk(0):
+./Plugins/Extensions/MediaPlayer/plugin.py:1004:	def setText(self, text, line):
+./Plugins/Extensions/MediaPlayer/plugin.py:1010:		if line == 1:
+./Plugins/Extensions/MediaPlayer/plugin.py:1012:		elif line == 3:
+./Plugins/Extensions/MediaPlayer/plugin.py:1014:		elif line == 4:
+./Plugins/Extensions/CutListEditor/ui.py:138:		<widget name="Timeline" position="50,485" size="615,20" backgroundColor="#505555" pointer="skin_default/position_arrow.png:3,5" foregroundColor="black" />
+./Plugins/Extensions/CutListEditor/ui.py:161:		self["Timeline"] = ServicePositionGauge(self.session.nav)
+./Plugins/Extensions/PicturePlayer/ui.py:25:config.pic.infoline = ConfigEnableDisable(default=True)
+./Plugins/Extensions/PicturePlayer/ui.py:176:			getConfigListEntry(_("Show info line"), config.pic.infoline),
+./Plugins/Extensions/PicturePlayer/ui.py:512:		if config.pic.infoline.value == False:
+./Plugins/Extensions/PicturePlayer/ui.py:519:			if config.pic.infoline.value:
+./Plugins/Extensions/CoolTVGuide/Cool3D/Makefile.am:12:timeline-now.png
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTVGuide_720.xml:15:	<widget name="timeline_text" position="0,40" size="660,25" foregroundColor="#00e5b243" backgroundColor="#000000" transparent="1"/>
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTVGuide_720.xml:17:	<widget name="timeline0" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTVGuide_720.xml:18:	<widget name="timeline1" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTVGuide_720.xml:19:	<widget name="timeline2" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTVGuide_720.xml:20:	<widget name="timeline3" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTVGuide_720.xml:21:	<widget name="timeline4" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTVGuide_720.xml:22:	<widget name="timeline5" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTVGuide_720.xml:23:	<widget name="timeline_now" position="25,65" zPosition="2" size="19,378" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/CoolTVGuide/Cool3D/timeline-now.png" alphatest="on" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolNiceGuide_1024.xml:34:	<widget name="timeline_text" position="7,232" size="980,25" foregroundColor="#00e5b243" backgroundColor="#000000" transparent="1" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolNiceGuide_1024.xml:36:	<widget name="timeline0" position="0,232" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolNiceGuide_1024.xml:37:	<widget name="timeline1" position="0,232" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolNiceGuide_1024.xml:38:	<widget name="timeline2" position="0,232" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolNiceGuide_1024.xml:39:	<widget name="timeline3" position="0,232" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolNiceGuide_1024.xml:40:	<widget name="timeline4" position="0,232" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolNiceGuide_1024.xml:41:	<widget name="timeline5" position="0,232" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolNiceGuide_1024.xml:42:	<widget name="timeline_now" position="0,262" size="19,270" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/CoolTVGuide/Cool3D/timeline-now.png" alphatest="on" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolNiceGuide_720.xml:29:	<widget name="timeline_text" position="0,242" size="690,25" foregroundColor="#00e5b243" backgroundColor="#000000" transparent="1" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolNiceGuide_720.xml:31:	<widget name="timeline0" position="0,235" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolNiceGuide_720.xml:32:	<widget name="timeline1" position="0,235" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolNiceGuide_720.xml:33:	<widget name="timeline2" position="0,235" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolNiceGuide_720.xml:34:	<widget name="timeline3" position="0,235" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolNiceGuide_720.xml:35:	<widget name="timeline4" position="0,235" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolNiceGuide_720.xml:36:	<widget name="timeline5" position="0,235" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolNiceGuide_720.xml:37:	<widget name="timeline_now" position="20,267" zPosition="2" size="19,270" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/CoolTVGuide/Cool3D/timeline-now.png" alphatest="on" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolNiceGuide_1280.xml:32:	<widget name="timeline_text" position="9,286" size="1230,30" foregroundColor="#00e5b243" backgroundColor="#000000" transparent="1" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolNiceGuide_1280.xml:34:	<widget name="timeline0" position="0,320" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolNiceGuide_1280.xml:35:	<widget name="timeline1" position="0,320" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolNiceGuide_1280.xml:36:	<widget name="timeline2" position="0,320" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolNiceGuide_1280.xml:37:	<widget name="timeline3" position="0,320" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolNiceGuide_1280.xml:38:	<widget name="timeline4" position="0,320" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolNiceGuide_1280.xml:39:	<widget name="timeline5" position="0,320" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolNiceGuide_1280.xml:40:	<widget name="timeline_now" position="0,313" zPosition="2" size="19,360" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/CoolTVGuide/Cool3D/timeline-now.png" alphatest="on" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTVGuide_1024.xml:15:	<widget name="timeline_text" position="7,45" size="980,25" foregroundColor="#00e5b243" backgroundColor="#000000" transparent="1"/>
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTVGuide_1024.xml:17:	<widget name="timeline0" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTVGuide_1024.xml:18:	<widget name="timeline1" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTVGuide_1024.xml:19:	<widget name="timeline2" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTVGuide_1024.xml:20:	<widget name="timeline3" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTVGuide_1024.xml:21:	<widget name="timeline4" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTVGuide_1024.xml:22:	<widget name="timeline5" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTVGuide_1024.xml:23:	<widget name="timeline_now" position="0,70" zPosition="2" size="19,378" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/CoolTVGuide/Cool3D/timeline-now.png" alphatest="on" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolMultiGuide_720.xml:29:	<widget name="timeline_text" position="0,242" size="690,25" foregroundColor="#00e5b243" backgroundColor="#000000" transparent="1" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolMultiGuide_720.xml:31:	<widget name="timeline0" position="0,235" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolMultiGuide_720.xml:32:	<widget name="timeline1" position="0,235" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolMultiGuide_720.xml:33:	<widget name="timeline2" position="0,235" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolMultiGuide_720.xml:34:	<widget name="timeline3" position="0,235" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolMultiGuide_720.xml:35:	<widget name="timeline4" position="0,235" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolMultiGuide_720.xml:36:	<widget name="timeline5" position="0,235" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolMultiGuide_720.xml:37:	<widget name="timeline_now" position="20,267" zPosition="2" size="19,270" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/CoolTVGuide/Cool3D/timeline-now.png" alphatest="on" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolMultiGuide_1024.xml:34:	<widget name="timeline_text" position="7,232" size="980,25" foregroundColor="#00e5b243" backgroundColor="#000000" transparent="1" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolMultiGuide_1024.xml:36:	<widget name="timeline0" position="0,232" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolMultiGuide_1024.xml:37:	<widget name="timeline1" position="0,232" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolMultiGuide_1024.xml:38:	<widget name="timeline2" position="0,232" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolMultiGuide_1024.xml:39:	<widget name="timeline3" position="0,232" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolMultiGuide_1024.xml:40:	<widget name="timeline4" position="0,232" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolMultiGuide_1024.xml:41:	<widget name="timeline5" position="0,232" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolMultiGuide_1024.xml:42:	<widget name="timeline_now" position="0,262" size="19,270" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/CoolTVGuide/Cool3D/timeline-now.png" alphatest="on" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTVGuide_1280.xml:16:	<widget name="timeline_text" position="9,60" size="1230,30" foregroundColor="#00e5b243" backgroundColor="#000000" transparent="1"/>
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTVGuide_1280.xml:18:	<widget name="timeline0" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTVGuide_1280.xml:19:	<widget name="timeline1" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTVGuide_1280.xml:20:	<widget name="timeline2" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTVGuide_1280.xml:21:	<widget name="timeline3" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTVGuide_1280.xml:22:	<widget name="timeline4" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTVGuide_1280.xml:23:	<widget name="timeline5" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTVGuide_1280.xml:24:	<widget name="timeline_now" position="0,90" zPosition="2" size="19,480" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/CoolTVGuide/Cool3D/timeline-now.png" alphatest="on" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolMultiGuide_1280.xml:32:	<widget name="timeline_text" position="9,286" size="1230,30" foregroundColor="#00e5b243" backgroundColor="#000000" transparent="1" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolMultiGuide_1280.xml:34:	<widget name="timeline0" position="0,320" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolMultiGuide_1280.xml:35:	<widget name="timeline1" position="0,320" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolMultiGuide_1280.xml:36:	<widget name="timeline2" position="0,320" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolMultiGuide_1280.xml:37:	<widget name="timeline3" position="0,320" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolMultiGuide_1280.xml:38:	<widget name="timeline4" position="0,320" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolMultiGuide_1280.xml:39:	<widget name="timeline5" position="0,320" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolMultiGuide_1280.xml:40:	<widget name="timeline_now" position="0,313" zPosition="2" size="19,360" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/CoolTVGuide/Cool3D/timeline-now.png" alphatest="on" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTinyGuide_1024.xml:15:	<widget name="timeline_text" position="7,45" size="980,25" foregroundColor="#00e5b243" backgroundColor="#000000" transparent="1"/>
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTinyGuide_1024.xml:17:	<widget name="timeline0" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTinyGuide_1024.xml:18:	<widget name="timeline1" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTinyGuide_1024.xml:19:	<widget name="timeline2" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTinyGuide_1024.xml:20:	<widget name="timeline3" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTinyGuide_1024.xml:21:	<widget name="timeline4" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTinyGuide_1024.xml:22:	<widget name="timeline5" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTinyGuide_1024.xml:23:	<widget name="timeline_now" position="0,70" zPosition="2" size="19,378" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/CoolTVGuide/Cool3D/timeline-now.png" alphatest="on" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTinyGuide_1280.xml:16:	<widget name="timeline_text" position="9,60" size="1230,30" foregroundColor="#00e5b243" backgroundColor="#000000" transparent="1"/>
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTinyGuide_1280.xml:18:	<widget name="timeline0" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTinyGuide_1280.xml:19:	<widget name="timeline1" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTinyGuide_1280.xml:20:	<widget name="timeline2" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTinyGuide_1280.xml:21:	<widget name="timeline3" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTinyGuide_1280.xml:22:	<widget name="timeline4" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTinyGuide_1280.xml:23:	<widget name="timeline5" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTinyGuide_1280.xml:24:	<widget name="timeline_now" position="0,90" zPosition="2" size="19,480" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/CoolTVGuide/Cool3D/timeline-now.png" alphatest="on" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTinyGuide_720.xml:15:	<widget name="timeline_text" position="0,40" size="660,25" foregroundColor="#00e5b243" backgroundColor="#000000" transparent="1"/>
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTinyGuide_720.xml:17:	<widget name="timeline0" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTinyGuide_720.xml:18:	<widget name="timeline1" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTinyGuide_720.xml:19:	<widget name="timeline2" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTinyGuide_720.xml:20:	<widget name="timeline3" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTinyGuide_720.xml:21:	<widget name="timeline4" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTinyGuide_720.xml:22:	<widget name="timeline5" position="0,140" zPosition="1" size="0,0" pixmap="skin_default/timeline.png" />
+./Plugins/Extensions/CoolTVGuide/CoolSkin/CoolTinyGuide_720.xml:23:	<widget name="timeline_now" position="25,65" zPosition="2" size="19,378" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/CoolTVGuide/Cool3D/timeline-now.png" alphatest="on" />
+Binary file ./Plugins/Extensions/CoolTVGuide/plugin.pyo matches
+Binary file ./Plugins/Extensions/CoolTVGuide/locale/fr/LC_MESSAGES/CoolTVGuide.mo matches
+./Plugins/Extensions/CoolTVGuide/locale/fr/LC_MESSAGES/CoolTVGuide.po:113:msgid "Timeline Fontsize (20), (18), (16) (need restart)"
+Binary file ./Plugins/Extensions/CoolTVGuide/locale/cs/LC_MESSAGES/CoolTVGuide.mo matches
+./Plugins/Extensions/CoolTVGuide/locale/cs/LC_MESSAGES/CoolTVGuide.po:113:msgid "Timeline Fontsize (20), (18), (16) (need restart)"
+Binary file ./Plugins/Extensions/CoolTVGuide/locale/sk/LC_MESSAGES/CoolTVGuide.mo matches
+./Plugins/Extensions/CoolTVGuide/locale/sk/LC_MESSAGES/CoolTVGuide.po:98:msgid "Timeline Fontsize (20), (18), (16) (need restart)"
+Binary file ./Plugins/Extensions/CoolTVGuide/locale/it/LC_MESSAGES/CoolTVGuide.mo matches
+./Plugins/Extensions/CoolTVGuide/locale/it/LC_MESSAGES/CoolTVGuide.po:90:msgstr "Dimen. Carattere Timeline 60 Pixel (18), (15), (15)"
+./Plugins/Extensions/CoolTVGuide/locale/it/LC_MESSAGES/CoolTVGuide.po:93:msgstr "Dimen. Carattere Timeline 30 Pixel (18), (15), (15)"
+./Plugins/Extensions/CoolTVGuide/locale/it/LC_MESSAGES/CoolTVGuide.po:98:msgid "Timeline Fontsize (20), (18), (16) (need restart)"
+./Plugins/Extensions/CoolTVGuide/locale/it/LC_MESSAGES/CoolTVGuide.po:99:msgstr "Dimen. Carattere Timeline (20), (18), (16) (Riavvio Necess.)"
+./Plugins/Extensions/CoolTVGuide/locale/it/LC_MESSAGES/CoolTVGuide.po:102:msgstr "Centra Titolo Evento nella Timeline 60 Pixel (Si)"
+./Plugins/Extensions/CoolTVGuide/locale/it/LC_MESSAGES/CoolTVGuide.po:105:msgstr "Lunghezza Della Timeline Minuti (180)"
+Binary file ./Plugins/Extensions/CoolTVGuide/locale/pl/LC_MESSAGES/CoolTVGuide.mo matches
+./Plugins/Extensions/CoolTVGuide/locale/pl/LC_MESSAGES/CoolTVGuide.po:113:msgid "Timeline Fontsize (20), (18), (16) (need restart)"
+Binary file ./Plugins/Extensions/CoolTVGuide/locale/fa/LC_MESSAGES/CoolTVGuide.mo matches
+Binary file ./Plugins/Extensions/CoolTVGuide/locale/de/LC_MESSAGES/CoolTVGuide.mo matches
+./Plugins/Extensions/CoolTVGuide/locale/de/LC_MESSAGES/CoolTVGuide.po:104:msgid "Timeline Fontsize (20), (18), (16) (need restart)"
+./Plugins/Extensions/CoolTVGuide/locale/CoolTVGuide.po:104:msgid "Timeline Fontsize (20), (18), (16) (need restart)"
+Binary file ./Plugins/Extensions/CoolTVGuide/locale/no/LC_MESSAGES/CoolTVGuide.mo matches
+./Plugins/Extensions/CoolTVGuide/locale/no/LC_MESSAGES/CoolTVGuide.po:113:msgid "Timeline Fontsize (20), (18), (16) (need restart)"
+Binary file ./Plugins/Extensions/CoolTVGuide/locale/bg/LC_MESSAGES/CoolTVGuide.mo matches
+./Plugins/Extensions/CoolTVGuide/locale/bg/LC_MESSAGES/CoolTVGuide.po:107:msgid "Timeline Fontsize (20), (18), (16) (need restart)"
+./Plugins/Extensions/CoolTVGuide/locale/bg/LC_MESSAGES/CoolTVGuide.po:108:msgstr "Timeline шрифт размер (20), (18), (16) (рестарт)"
+Binary file ./Plugins/Extensions/CoolTVGuide/locale/nl/LC_MESSAGES/CoolTVGuide.mo matches
+./Plugins/Extensions/CoolTVGuide/locale/nl/LC_MESSAGES/CoolTVGuide.po:98:msgid "Timeline Fontsize (20), (18), (16) (need restart)"
+./Plugins/Extensions/HbbTV/plugin.py:169:		for d in data.splitlines():
+./Plugins/Extensions/HbbTV/plugin.py:1201:		for line in f.readlines():
+./Plugins/Extensions/HbbTV/plugin.py:1202:			if line.startswith('start='):
+./Plugins/Extensions/HbbTV/plugin.py:1203:				tmp = line[6:len(line)-1].split()
+./Plugins/Extensions/HbbTV/plugin.py:1213:		f.writelines(tmpstr)
+./Plugins/Extensions/DVDBurn/ProjectSettings.py:162:			#self.list.append(getConfigListEntry(_("Menu")+' '+_("headline")+' '+_("color"), self.settings.color_headline))
+./Plugins/Extensions/DVDBurn/ProjectSettings.py:166:			#self.list.append(getConfigListEntry(_("Font size")+' ('+_("headline")+', '+_("Title")+', '+_("Subtitles")+')', self.settings.font_size))
+./Plugins/Extensions/DVDBurn/TitleCutter.py:78:		<widget name="Timeline" position="0,0" />
+./Plugins/Extensions/DVDBurn/Process.py:34:	def processOutputLine(self, line):
+./Plugins/Extensions/DVDBurn/Process.py:35:		print "[mpeg2encTask]", line[:-1]
+./Plugins/Extensions/DVDBurn/Process.py:113:	def processOutputLine(self, line):
+./Plugins/Extensions/DVDBurn/Process.py:114:		line = line[:-1]
+./Plugins/Extensions/DVDBurn/Process.py:115:		#print "[DemuxTask]", line
+./Plugins/Extensions/DVDBurn/Process.py:121:		if line.startswith(MSG_NEW_FILE):
+./Plugins/Extensions/DVDBurn/Process.py:122:			file = line[len(MSG_NEW_FILE):]
+./Plugins/Extensions/DVDBurn/Process.py:126:		elif line.startswith(MSG_PROGRESS):
+./Plugins/Extensions/DVDBurn/Process.py:127:			progress = line[len(MSG_PROGRESS):]
+./Plugins/Extensions/DVDBurn/Process.py:129:		elif line.startswith(MSG_NEW_MP2) or line.startswith(MSG_NEW_AC3):
+./Plugins/Extensions/DVDBurn/Process.py:131:				self.currentPID = str(int(line.split(': PID 0x',1)[1].split(' ',1)[0],16))
+./Plugins/Extensions/DVDBurn/Process.py:225:	def processOutputLine(self, line):
+./Plugins/Extensions/DVDBurn/Process.py:226:		print "[MplexTask] ", line[:-1]
+./Plugins/Extensions/DVDBurn/Process.py:227:		if line.startswith("**ERROR:"):
+./Plugins/Extensions/DVDBurn/Process.py:228:			if line.find("Frame data under-runs detected") != -1:
+./Plugins/Extensions/DVDBurn/Process.py:252:	def processOutputLine(self, line):
+./Plugins/Extensions/DVDBurn/Process.py:253:		print "[ReplexTask] ", line[:-1]
+./Plugins/Extensions/DVDBurn/Process.py:264:	def processOutputLine(self, line):
+./Plugins/Extensions/DVDBurn/Process.py:265:		print "[DVDAuthorTask] ", line[:-1]
+./Plugins/Extensions/DVDBurn/Process.py:266:		if not self.menupreview and line.startswith("STAT: Processing"):
+./Plugins/Extensions/DVDBurn/Process.py:268:		elif line.startswith("STAT: VOBU"):
+./Plugins/Extensions/DVDBurn/Process.py:270:				progress = int(line.split("MB")[0].split(" ")[-1])
+./Plugins/Extensions/DVDBurn/Process.py:328:	def processOutputLine(self, line):
+./Plugins/Extensions/DVDBurn/Process.py:329:		line = line[:-1]
+./Plugins/Extensions/DVDBurn/Process.py:330:		print "[GROWISOFS] %s" % line
+./Plugins/Extensions/DVDBurn/Process.py:331:		if line[8:14] == "done, ":
+./Plugins/Extensions/DVDBurn/Process.py:332:			self.progress = float(line[:6])
+./Plugins/Extensions/DVDBurn/Process.py:334:		elif line.find("flushing cache") != -1:
+./Plugins/Extensions/DVDBurn/Process.py:336:		elif line.find("closing disc") != -1:
+./Plugins/Extensions/DVDBurn/Process.py:338:		elif line.startswith(":-["):
+./Plugins/Extensions/DVDBurn/Process.py:339:			if line.find("ASC=30h") != -1:
+./Plugins/Extensions/DVDBurn/Process.py:341:			elif line.find("ASC=24h") != -1:
+./Plugins/Extensions/DVDBurn/Process.py:343:			elif line.find("SK=5h/ASC=A8h/ACQ=04h") != -1:
+./Plugins/Extensions/DVDBurn/Process.py:347:				print "BurnTask: unknown error %s" % line
+./Plugins/Extensions/DVDBurn/Process.py:348:		elif line.startswith(":-("):
+./Plugins/Extensions/DVDBurn/Process.py:349:			if line.find("No space left on device") != -1:
+./Plugins/Extensions/DVDBurn/Process.py:354:			elif line.find("write failed") != -1:
+./Plugins/Extensions/DVDBurn/Process.py:356:			elif line.find("unable to open64(") != -1 and line.find(",O_RDONLY): No such file or directory") != -1:
+./Plugins/Extensions/DVDBurn/Process.py:358:			elif line.find("media is not recognized as recordable DVD") != -1:
+./Plugins/Extensions/DVDBurn/Process.py:362:				print "BurnTask: unknown error %s" % line
+./Plugins/Extensions/DVDBurn/Process.py:363:		elif line.startswith("FATAL:"):
+./Plugins/Extensions/DVDBurn/Process.py:364:			if line.find("already carries isofs!"):
+./Plugins/Extensions/DVDBurn/Process.py:368:				print "BurnTask: unknown error %s" % line
+./Plugins/Extensions/DVDBurn/Process.py:369:		elif line.find("-allow-limited-size was not specified. There is no way do represent this file size. Aborting.") != -1:
+./Plugins/Extensions/DVDBurn/Process.py:371:		elif line.startswith("genisoimage: File too large."):
+./Plugins/Extensions/DVDBurn/Process.py:497:			self.Menus.fontsizes = [s.fontsize_headline.getValue(), s.fontsize_title.getValue(), s.fontsize_subtitle.getValue()]
+./Plugins/Extensions/DVDBurn/Process.py:498:			self.Menus.fonts = [(truetype(s.fontface_headline.getValue(), self.Menus.fontsizes[0])), (truetype(s.fontface_title.getValue(), self.Menus.fontsizes[1])),(truetype(s.fontface_subtitle.getValue(), self.Menus.fontsizes[2]))]
+./Plugins/Extensions/DVDBurn/Process.py:539:			headlineText = self.job.project.settings.name.getValue().decode("utf-8")
+./Plugins/Extensions/DVDBurn/Process.py:540:			headlinePos = self.getPosition(s.offset_headline.getValue(), 0, 0, s_width, s_top, draw_bg.textsize(headlineText, font=fonts[0]))
+./Plugins/Extensions/DVDBurn/Process.py:541:			draw_bg.text(headlinePos, headlineText, fill=self.Menus.color_headline, font=fonts[0])
+./Plugins/Extensions/DVDBurn/Process.py:571:			#draw_bg.rectangle((left, top, right, bottom), outline=(255,0,0))
+./Plugins/Extensions/DVDBurn/Process.py:670:		self.color_headline = tuple(s.color_headline.getValue())
+./Plugins/Extensions/DVDBurn/DVDToolbox.py:91:		for line in mediuminfo.splitlines():
+./Plugins/Extensions/DVDBurn/DVDToolbox.py:92:			if line.find("Mounted Media:") > -1:
+./Plugins/Extensions/DVDBurn/DVDToolbox.py:93:				mediatype = line.rsplit(',',1)[1][1:]
+./Plugins/Extensions/DVDBurn/DVDToolbox.py:98:			elif line.find("Legacy lead-out at:") > -1:
+./Plugins/Extensions/DVDBurn/DVDToolbox.py:99:				used = int(line.rsplit('=',1)[1]) / 1048576.0
+./Plugins/Extensions/DVDBurn/DVDToolbox.py:101:			elif line.find("formatted:") > -1:
+./Plugins/Extensions/DVDBurn/DVDToolbox.py:102:				formatted_capacity = int(line.rsplit('=',1)[1]) / 1048576.0
+./Plugins/Extensions/DVDBurn/DVDToolbox.py:104:			elif formatted_capacity == 0 and line.find("READ CAPACITY:") > -1:
+./Plugins/Extensions/DVDBurn/DVDToolbox.py:105:				read_capacity = int(line.rsplit('=',1)[1]) / 1048576.0
+./Plugins/Extensions/DVDBurn/DVDToolbox.py:107:		for line in mediuminfo.splitlines():
+./Plugins/Extensions/DVDBurn/DVDToolbox.py:108:			if line.find("Free Blocks:") > -1:
+./Plugins/Extensions/DVDBurn/DVDToolbox.py:110:					size = eval(line[14:].replace("KB","*1024"))
+./Plugins/Extensions/DVDBurn/DVDToolbox.py:118:			elif line.find("Disc status:") > -1:
+./Plugins/Extensions/DVDBurn/DVDToolbox.py:119:				if line.find("blank") > -1:
+./Plugins/Extensions/DVDBurn/DVDToolbox.py:123:				elif line.find("complete") > -1 and formatted_capacity == 0:
+./Plugins/Extensions/DVDBurn/DVDToolbox.py:129:			infotext += line+'\n'
+./Plugins/Extensions/DVDBurn/DVDToolbox.py:197:	def processOutputLine(self, line):
+./Plugins/Extensions/DVDBurn/DVDToolbox.py:198:		if line.startswith("- media is already formatted"):
+./Plugins/Extensions/DVDBurn/DVDToolbox.py:201:		if line.startswith("- media is not blank") or line.startswith("  -format=full  to perform full (lengthy) reformat;"):
+./Plugins/Extensions/DVDBurn/DVDToolbox.py:204:		if line.startswith(":-( mounted media doesn't appear to be"):
+./Plugins/Extensions/DVDBurn/DVDProject.py:81:			for line in audiotracks:
+./Plugins/Extensions/DVDBurn/DVDProject.py:82:				list.append(line)
+./Plugins/Extensions/DVDBurn/DVDProject.py:209:		self.settings.color_headline = ConfigColor()
+./Plugins/Extensions/DVDBurn/DVDProject.py:210:		self.settings.color_headline = ConfigColor()
+./Plugins/Extensions/DVDBurn/DVDProject.py:213:		self.settings.fontface_headline = ConfigFilename()
+./Plugins/Extensions/DVDBurn/DVDProject.py:216:		self.settings.fontsize_headline = ConfigInteger(default = 46, limits = (0, 199))
+./Plugins/Extensions/DVDBurn/DVDProject.py:227:		self.settings.offset_headline = ConfigSequence(seperator = ',', default = [0,0], limits = [(-1,500),(-1,500)])
+./Plugins/Extensions/DVDBurn/DVDProject.py:233:		self.filekeys = ["menubg", "menuaudio", "fontface_headline", "fontface_title", "fontface_subtitle"]
+./Plugins/Extensions/DVDBurn/Text_menu_boat.ddvdm.xml:13:		color_headline="[0, 0, 128]"
+./Plugins/Extensions/DVDBurn/Text_menu_boat.ddvdm.xml:14:		fontface_headline="nmsbd.ttf"
+./Plugins/Extensions/DVDBurn/Text_menu_boat.ddvdm.xml:17:		fontsize_headline="46"
+./Plugins/Extensions/DVDBurn/Text_menu_boat.ddvdm.xml:26:		offset_headline="(-1, 40)"
+./Plugins/Extensions/DVDBurn/Thumbs_menu_clouds.ddvdm.xml:13:		color_headline="[128, 0, 0]"
+./Plugins/Extensions/DVDBurn/Thumbs_menu_clouds.ddvdm.xml:14:		fontface_headline="nmsbd.ttf"
+./Plugins/Extensions/DVDBurn/Thumbs_menu_clouds.ddvdm.xml:17:		fontsize_headline="46"
+./Plugins/Extensions/DVDBurn/Thumbs_menu_clouds.ddvdm.xml:26:		offset_headline="(-1, 40)"
+./Plugins/Extensions/GraphMultiEPG/meta/plugin_graphmultiepg.xml:10:		    <shortdescription>GraphMultiEPG shows a graphical timeline EPG</shortdescription>
+./Plugins/Extensions/GraphMultiEPG/meta/plugin_graphmultiepg.xml:11:                    <description>GraphMultiEPG shows a graphical timeline EPG.\nShows a nice overview of all running und upcoming tv shows.</description>
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:33:MAX_TIMELINES = 6
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:599:class TimelineText(HTMLComponent, GUIComponent):
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:632:	def setEntries(self, l, timeline_now, time_lines, force):
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:643:		# Note: event_rect and service_rect are relative to the timeline_text position
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:644:		#       while the time lines are relative to the GraphEPG screen position!
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:649:			num_lines = time_epoch / time_steps
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:650:			incWidth = event_rect.width() / num_lines
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:654:			for x in range(0, num_lines):
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:662:				line = time_lines[x]
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:663:				old_pos = line.position
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:664:				line.setPosition(xpos + eventLeft, old_pos[1])
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:665:				line.visible = True
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:667:			for x in range(num_lines, MAX_TIMELINES):
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:668:				time_lines[x].visible = False
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:675:			xpos = int((((now - time_base) * event_rect.width()) / (time_epoch * 60)) - (timeline_now.instance.size().width() / 2))
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:676:			old_pos = timeline_now.position
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:679:				timeline_now.setPosition(new_pos[0], new_pos[1])
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:680:			timeline_now.visible = True
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:682:			timeline_now.visible = False
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:710:		self["timeline_text"] = TimelineText()
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:713:		self.time_lines = [ ]
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:714:		for x in range(0, MAX_TIMELINES):
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:716:			self.time_lines.append(pm)
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:717:			self["timeline%d"%(x)] = pm
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:718:		self["timeline_now"] = Pixmap()
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:768:		self.updateTimelineTimer = eTimer()
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:769:		self.updateTimelineTimer.callback.append(self.moveTimeLines)
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:770:		self.updateTimelineTimer.start(60 * 1000)
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:800:			self.moveTimeLines(True)
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:805:		self.moveTimeLines()
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:844:				self.moveTimeLines(True)
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:859:		self.moveTimeLines(True)
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:894:		self.moveTimeLines()
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:903:		self.moveTimeLines()
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:1031:	def moveTimeLines(self, force=False):
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:1032:		self.updateTimelineTimer.start((60 - (int(time()) % 60)) * 1000)	#keep syncronised
+./Plugins/Extensions/GraphMultiEPG/GraphMultiEpg.py:1033:		self["timeline_text"].setEntries(self["list"], self["timeline_now"], self.time_lines, force)
+./Plugins/Extensions/TuxboxPlugins/plugin.py:28:		for x in file.readlines():
+./Plugins/Extensions/SocketMMI/src/socket_mmi.cpp:241:				eDebugNoNewLine("%02x ", data[i]);
+./Plugins/Extensions/SocketMMI/src/socket_mmi.cpp:274:						eDebugNoNewLine("%02x ", dest[i]);
+./Plugins/SystemPlugins/SoftwareManager/SoftwareTools.py:127:				for x in result.splitlines():
+./Plugins/SystemPlugins/SoftwareManager/SoftwareTools.py:190:			for x in result.splitlines():
+./Plugins/SystemPlugins/SoftwareManager/BackupRestore.py:88:			for line in open(skinFiles).readlines():
+./Plugins/SystemPlugins/SoftwareManager/BackupRestore.py:89:				if os_path.exists(line.split("\n")[0]) and not line.startswith(skinDir):
+./Plugins/SystemPlugins/SoftwareManager/BackupRestore.py:90:					self.backupdirs = self.backupdirs + " " + line.split("\n")[0]
+./Plugins/SystemPlugins/SoftwareManager/plugin.py:138:#			self.list.append(("software-update", _("Software update"), _("\nOnline update of your receiver software." ) + self.oktext, None))
+./Plugins/SystemPlugins/SoftwareManager/plugin.py:1477:				sources = fp.readlines()
+./Plugins/SystemPlugins/SoftwareManager/plugin.py:1785:			for x in result.splitlines():
+./Plugins/SystemPlugins/SoftwareManager/plugin.py:1805:			for x in result.splitlines():
+./Plugins/SystemPlugins/SoftwareManager/plugin.py:1820:			for x in result.splitlines():
+./Plugins/SystemPlugins/SoftwareManager/plugin.py:2021:		for line in f.readlines():
+./Plugins/SystemPlugins/SoftwareManager/plugin.py:2022:			if line.find('MemFree') != -1:
+./Plugins/SystemPlugins/SoftwareManager/plugin.py:2023:				parts = line.strip().split()
+./Plugins/SystemPlugins/SoftwareManager/plugin.py:2025:			elif line.find('SwapFree') != -1:
+./Plugins/SystemPlugins/SoftwareManager/plugin.py:2026:				parts = line.strip().split()
+./Plugins/SystemPlugins/Videomode/VideoHardware.py:328:		# determine policy = {bestfit,letterbox,panscan,nonlinear}
+./Plugins/SystemPlugins/Videomode/VideoHardware.py:344:		#     nonlinear       use nonlinear
+./Plugins/SystemPlugins/Videomode/VideoHardware.py:364:			policy_choices = {"pillarbox": "panscan", "panscan": "letterbox", "nonlinear": "nonlinear", "scale": "bestfit"}
+./Plugins/SystemPlugins/Videomode/VideoHardware.py:365:			if path.exists("/proc/stb/video/policy_choices") and "auto" in open("/proc/stb/video/policy_choices").readline():
+./Plugins/SystemPlugins/Videomode/VideoHardware.py:369:			if path.exists("/proc/stb/video/policy2_choices") and "auto" in open("/proc/stb/video/policy2_choices").readline():
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:189:			supplicant = fp.readlines()
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:287:		for line in result.splitlines():
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:288:			line = line.strip()
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:289:			if "ESSID" in line:
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:290:				if "off/any" in line:
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:293:					if "Nickname" in line:
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:294:						ssid=(line[line.index('ESSID')+7:line.index('"  Nickname')])
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:296:						ssid=(line[line.index('ESSID')+7:len(line)-1])
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:299:			if "Frequency" in line:
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:300:				frequency = line[line.index('Frequency')+10 :line.index(' GHz')]
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:303:			if "Access Point" in line:
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:304:				if "Sensitivity" in line:
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:305:					ap=line[line.index('Access Point')+14:line.index('   Sensitivity')]
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:307:					ap=line[line.index('Access Point')+14:len(line)]
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:310:			if "Bit Rate" in line:
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:311:				if "kb" in line:
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:312:					br = line[line.index('Bit Rate')+9 :line.index(' kb/s')]
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:314:					br = line[line.index('Bit Rate')+9 :line.index(' Mb/s')]
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:317:			if "Encryption key" in line:
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:318:				if ":off" in line:
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:320:				elif "Security" in line:
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:321:					enc = line[line.index('Encryption key')+15 :line.index('   Security')]
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:325:					enc = line[line.index('Encryption key')+15 :len(line)]
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:330:			if 'Quality' in line:
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:331:				if "/100" in line:
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:332:					qual = line[line.index('Quality')+8:line.index('  Signal')]
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:334:					qual = line[line.index('Quality')+8:line.index('Sig')]
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:337:			if 'Signal level' in line:
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:338:				if "dBm" in line:
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:339:					signal = line[line.index('Signal level')+13 :line.index(' dBm')] + " dBm"
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:340:				elif "/100" in line:
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:341:					if "Noise" in line:
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:342:						signal = line[line.index('Signal level')+13:line.index('  Noise')]
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:344:						signal = line[line.index('Signal level')+13:len(line)]
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:346:					if "Noise" in line:
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:347:						signal = line[line.index('Signal level')+13:line.index('  Noise')]
+./Plugins/SystemPlugins/WirelessLan/Wlan.py:349:						signal = line[line.index('Signal level')+13:len(line)]						
+./Plugins/SystemPlugins/NFIFlash/flasher.py:70:			self.output_line = data
+./Plugins/SystemPlugins/TempFanControl/*ansi-term*:186:./remove.sh: line 18: github.com.pli3.enigma2-plugins.git.done: command not found
+./Plugins/SystemPlugins/TempFanControl/*ansi-term*:735:# Please enter the commit message for your changes. Lines starting
+./Plugins/SystemPlugins/TempFanControl/*ansi-term*:796: ~/Work/E2/enigma2.ci/.git/COMMIT_EDITMSG[+]   CWD: /home/fermi/Work/E2/enigma2.ci   Line: 4/13:44                                                                                    
+./Plugins/SystemPlugins/PositionerSetup/plugin.py:658:			# as a high symbol rate. Linear interpolation elsewhere.
+./Plugins/newplugin.py:70:lines = makefile.readlines()
+./Plugins/newplugin.py:71:lines = ''.join(lines)
+./Plugins/newplugin.py:72:lines = lines.strip()
+./Plugins/newplugin.py:73:lines += " " + internalname
+./Plugins/newplugin.py:77:makefile.write(lines)
+./Plugins/newplugin.py:80:lines = []
+./Plugins/newplugin.py:84:	line = configure.readline()
+./Plugins/newplugin.py:85:	if not line:
+./Plugins/newplugin.py:87:	lines.append(line)
+./Plugins/newplugin.py:88:	if line.strip() == "lib/python/Plugins/" + category + "/Makefile":
+./Plugins/newplugin.py:89:		lines.append("lib/python/Plugins/" + pluginpath + "/Makefile\n")
+./Plugins/newplugin.py:94:configure.writelines(lines)
+./Screens/ChangeRCU.py:77:				if int(fd.readline().strip()) in self.devices.values():
+./Screens/ChangeRCU.py:78:					self.rcu = int(fd.readline().strip()) 
+./Screens/ChangeRCU.py:133:			rcuType = int(fd.readline().strip())
+./Screens/AutoCardReg.py:164:		lines = f.readlines()
+./Screens/AutoCardReg.py:167:		for line in lines:
+./Screens/AutoCardReg.py:168:			if line.find('SERVER LISTEN PORT :') != -1:
+./Screens/AutoCardReg.py:169:				if line[0] != '#':
+./Screens/AutoCardReg.py:170:					if line.find('45000') != -1:
+./Screens/AutoCardReg.py:172:					elif line.find('45001') != -1:
+./Screens/AutoCardReg.py:174:					elif line.find('45002') != -1:
+./Screens/AutoCardReg.py:176:					elif line.find('45003') != -1:
+./Screens/AutoCardReg.py:178:					elif line.find('45004') != -1:
+./Screens/AutoCardReg.py:180:					elif line.find('45005') != -1:
+./Screens/AutoCardReg.py:182:					elif line.find('45006') != -1:
+./Screens/AutoCardReg.py:184:					elif line.find('45007') != -1:
+./Screens/AutoCardReg.py:186:					elif line.find('45008') != -1:
+./Screens/AutoCardReg.py:188:					elif line.find('45009') != -1:
+./Screens/AutoCardReg.py:196:		lines = f.readlines()
+./Screens/AutoCardReg.py:199:		for line in lines:
+./Screens/AutoCardReg.py:200:			if line.find('<newcamd_port>') != -1:
+./Screens/AutoCardReg.py:201:				if line[0] != '#':
+./Screens/AutoCardReg.py:202:					if line.find('44000') != -1:
+./Screens/AutoCardReg.py:204:					elif line.find('44001') != -1:
+./Screens/AutoCardReg.py:206:					elif line.find('44002') != -1:
+./Screens/AutoCardReg.py:208:					elif line.find('44003') != -1:
+./Screens/AutoCardReg.py:210:					elif line.find('44004') != -1:
+./Screens/AutoCardReg.py:212:					elif line.find('44005') != -1:
+./Screens/AutoCardReg.py:214:					elif line.find('44006') != -1:
+./Screens/AutoCardReg.py:216:					elif line.find('44007') != -1:
+./Screens/AutoCardReg.py:218:					elif line.find('44008') != -1:
+./Screens/AutoCardReg.py:220:					elif line.find('44009') != -1:
+./Screens/AutoCardReg.py:227:		line = fp_read.read()
+./Screens/AutoCardReg.py:229:		line = line.split()
+./Screens/AutoCardReg.py:232:		self.nameserver = line[1]
+./Screens/AutoCardReg.py:246:		lines = fp_read.readlines()
+./Screens/AutoCardReg.py:248:		for line in lines:
+./Screens/AutoCardReg.py:249:			line = line.split()
+./Screens/AutoCardReg.py:250:			if line[0] == "0.0.0.0":
+./Screens/AutoCardReg.py:251:				self.gateway=line[1]
+./Screens/AutoCardReg.py:257:		lines = fp_read.readlines()
+./Screens/AutoCardReg.py:261:		for line in lines:
+./Screens/AutoCardReg.py:262:			if line.find('iface eth0 inet') != -1:
+./Screens/AutoCardReg.py:263:				if line.find('iface eth0 inet dhcp') != -1:
+./Screens/AutoCardReg.py:271:			elif line.find('address') != -1:
+./Screens/AutoCardReg.py:273:			elif line.find('gateway') != -1:
+./Screens/AutoCardReg.py:276:				fp_write.write(line)
+./Screens/AutoCardReg.py:359:		lines = fr.readlines()
+./Screens/AutoCardReg.py:369:			for line in lines:
+./Screens/AutoCardReg.py:370:				if line.find("dummy dummy") != -1:
+./Screens/AutoCardReg.py:373:				if line.find("F: server server") != -1:
+./Screens/AutoCardReg.py:375:				elif line.find("SERVER LISTEN PORT") != -1:
+./Screens/AutoCardReg.py:378:					fw.write(line)
+./Screens/AutoCardReg.py:383:			for line in lines:
+./Screens/AutoCardReg.py:384:				if line.find("F: server server") != -1:
+./Screens/AutoCardReg.py:386:				elif line.find("SERVER LISTEN PORT") != -1:
+./Screens/AutoCardReg.py:389:					fw.write(line)
+./Screens/Update.py:268:		for line in open("/proc/mtd", "r").readlines():
+./Screens/Update.py:269:			if "kernel" in line:
+./Screens/Update.py:270:				return "/dev/" + line.split(":")[0]
+./Screens/MovieSelection.py:67:	(str(MovieList.LISTTYPE_MINIMAL), _("list style single line"))]
+./Screens/MovieSelection.py:360:					(_("Start offline decode"), csel.do_decode),
+./Screens/MovieSelection.py:1403:					sid = metafile.readline()
+./Screens/MovieSelection.py:1404:					oldtitle = metafile.readline()
+./Screens/MovieSelection.py:1704:		offline = serviceHandler.offlineOperations(current)
+./Screens/MovieSelection.py:1706:			if offline is None:
+./Screens/MovieSelection.py:1710:				if offline.deleteFromDisk(0):
+./Screens/MovieSelection.py:1711:					raise Exception, "Offline delete failed"
+./Screens/PluginBrowser.py:438:		#split in lines
+./Screens/PluginBrowser.py:439:		lines = str.split('\n')
+./Screens/PluginBrowser.py:440:		#'str' should end with '\n', so when splitting, the last line should be empty. If this is not the case, we received an incomplete line
+./Screens/PluginBrowser.py:441:		if len(lines[-1]):
+./Screens/PluginBrowser.py:443:			self.remainingdata = lines[-1]
+./Screens/PluginBrowser.py:444:			lines = lines[0:-1]
+./Screens/PluginBrowser.py:454:		for x in lines:
+./Screens/PluginBrowser.py:475:		verticallineIcon = LoadPixmap(resolveFilename(SCOPE_SKIN_IMAGE, "skin_default/verticalline-plugins.png"))
+./Screens/PluginBrowser.py:485:			self.plugins[split[0]].append((PluginDescriptor(name = x[3], description = x[2], icon = verticallineIcon), split[1], x[1]))
+./Screens/PluginBrowser.py:779:		#split in lines
+./Screens/PluginBrowser.py:780:		lines = str.split('\n')
+./Screens/PluginBrowser.py:781:		#'str' should end with '\n', so when splitting, the last line should be empty. If this is not the case, we received an incomplete line
+./Screens/PluginBrowser.py:782:		if len(lines[-1]):
+./Screens/PluginBrowser.py:784:			self.remainingdata = lines[-1]
+./Screens/PluginBrowser.py:785:			lines = lines[0:-1]
+./Screens/PluginBrowser.py:796:			for x in lines:
+./Screens/PluginBrowser.py:814:		verticallineIcon = LoadPixmap(resolveFilename(SCOPE_SKIN_IMAGE, "skin_default/verticalline-plugins.png"))
+./Screens/PluginBrowser.py:824:			self.plugins[split[0]].append((PluginDescriptor(name = x[3], description = x[2], icon = verticallineIcon), split[1], x[1]))
+./Screens/PluginBrowser.py:868:		lines = readFp.readlines()
+./Screens/PluginBrowser.py:870:		lines = lines[0] # change list to string
+./Screens/PluginBrowser.py:871:		lines = lines.split(' ')
+./Screens/PluginBrowser.py:872:		packageSize = int(lines[1])
+./Screens/PluginBrowser.py:884:		lines = readFp.readlines()
+./Screens/PluginBrowser.py:885:		for line in lines:
+./Screens/PluginBrowser.py:886:			if re.search("config.servicelist.startuproot", line) == None \
+./Screens/PluginBrowser.py:887:				and re.search("config.servicelist.startupservice", line) == None \
+./Screens/PluginBrowser.py:888:				and re.search("config.tv.lastroot", line) == None \
+./Screens/PluginBrowser.py:889:				and re.search("config.tv.lastservice", line) == None:
+./Screens/PluginBrowser.py:890:				writeFp.write(line)	
+./Screens/PluginBrowser.py:892:				print "remove line : ",line
+./Screens/ScanSetup.py:137:		#split in lines
+./Screens/ScanSetup.py:138:		lines = str.split('\n')
+./Screens/ScanSetup.py:139:		#'str' should end with '\n', so when splitting, the last line should be empty. If this is not the case, we received an incomplete line
+./Screens/ScanSetup.py:140:		if len(lines[-1]):
+./Screens/ScanSetup.py:142:			self.remainingdata = lines[-1]
+./Screens/ScanSetup.py:143:			lines = lines[0:-1]
+./Screens/ScanSetup.py:147:		for line in lines:
+./Screens/ScanSetup.py:148:			data = line.split()
+./Screens/ScanSetup.py:1125:		self.chMotorized = open("/tmp/.channel.motorized", "r").readlines()
+./Screens/ScanSetup.py:1131:		self.chNonMotorized = open("/tmp/.channel.non.motorized", "r").readlines()
+./Screens/ScanSetup.py:1194:			self.installedChLists = fp.readlines()
+./Screens/TestMenu.py:888:		for line in data.splitlines():
+./Screens/TestMenu.py:889:			line = line.strip()
+./Screens/TestMenu.py:890:			if 'Link detected:' in line:
+./Screens/TestMenu.py:891:				if "yes" in line:
+./Screens/Wizard.py:260:				if int(fd.readline().strip()) in self.devices.values():
+./Screens/Wizard.py:261:					self.rcu = int(fd.readline().strip()) 
+./Screens/NetworkSetup.py:921:		for line in data.splitlines():
+./Screens/NetworkSetup.py:922:			line = line.strip()
+./Screens/NetworkSetup.py:923:			if 'Link detected:' in line:
+./Screens/NetworkSetup.py:924:				if "yes" in line:
+./Screens/NetworkSetup.py:1321:		for item in data.splitlines():
+./Screens/Satconfig.py:561:								# we need a newline here, since multi content lists don't support automtic line wrapping
+./Screens/InfoBar.py:328:				offline = serviceHandler.offlineOperations(ref)
+./Screens/InfoBar.py:329:				if offline.deleteFromDisk(0):
+./Screens/About.py:166:		# TRANSLATORS: Add here whatever should be shown in the "translator" about screen, up to 6 lines (use \n for newline)
+./Screens/About.py:172:		infolines = _("").split("\n")
+./Screens/About.py:174:		for x in infolines:
+./python.cpp:20:	m_line=0;
+./python.cpp:30:	m_line=ob.m_line;
+./python.cpp:46:			eDebug("last modified in file %s line %d from %d to %d",
+./python.cpp:47:				m_file, m_line, m_from, m_to);
+./python.cpp:53:void ePyObject::incref(const char *file, int line)
+./python.cpp:57:		eDebug("invalid incref python object with null pointer %s %d!!!", file, line);
+./python.cpp:59:			eDebug("last modified in file %s line %d from %d to %d",
+./python.cpp:60:				m_file, m_line, m_from, m_to);
+./python.cpp:65:		eDebug("invalid incref %s python object with refcounting value %d in file %s line %d!!!",
+./python.cpp:66:			m_erased ? "deleted" : "undeleted", m_ob->ob_refcnt, file, line);
+./python.cpp:68:			eDebug("last modified in file %s line %d from %d to %d",
+./python.cpp:69:				m_file, m_line, m_from, m_to);
+./python.cpp:74:		eDebug("invalid incref %s python object with refcounting value %d (MAX_INT!!!) in file %s line %d!!!",
+./python.cpp:75:			m_erased ? "deleted" : "undeleted", m_ob->ob_refcnt, file, line);
+./python.cpp:77:			eDebug("last modified in file %s line %d from %d to %d",
+./python.cpp:78:				m_file, m_line, m_from, m_to);
+./python.cpp:82:	m_line = line;
+./python.cpp:88:void ePyObject::decref(const char *file, int line)
+./python.cpp:92:		eDebug("invalid decref python object with null pointer %s %d!!!", file, line);
+./python.cpp:94:			eDebug("last modified in file %s line %d from %d to %d",
+./python.cpp:95:				m_file, m_line, m_from, m_to);
+./python.cpp:100:		eDebug("invalid decref %s python object with refcounting value %d in file %s line %d!!!",
+./python.cpp:101:			m_erased ? "deleted" : "undeleted", m_ob->ob_refcnt, file, line);
+./python.cpp:103:			eDebug("last modified in file %s line %d from %d to %d",
+./python.cpp:104:				m_file, m_line, m_from, m_to);
+./python.cpp:108:	m_line = line;
+./enigma_python.i:114:%feature("ref")   iObject "$this->AddRef(); /* eDebug(\"AddRef (%s:%d)!\", __FILE__, __LINE__); */ "
+./enigma_python.i:115:%feature("unref") iObject "$this->Release(); /* eDebug(\"Release! %s:%d\", __FILE__, __LINE__); */ "

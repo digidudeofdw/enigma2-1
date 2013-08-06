@@ -1,6 +1,6 @@
 <wizard>
 		<step id="start" nextstep="introduction">
-			<text value="Welcome.\n\nThis start wizard will guide you through the basic setup of your Settop Box.\nPress the OK button on your remote control to move to the next step." />
+			<text value="Welcome.\n\nThis start wizard will guide you through the basic setup of your receiver.\nPress the OK button on your remote control to move to the next step." />
 			<code>
 self.clearSelectedKeys()
 self.selectKey("OK")
@@ -9,8 +9,8 @@ self.selectKey("OK")
 		<step id="introduction" >
 			<text value="Use the up/down keys on your remote control to select an option. After that, press OK." />
 			<list>
-				<listentry caption="Use wizard to set up basic features" step="nima" />
-				<listentry caption="Exit wizard" step="end" />
+				<listentry caption="Use the wizard to set up basic features" step="nima" />
+				<listentry caption="Exit the wizard" step="end" />
 			</list>
 			<code>
 self.clearSelectedKeys()

@@ -74,7 +74,7 @@ class HardwareInfo:
 			return True
 
 	def has_yuv(self):
-		DEVICES_WITHOUT_YUV = [ 'tmsingle', 'tm2toe', 'ios300hd', 'tmnanooe', 'mediabox', 'tmnanosuper' ]
+		DEVICES_WITHOUT_YUV = [ 'tmsingle', 'tm2toe', 'ios300hd', 'tmnanooe', 'mediabox', 'tmnanosuper' ,'optimussos1' ]
 		if HardwareInfo.device_name in DEVICES_WITHOUT_YUV:
 			return False
 		else:
